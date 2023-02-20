@@ -42,6 +42,20 @@
 											"value": "'@{item().MBR_UnpvtTableName}'",
 											"type": "Expression"
 										}
+									},
+									"datasetParameters": {
+										"getMBRUnpvtData": {
+											"vTableName": {
+												"value": "@item().MBR_UnpvtTableName",
+												"type": "Expression"
+											}
+										},
+										"insertMBRStagingData": {
+											"stgFinancialTable": {
+												"value": "@item().StgFinancialTableName",
+												"type": "Expression"
+											}
+										}
 									}
 								},
 								"compute": {

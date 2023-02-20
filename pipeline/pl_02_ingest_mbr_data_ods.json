@@ -365,7 +365,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('get All MBR Parameters').output.value",
+						"value": "@activity('Get MBR Parameters').output.value",
 						"type": "Expression"
 					},
 					"activities": [
