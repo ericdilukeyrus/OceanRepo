@@ -1,0 +1,33 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "adf-ocean-dev"
+		},
+		"dimensions_source_connectionString": {
+			"value": ""
+		},
+		"ls_files_to_load_connectionString": {
+			"value": ""
+		},
+		"ocean_db_connectionString": {
+			"value": ""
+		},
+		"ocean_db_nonencrypted_connectionString": {
+			"value": ""
+		},
+		"AzureKeyVaultOceanProject_properties_typeProperties_baseUrl": {
+			"value": "https://ocean-project.vault.azure.net/"
+		},
+		"SharepointOceanProject_properties_typeProperties_url": {
+			"value": "https://keyrusgroup.sharepoint.com"
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}

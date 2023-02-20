@@ -1,0 +1,124 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "adf-ocean-dev"
+		},
+		"dimensions_source_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'dimensions_source'"
+		},
+		"ls_files_to_load_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'ls_files_to_load'"
+		},
+		"ocean_db_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'ocean_db'"
+		},
+		"ocean_db_nonencrypted_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'ocean_db_nonencrypted'"
+		},
+		"AzureKeyVaultOceanProject_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://ocean-project.vault.azure.net/"
+		},
+		"SharepointOceanProject_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://keyrusgroup.sharepoint.com"
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "URI to storage account containing linked ARM templates"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "Sas token to storage account containing linked ARM templates"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "adf-ocean-dev_ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"dimensions_source_connectionString": {
+						"value": "[parameters('dimensions_source_connectionString')]"
+					},
+					"ls_files_to_load_connectionString": {
+						"value": "[parameters('ls_files_to_load_connectionString')]"
+					},
+					"ocean_db_connectionString": {
+						"value": "[parameters('ocean_db_connectionString')]"
+					},
+					"ocean_db_nonencrypted_connectionString": {
+						"value": "[parameters('ocean_db_nonencrypted_connectionString')]"
+					},
+					"AzureKeyVaultOceanProject_properties_typeProperties_baseUrl": {
+						"value": "[parameters('AzureKeyVaultOceanProject_properties_typeProperties_baseUrl')]"
+					},
+					"SharepointOceanProject_properties_typeProperties_url": {
+						"value": "[parameters('SharepointOceanProject_properties_typeProperties_url')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "adf-ocean-dev_ArmTemplate_1",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_1.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'adf-ocean-dev_ArmTemplate_0')]"
+			]
+		},
+		{
+			"name": "adf-ocean-dev_ArmTemplate_2",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_2.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'adf-ocean-dev_ArmTemplate_1')]"
+			]
+		}
+	]
+}
