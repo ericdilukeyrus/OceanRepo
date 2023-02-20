@@ -1,9 +1,6 @@
 {
 	"name": "df_copy_all_mbr",
 	"properties": {
-		"folder": {
-			"name": "EDI"
-		},
 		"type": "MappingDataFlow",
 		"typeProperties": {
 			"sources": [

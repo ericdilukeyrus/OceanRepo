@@ -1,9 +1,6 @@
 {
 	"name": "df_stg_financials",
 	"properties": {
-		"folder": {
-			"name": "EDI"
-		},
 		"type": "MappingDataFlow",
 		"typeProperties": {
 			"sources": [

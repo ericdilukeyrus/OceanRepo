@@ -1,9 +1,6 @@
 {
 	"name": "df_Load_Fact_Financials",
 	"properties": {
-		"folder": {
-			"name": "EDI"
-		},
 		"type": "MappingDataFlow",
 		"typeProperties": {
 			"sources": [
