@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Get Active MBR Scope",
+				"name": "Get All Active MBR Scope",
 				"type": "Lookup",
 				"dependsOn": [
 					{
@@ -43,7 +43,7 @@
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Get Active MBR Scope",
+						"activity": "Get All Active MBR Scope",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -52,7 +52,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('Get Active MBR Scope').output.value",
+						"value": "@activity('Get All Active MBR Scope').output.value",
 						"type": "Expression"
 					},
 					"isSequential": true,

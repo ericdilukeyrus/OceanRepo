@@ -42,20 +42,6 @@
 											"value": "'@{item().MBR_UnpvtTableName}'",
 											"type": "Expression"
 										}
-									},
-									"datasetParameters": {
-										"GetMBRUnpvtData": {
-											"vTableName": {
-												"value": "@item().MBR_UnpvtTableName",
-												"type": "Expression"
-											}
-										},
-										"sink1": {
-											"stgFinancialTable": {
-												"value": "@item().StgFinancialTableName",
-												"type": "Expression"
-											}
-										}
 									}
 								},
 								"compute": {

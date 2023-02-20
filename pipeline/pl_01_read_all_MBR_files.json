@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Get MBR files list",
+				"name": "Get MBR All Files",
 				"type": "GetMetadata",
 				"dependsOn": [],
 				"policy": {
@@ -40,7 +40,7 @@
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Get MBR files list",
+						"activity": "Get MBR All Files",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -49,13 +49,13 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('Get MBR files list').output.childItems",
+						"value": "@activity('Get MBR All Files').output.childItems",
 						"type": "Expression"
 					},
 					"isSequential": true,
 					"activities": [
 						{
-							"name": "pl_02_ingest_mbr_data",
+							"name": "Ingest MBR Data",
 							"type": "ExecutePipeline",
 							"dependsOn": [],
 							"userProperties": [],

@@ -27,7 +27,7 @@
 			],
 			"transformations": [
 				{
-					"name": "AddMBRMetadata",
+					"name": "addMBRMetadata",
 					"description": "BU_Code\nBU_Name\nMBR_Scope\nMBR_Month"
 				},
 				{
@@ -97,8 +97,8 @@
 				"          BU_Name = $pBU_Name,",
 				"          Currency_Code = $pCurrency_Code,",
 				"          MBR_Scope = $pMBR_Scope,",
-				"          MBR_Month = $pMBR_Month) ~> AddMBRMetadata",
-				"AddMBRMetadata select(mapColumn(",
+				"          MBR_Month = $pMBR_Month) ~> addMBRMetadata",
+				"addMBRMetadata select(mapColumn(",
 				"          {_col0_},",
 				"          {_col1_},",
 				"          {_col2_},",

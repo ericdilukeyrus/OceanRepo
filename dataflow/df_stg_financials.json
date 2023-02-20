@@ -12,7 +12,7 @@
 						"referenceName": "ds_ocean_ods",
 						"type": "DatasetReference"
 					},
-					"name": "GetMBRUnpvtData"
+					"name": "getMBRUnpvtData"
 				}
 			],
 			"sinks": [
@@ -21,12 +21,12 @@
 						"referenceName": "stg_financials",
 						"type": "DatasetReference"
 					},
-					"name": "sink1"
+					"name": "insertMBRStagingData"
 				}
 			],
 			"transformations": [
 				{
-					"name": "AddColumns",
+					"name": "addColumns",
 					"description": "Add Columns : \nScenario\nMonthYear"
 				}
 			],
@@ -51,14 +51,14 @@
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     query: (\"select * from [ods].[{$unpvtTableName}]\"),",
-				"     format: 'query') ~> GetMBRUnpvtData",
-				"GetMBRUnpvtData derive(Scenario = case( like(Period, 'Actual%'),'Actual','Budget'),",
+				"     format: 'query') ~> getMBRUnpvtData",
+				"getMBRUnpvtData derive(Scenario = case( like(Period, 'Actual%'),'Actual','Budget'),",
 				"          MonthYear = case(like(Period,'%CY%'),\r",
 				"toDate(concat(toString(year(toDate(MBR_Month))), '-',right(Period,2))),\r",
 				"toDate(concat(toString(year(toDate(MBR_Month))-1), '-',right(Period,2)))),",
 				"          Index = toInteger(Index),",
-				"          Value = toFloat(Value)) ~> AddColumns",
-				"AddColumns sink(allowSchemaDrift: false,",
+				"          Value = toFloat(Value)) ~> addColumns",
+				"addColumns sink(allowSchemaDrift: false,",
 				"     validateSchema: false,",
 				"     input(",
 				"          BusinessUnit as string,",
@@ -83,7 +83,7 @@
 				"          Nature = K_Nature,",
 				"          MonthYear,",
 				"          Value",
-				"     )) ~> sink1"
+				"     )) ~> insertMBRStagingData"
 			]
 		}
 	}

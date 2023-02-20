@@ -54,43 +54,48 @@
 			],
 			"transformations": [
 				{
-					"name": "addYearMonthID"
+					"name": "addYearMonthID",
+					"description": "Add MonthYearID"
 				},
 				{
-					"name": "joinDimScenario"
+					"name": "joinDimScenario",
+					"description": "Inner join with 'getDimScenario'"
 				},
 				{
-					"name": "joinDimNature"
+					"name": "joinDimNature",
+					"description": "Inner join with 'getDimNature'"
 				},
 				{
-					"name": "getOrigationID"
+					"name": "getOrganizationID"
 				},
 				{
-					"name": "joinDimOrganisation"
+					"name": "joinDimOrganisation",
+					"description": "Inner join on 'joinDimNature' and 'getOrganizationID'"
 				},
 				{
 					"name": "cleanColumns"
 				},
 				{
-					"name": "join1"
+					"name": "joinFactFinancials"
 				},
 				{
 					"name": "factDataClean"
 				},
 				{
-					"name": "derivedColumn1"
+					"name": "insertOrUpdateColumns"
 				},
 				{
 					"name": "insertOrUpdate"
 				},
 				{
-					"name": "filter1"
+					"name": "includesUpsert"
 				},
 				{
-					"name": "select1"
+					"name": "cleanColumnsToUpsert"
 				},
 				{
-					"name": "convertToInteger"
+					"name": "convertToInteger",
+					"description": "Convert Surrogate Key to Integer"
 				}
 			],
 			"scriptLines": [
@@ -186,8 +191,8 @@
 				"          OrganisationID",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> getOrigationID",
-				"joinDimNature, getOrigationID join(BusinessUnit == {Business Unit},",
+				"     skipDuplicateMapOutputs: true) ~> getOrganizationID",
+				"joinDimNature, getOrganizationID join(BusinessUnit == {Business Unit},",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
@@ -209,7 +214,7 @@
 				"     joinType:'left',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> join1",
+				"     broadcast: 'auto')~> joinFactFinancials",
 				"getFactData select(mapColumn(",
 				"          ScenarioID,",
 				"          NatureID,",
@@ -219,14 +224,14 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> factDataClean",
-				"join1 derive(InsertOrUpdate = iif(isNull(factDataClean@ScenarioID) && isNull(factDataClean@NatureID) && isNull(factDataClean@OrganisationID) && isNull(factDataClean@MonthYearID) \r",
+				"joinFactFinancials derive(InsertOrUpdate = iif(isNull(factDataClean@ScenarioID) && isNull(factDataClean@NatureID) && isNull(factDataClean@OrganisationID) && isNull(factDataClean@MonthYearID) \r",
 				", 'I',\r",
 				"iif(cleanColumns@Value == factDataClean@Value, 'P','U')\r",
-				")) ~> derivedColumn1",
-				"select1 alterRow(insertIf(InsertOrUpdate=='I'),",
+				")) ~> insertOrUpdateColumns",
+				"cleanColumnsToUpsert alterRow(insertIf(InsertOrUpdate=='I'),",
 				"     updateIf(InsertOrUpdate=='U')) ~> insertOrUpdate",
-				"derivedColumn1 filter(in(['I','U'],InsertOrUpdate)) ~> filter1",
-				"filter1 select(mapColumn(",
+				"insertOrUpdateColumns filter(in(['I','U'],InsertOrUpdate)) ~> includesUpsert",
+				"includesUpsert select(mapColumn(",
 				"          ScenarioID = convertToInteger@ScenarioID,",
 				"          NatureID = convertToInteger@NatureID,",
 				"          OrganisationID = convertToInteger@OrganisationID,",
@@ -241,7 +246,7 @@
 				"          InsertOrUpdate",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> select1",
+				"     skipDuplicateMapOutputs: true) ~> cleanColumnsToUpsert",
 				"cleanColumns derive(ScenarioID = toInteger(ScenarioID),",
 				"          NatureID = toInteger(NatureID),",
 				"          OrganisationID = toInteger(OrganisationID)) ~> convertToInteger",
