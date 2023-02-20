@@ -5,6 +5,11 @@
 			"referenceName": "ocean_db_nonencrypted",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"FactName": {
+				"type": "string"
+			}
+		},
 		"annotations": [],
 		"type": "AzureSqlTable",
 		"schema": [
@@ -65,7 +70,10 @@
 		],
 		"typeProperties": {
 			"schema": "dwh",
-			"table": "FactFinancials"
+			"table": {
+				"value": "@dataset().FactName",
+				"type": "Expression"
+			}
 		}
 	},
 	"type": "Microsoft.DataFactory/factories/datasets"

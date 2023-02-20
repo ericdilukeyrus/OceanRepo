@@ -49,7 +49,14 @@
 						"referenceName": "ds_fact_tables",
 						"type": "DatasetReference"
 					},
-					"name": "loadFactTable"
+					"name": "insertFactFinancials"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_fact_tables",
+						"type": "DatasetReference"
+					},
+					"name": "insertFactKPI"
 				}
 			],
 			"transformations": [
@@ -60,10 +67,6 @@
 				{
 					"name": "joinDimScenario",
 					"description": "Inner join with 'getDimScenario'"
-				},
-				{
-					"name": "joinDimNature",
-					"description": "Inner join with 'getDimNature'"
 				},
 				{
 					"name": "getOrganizationID"
@@ -96,6 +99,12 @@
 				{
 					"name": "convertToInteger",
 					"description": "Convert Surrogate Key to Integer"
+				},
+				{
+					"name": "FINorKPI"
+				},
+				{
+					"name": "joinDimNature"
 				}
 			],
 			"scriptLines": [
@@ -181,33 +190,28 @@
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joinDimScenario",
-				"joinDimScenario, getDimNature join(getMBRStagingData@NatureID == getDimNature@NatureID,",
-				"     joinType:'inner',",
-				"     matchType:'exact',",
-				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> joinDimNature",
 				"getDimOrganisation select(mapColumn(",
 				"          {Business Unit},",
 				"          OrganisationID",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> getOrganizationID",
-				"joinDimNature, getOrganizationID join(BusinessUnit == {Business Unit},",
+				"joinDimScenario, getOrganizationID join(BusinessUnit == {Business Unit},",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joinDimOrganisation",
 				"joinDimOrganisation select(mapColumn(",
 				"          ScenarioID = Scenario_Index,",
-				"          NatureID = getDimNature@NatureID,",
 				"          OrganisationID,",
+				"          NatureID,",
 				"          MonthYearID,",
 				"          MonthYear,",
 				"          Value",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> cleanColumns",
-				"convertToInteger, factDataClean join(convertToInteger@ScenarioID == factDataClean@ScenarioID",
+				"joinDimNature, factDataClean join(convertToInteger@ScenarioID == factDataClean@ScenarioID",
 				"     && convertToInteger@NatureID == factDataClean@NatureID",
 				"     && convertToInteger@OrganisationID == factDataClean@OrganisationID",
 				"     && cleanColumns@MonthYearID == factDataClean@MonthYearID,",
@@ -226,30 +230,32 @@
 				"     skipDuplicateMapOutputs: true) ~> factDataClean",
 				"joinFactFinancials derive(InsertOrUpdate = iif(isNull(factDataClean@ScenarioID) && isNull(factDataClean@NatureID) && isNull(factDataClean@OrganisationID) && isNull(factDataClean@MonthYearID) \r",
 				", 'I',\r",
-				"iif(cleanColumns@Value == factDataClean@Value, 'P','U')\r",
+				"iif(FINorKPI@FIN@Value == factDataClean@Value, 'P','U')\r",
 				")) ~> insertOrUpdateColumns",
 				"cleanColumnsToUpsert alterRow(insertIf(InsertOrUpdate=='I'),",
 				"     updateIf(InsertOrUpdate=='U')) ~> insertOrUpdate",
 				"insertOrUpdateColumns filter(in(['I','U'],InsertOrUpdate)) ~> includesUpsert",
 				"includesUpsert select(mapColumn(",
-				"          ScenarioID = convertToInteger@ScenarioID,",
-				"          NatureID = convertToInteger@NatureID,",
-				"          OrganisationID = convertToInteger@OrganisationID,",
-				"          MonthYearID = cleanColumns@MonthYearID,",
+				"          ScenarioID = FINorKPI@FIN@ScenarioID,",
+				"          OrganisationID = FINorKPI@FIN@OrganisationID,",
+				"          NatureID = getDimNature@NatureID,",
+				"          MonthYearID = FINorKPI@FIN@MonthYearID,",
 				"          MonthYear,",
-				"          Value = cleanColumns@Value,",
-				"          ScenarioID = factDataClean@ScenarioID,",
-				"          NatureID = factDataClean@NatureID,",
-				"          OrganisationID = factDataClean@OrganisationID,",
-				"          MonthYearID = factDataClean@MonthYearID,",
-				"          Value = factDataClean@Value,",
+				"          Value = FINorKPI@FIN@Value,",
 				"          InsertOrUpdate",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> cleanColumnsToUpsert",
 				"cleanColumns derive(ScenarioID = toInteger(ScenarioID),",
-				"          NatureID = toInteger(NatureID),",
-				"          OrganisationID = toInteger(OrganisationID)) ~> convertToInteger",
+				"          OrganisationID = toInteger(OrganisationID),",
+				"          FactIndicator = iif(NatureID >= 372, 'KPI', 'FIN') ) ~> convertToInteger",
+				"convertToInteger split(FactIndicator == 'FIN',",
+				"     disjoint: false) ~> FINorKPI@(FIN, KPI)",
+				"FINorKPI@FIN, getDimNature join(FINorKPI@FIN@NatureID == getDimNature@NatureID,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinDimNature",
 				"insertOrUpdate sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
@@ -266,9 +272,9 @@
 				"          ModifiedBy as string",
 				"     ),",
 				"     deletable:false,",
-				"     insertable:true,",
-				"     updateable:true,",
-				"     upsertable:false,",
+				"     insertable:false,",
+				"     updateable:false,",
+				"     upsertable:true,",
 				"     keys:['ScenarioID','NatureID','OrganisationID','MonthYearID'],",
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
@@ -281,7 +287,38 @@
 				"          MonthYearID,",
 				"          MonthYear,",
 				"          Value",
-				"     )) ~> loadFactTable"
+				"     )) ~> insertFactFinancials",
+				"FINorKPI@KPI sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          FactFinID as long,",
+				"          ScenarioID as integer,",
+				"          NatureID as integer,",
+				"          OrganisationID as integer,",
+				"          MonthYearID as integer,",
+				"          MonthYear as date,",
+				"          Value as double,",
+				"          CreatedOn as timestamp,",
+				"          CreatedBy as string,",
+				"          ModifiedOn as timestamp,",
+				"          ModifiedBy as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          ScenarioID,",
+				"          NatureID,",
+				"          OrganisationID,",
+				"          MonthYearID,",
+				"          MonthYear,",
+				"          Value",
+				"     )) ~> insertFactKPI"
 			]
 		}
 	}
