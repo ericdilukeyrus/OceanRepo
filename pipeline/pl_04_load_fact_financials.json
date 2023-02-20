@@ -81,9 +81,6 @@
 										"getDimOrganisation": {
 											"vTableName": "DimOrganisation"
 										},
-										"getFactData": {
-											"FactName": "FactFinancials2"
-										},
 										"insertFactFinancials": {
 											"FactName": "FactFinancials2"
 										},

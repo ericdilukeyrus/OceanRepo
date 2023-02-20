@@ -40,7 +40,14 @@
 						"referenceName": "ds_fact_tables",
 						"type": "DatasetReference"
 					},
-					"name": "getFactData"
+					"name": "getFactFinancials"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_ocean_dwh",
+						"type": "DatasetReference"
+					},
+					"name": "getFactKPI"
 				}
 			],
 			"sinks": [
@@ -82,7 +89,7 @@
 					"name": "joinFactFinancials"
 				},
 				{
-					"name": "factDataClean"
+					"name": "factFinancialsClean"
 				},
 				{
 					"name": "insertOrUpdateColumns"
@@ -105,6 +112,21 @@
 				},
 				{
 					"name": "joinDimNature"
+				},
+				{
+					"name": "factKPIClean"
+				},
+				{
+					"name": "joinFactKPI"
+				},
+				{
+					"name": "upsertColumn"
+				},
+				{
+					"name": "includesUpsertKPI"
+				},
+				{
+					"name": "cleanColumnsToUpsertKPI"
 				}
 			],
 			"scriptLines": [
@@ -183,7 +205,24 @@
 				"     allowSchemaDrift: false,",
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
-				"     format: 'table') ~> getFactData",
+				"     format: 'table') ~> getFactFinancials",
+				"source(output(",
+				"          FactKPIID as long,",
+				"          ScenarioID as integer,",
+				"          NatureID as integer,",
+				"          OrganisationID as integer,",
+				"          MonthYearID as integer,",
+				"          MonthYear as date,",
+				"          Value as double,",
+				"          CreatedOn as timestamp,",
+				"          CreatedBy as string,",
+				"          ModifiedOn as timestamp,",
+				"          ModifiedBy as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> getFactKPI",
 				"getMBRStagingData derive(MonthYearID = toInteger(concat(toString(year(MonthYear)), lpad(toString(month(MonthYear)),2,'0'), '01'))) ~> addYearMonthID",
 				"addYearMonthID, getDimScenario join(Scenario == Scenario_Name0,",
 				"     joinType:'inner',",
@@ -211,15 +250,15 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> cleanColumns",
-				"joinDimNature, factDataClean join(FINorKPI@FIN@ScenarioID == factDataClean@ScenarioID",
-				"     && getDimNature@NatureID == factDataClean@NatureID",
-				"     && FINorKPI@FIN@OrganisationID == factDataClean@OrganisationID",
-				"     && FINorKPI@FIN@MonthYearID == factDataClean@MonthYearID,",
+				"joinDimNature, factFinancialsClean join(FINorKPI@FIN@ScenarioID == factFinancialsClean@ScenarioID",
+				"     && getDimNature@NatureID == factFinancialsClean@NatureID",
+				"     && FINorKPI@FIN@OrganisationID == factFinancialsClean@OrganisationID",
+				"     && FINorKPI@FIN@MonthYearID == factFinancialsClean@MonthYearID,",
 				"     joinType:'left',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joinFactFinancials",
-				"getFactData select(mapColumn(",
+				"getFactFinancials select(mapColumn(",
 				"          ScenarioID,",
 				"          NatureID,",
 				"          OrganisationID,",
@@ -227,10 +266,10 @@
 				"          Value",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> factDataClean",
-				"joinFactFinancials derive(InsertOrUpdate = iif(isNull(factDataClean@ScenarioID) && isNull(factDataClean@NatureID) && isNull(factDataClean@OrganisationID) && isNull(factDataClean@MonthYearID) \r",
+				"     skipDuplicateMapOutputs: true) ~> factFinancialsClean",
+				"joinFactFinancials derive(InsertOrUpdate = iif(isNull(factFinancialsClean@ScenarioID) && isNull(factFinancialsClean@NatureID) && isNull(factFinancialsClean@OrganisationID) && isNull(factFinancialsClean@MonthYearID) \r",
 				", 'I',\r",
-				"iif(FINorKPI@FIN@Value == factDataClean@Value, 'P','U')\r",
+				"iif(FINorKPI@FIN@Value == factFinancialsClean@Value, 'P','U')\r",
 				")) ~> insertOrUpdateColumns",
 				"cleanColumnsToUpsert alterRow(insertIf(InsertOrUpdate=='I'),",
 				"     updateIf(InsertOrUpdate=='U')) ~> insertOrUpdate",
@@ -256,6 +295,36 @@
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joinDimNature",
+				"getFactKPI select(mapColumn(",
+				"          ScenarioID,",
+				"          NatureID,",
+				"          OrganisationID,",
+				"          MonthYearID,",
+				"          Value",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> factKPIClean",
+				"FINorKPI@KPI, factKPIClean join(FINorKPI@KPI@ScenarioID == factKPIClean@ScenarioID",
+				"     && FINorKPI@KPI@OrganisationID == factKPIClean@OrganisationID",
+				"     && FINorKPI@KPI@NatureID == factKPIClean@NatureID",
+				"     && FINorKPI@KPI@MonthYearID == factKPIClean@MonthYearID,",
+				"     joinType:'left',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinFactKPI",
+				"joinFactKPI derive(InsertOrUpdate = iif(isNull(factKPIClean@ScenarioID) && isNull(factKPIClean@NatureID) && isNull(factKPIClean@OrganisationID) && isNull(factKPIClean@MonthYearID) , \r",
+				"'I',iif(FINorKPI@KPI@Value == factKPIClean@Value, 'P','U'))) ~> upsertColumn",
+				"upsertColumn filter(in(['I','U'],InsertOrUpdate)) ~> includesUpsertKPI",
+				"includesUpsertKPI select(mapColumn(",
+				"          ScenarioID = FINorKPI@KPI@ScenarioID,",
+				"          OrganisationID = FINorKPI@KPI@OrganisationID,",
+				"          NatureID = FINorKPI@KPI@NatureID,",
+				"          MonthYearID = FINorKPI@KPI@MonthYearID,",
+				"          MonthYear,",
+				"          Value = FINorKPI@KPI@Value",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> cleanColumnsToUpsertKPI",
 				"insertOrUpdate sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
@@ -288,7 +357,7 @@
 				"          MonthYear,",
 				"          Value",
 				"     )) ~> insertFactFinancials",
-				"FINorKPI@KPI sink(allowSchemaDrift: true,",
+				"cleanColumnsToUpsertKPI sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          FactFinID as long,",
