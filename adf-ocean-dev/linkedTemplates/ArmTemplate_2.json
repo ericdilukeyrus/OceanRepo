@@ -1246,43 +1246,48 @@
 					],
 					"transformations": [
 						{
-							"name": "addYearMonthID"
+							"name": "addYearMonthID",
+							"description": "Add MonthYearID"
 						},
 						{
-							"name": "joinDimScenario"
+							"name": "joinDimScenario",
+							"description": "Inner join with 'getDimScenario'"
 						},
 						{
-							"name": "joinDimNature"
+							"name": "joinDimNature",
+							"description": "Inner join with 'getDimNature'"
 						},
 						{
-							"name": "getOrigationID"
+							"name": "getOrganizationID"
 						},
 						{
-							"name": "joinDimOrganisation"
+							"name": "joinDimOrganisation",
+							"description": "Inner join on 'joinDimNature' and 'getOrganizationID'"
 						},
 						{
 							"name": "cleanColumns"
 						},
 						{
-							"name": "join1"
+							"name": "joinFactFinancials"
 						},
 						{
 							"name": "factDataClean"
 						},
 						{
-							"name": "derivedColumn1"
+							"name": "insertOrUpdateColumns"
 						},
 						{
 							"name": "insertOrUpdate"
 						},
 						{
-							"name": "filter1"
+							"name": "includesUpsert"
 						},
 						{
-							"name": "select1"
+							"name": "cleanColumnsToUpsert"
 						},
 						{
-							"name": "convertToInteger"
+							"name": "convertToInteger",
+							"description": "Convert Surrogate Key to Integer"
 						}
 					],
 					"scriptLines": [
@@ -1378,8 +1383,8 @@
 						"          OrganisationID",
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> getOrigationID",
-						"joinDimNature, getOrigationID join(BusinessUnit == {Business Unit},",
+						"     skipDuplicateMapOutputs: true) ~> getOrganizationID",
+						"joinDimNature, getOrganizationID join(BusinessUnit == {Business Unit},",
 						"     joinType:'inner',",
 						"     matchType:'exact',",
 						"     ignoreSpaces: false,",
@@ -1401,7 +1406,7 @@
 						"     joinType:'left',",
 						"     matchType:'exact',",
 						"     ignoreSpaces: false,",
-						"     broadcast: 'auto')~> join1",
+						"     broadcast: 'auto')~> joinFactFinancials",
 						"getFactData select(mapColumn(",
 						"          ScenarioID,",
 						"          NatureID,",
@@ -1411,14 +1416,14 @@
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true) ~> factDataClean",
-						"join1 derive(InsertOrUpdate = iif(isNull(factDataClean@ScenarioID) && isNull(factDataClean@NatureID) && isNull(factDataClean@OrganisationID) && isNull(factDataClean@MonthYearID) \r",
+						"joinFactFinancials derive(InsertOrUpdate = iif(isNull(factDataClean@ScenarioID) && isNull(factDataClean@NatureID) && isNull(factDataClean@OrganisationID) && isNull(factDataClean@MonthYearID) \r",
 						", 'I',\r",
 						"iif(cleanColumns@Value == factDataClean@Value, 'P','U')\r",
-						")) ~> derivedColumn1",
-						"select1 alterRow(insertIf(InsertOrUpdate=='I'),",
+						")) ~> insertOrUpdateColumns",
+						"cleanColumnsToUpsert alterRow(insertIf(InsertOrUpdate=='I'),",
 						"     updateIf(InsertOrUpdate=='U')) ~> insertOrUpdate",
-						"derivedColumn1 filter(in(['I','U'],InsertOrUpdate)) ~> filter1",
-						"filter1 select(mapColumn(",
+						"insertOrUpdateColumns filter(in(['I','U'],InsertOrUpdate)) ~> includesUpsert",
+						"includesUpsert select(mapColumn(",
 						"          ScenarioID = convertToInteger@ScenarioID,",
 						"          NatureID = convertToInteger@NatureID,",
 						"          OrganisationID = convertToInteger@OrganisationID,",
@@ -1433,7 +1438,7 @@
 						"          InsertOrUpdate",
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> select1",
+						"     skipDuplicateMapOutputs: true) ~> cleanColumnsToUpsert",
 						"cleanColumns derive(ScenarioID = toInteger(ScenarioID),",
 						"          NatureID = toInteger(NatureID),",
 						"          OrganisationID = toInteger(OrganisationID)) ~> convertToInteger",
@@ -1505,7 +1510,7 @@
 					],
 					"transformations": [
 						{
-							"name": "AddMBRMetadata",
+							"name": "addMBRMetadata",
 							"description": "BU_Code\nBU_Name\nMBR_Scope\nMBR_Month"
 						},
 						{
@@ -1575,8 +1580,8 @@
 						"          BU_Name = $pBU_Name,",
 						"          Currency_Code = $pCurrency_Code,",
 						"          MBR_Scope = $pMBR_Scope,",
-						"          MBR_Month = $pMBR_Month) ~> AddMBRMetadata",
-						"AddMBRMetadata select(mapColumn(",
+						"          MBR_Month = $pMBR_Month) ~> addMBRMetadata",
+						"addMBRMetadata select(mapColumn(",
 						"          {_col0_},",
 						"          {_col1_},",
 						"          {_col2_},",
@@ -1750,7 +1755,7 @@
 								"referenceName": "ds_ocean_ods",
 								"type": "DatasetReference"
 							},
-							"name": "GetMBRUnpvtData"
+							"name": "getMBRUnpvtData"
 						}
 					],
 					"sinks": [
@@ -1759,12 +1764,12 @@
 								"referenceName": "stg_financials",
 								"type": "DatasetReference"
 							},
-							"name": "sink1"
+							"name": "insertMBRStagingData"
 						}
 					],
 					"transformations": [
 						{
-							"name": "AddColumns",
+							"name": "addColumns",
 							"description": "Add Columns : \nScenario\nMonthYear"
 						}
 					],
@@ -1789,14 +1794,14 @@
 						"     validateSchema: false,",
 						"     isolationLevel: 'READ_UNCOMMITTED',",
 						"     query: (\"select * from [ods].[{$unpvtTableName}]\"),",
-						"     format: 'query') ~> GetMBRUnpvtData",
-						"GetMBRUnpvtData derive(Scenario = case( like(Period, 'Actual%'),'Actual','Budget'),",
+						"     format: 'query') ~> getMBRUnpvtData",
+						"getMBRUnpvtData derive(Scenario = case( like(Period, 'Actual%'),'Actual','Budget'),",
 						"          MonthYear = case(like(Period,'%CY%'),\r",
 						"toDate(concat(toString(year(toDate(MBR_Month))), '-',right(Period,2))),\r",
 						"toDate(concat(toString(year(toDate(MBR_Month))-1), '-',right(Period,2)))),",
 						"          Index = toInteger(Index),",
-						"          Value = toFloat(Value)) ~> AddColumns",
-						"AddColumns sink(allowSchemaDrift: false,",
+						"          Value = toFloat(Value)) ~> addColumns",
+						"addColumns sink(allowSchemaDrift: false,",
 						"     validateSchema: false,",
 						"     input(",
 						"          BusinessUnit as string,",
@@ -1821,7 +1826,7 @@
 						"          Nature = K_Nature,",
 						"          MonthYear,",
 						"          Value",
-						"     )) ~> sink1"
+						"     )) ~> insertMBRStagingData"
 					]
 				}
 			},
@@ -1970,7 +1975,7 @@
 				"description": "Move all import tables from the source systems",
 				"activities": [
 					{
-						"name": "Copy_MBR_Parameters",
+						"name": "Copy MBR Parameters",
 						"type": "Copy",
 						"dependsOn": [],
 						"policy": {
@@ -2035,7 +2040,7 @@
 						]
 					},
 					{
-						"name": "Copy_MBR_Currency",
+						"name": "Copy MBR Currency",
 						"type": "Copy",
 						"dependsOn": [],
 						"policy": {
@@ -2142,17 +2147,17 @@
 						]
 					},
 					{
-						"name": "get All MBR Parameters",
+						"name": "Get MBR Parameters",
 						"type": "Lookup",
 						"dependsOn": [
 							{
-								"activity": "Copy_MBR_Parameters",
+								"activity": "Copy MBR Parameters",
 								"dependencyConditions": [
 									"Succeeded"
 								]
 							},
 							{
-								"activity": "Copy_MBR_Currency",
+								"activity": "Copy MBR Currency",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -2188,7 +2193,7 @@
 						"type": "ForEach",
 						"dependsOn": [
 							{
-								"activity": "get All MBR Parameters",
+								"activity": "Get MBR Parameters",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -2197,7 +2202,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"items": {
-								"value": "@activity('get All MBR Parameters').output.value",
+								"value": "@activity('Get MBR Parameters').output.value",
 								"type": "Expression"
 							},
 							"isSequential": false,
@@ -2207,7 +2212,7 @@
 									"type": "ExecuteDataFlow",
 									"dependsOn": [
 										{
-											"activity": "Stored procedure1",
+											"activity": "Truncate ODS Table",
 											"dependencyConditions": [
 												"Succeeded"
 											]
@@ -2283,7 +2288,7 @@
 									}
 								},
 								{
-									"name": "Stored procedure1",
+									"name": "Truncate ODS Table",
 									"type": "SqlServerStoredProcedure",
 									"dependsOn": [],
 									"policy": {
@@ -2332,12 +2337,12 @@
 						"userProperties": [],
 						"typeProperties": {
 							"items": {
-								"value": "@activity('get All MBR Parameters').output.value",
+								"value": "@activity('Get MBR Parameters').output.value",
 								"type": "Expression"
 							},
 							"activities": [
 								{
-									"name": "Unpivot MBR Data",
+									"name": "Unpivot MBR ODS Table",
 									"type": "ExecuteDataFlow",
 									"dependsOn": [],
 									"policy": {
@@ -2390,7 +2395,7 @@
 									"type": "Script",
 									"dependsOn": [
 										{
-											"activity": "Unpivot MBR Data",
+											"activity": "Unpivot MBR ODS Table",
 											"dependencyConditions": [
 												"Succeeded"
 											]
@@ -2498,19 +2503,20 @@
 												}
 											},
 											"datasetParameters": {
-												"GetMBRUnpvtData": {
+												"getMBRUnpvtData": {
 													"vTableName": {
 														"value": "@item().MBR_UnpvtTableName",
 														"type": "Expression"
 													}
 												},
-												"sink1": {
+												"insertMBRStagingData": {
 													"stgFinancialTable": {
 														"value": "@item().StgFinancialTableName",
 														"type": "Expression"
 													}
 												}
-											}
+											},
+											"linkedServiceParameters": {}
 										},
 										"staging": {},
 										"compute": {
@@ -2774,7 +2780,7 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "Get MBR files list",
+						"name": "Get MBR All Files",
 						"type": "GetMetadata",
 						"dependsOn": [],
 						"policy": {
@@ -2811,7 +2817,7 @@
 						"type": "ForEach",
 						"dependsOn": [
 							{
-								"activity": "Get MBR files list",
+								"activity": "Get MBR All Files",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -2820,13 +2826,13 @@
 						"userProperties": [],
 						"typeProperties": {
 							"items": {
-								"value": "@activity('Get MBR files list').output.childItems",
+								"value": "@activity('Get MBR All Files').output.childItems",
 								"type": "Expression"
 							},
 							"isSequential": true,
 							"activities": [
 								{
-									"name": "pl_02_ingest_mbr_data",
+									"name": "Ingest MBR Data",
 									"type": "ExecutePipeline",
 									"dependsOn": [],
 									"userProperties": [],
@@ -2880,7 +2886,7 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "Get Active MBR Scope",
+						"name": "Get All Active MBR Scope",
 						"type": "Lookup",
 						"dependsOn": [
 							{
@@ -2920,7 +2926,7 @@
 						"type": "ForEach",
 						"dependsOn": [
 							{
-								"activity": "Get Active MBR Scope",
+								"activity": "Get All Active MBR Scope",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -2929,7 +2935,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"items": {
-								"value": "@activity('Get Active MBR Scope').output.value",
+								"value": "@activity('Get All Active MBR Scope').output.value",
 								"type": "Expression"
 							},
 							"isSequential": true,
