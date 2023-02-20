@@ -1,0 +1,18 @@
+{
+	"name": "ds_sharepoint_ocean_project",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SharepointOceanProject",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": "/sites/OceanProject/_api/web/GetFileByServerRelativeUrl('/sites/OceanProject/Shared Documents/Portugal/MBR Reporting_2023_v22 - 02 BUs (Example).xlsx')/$value"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

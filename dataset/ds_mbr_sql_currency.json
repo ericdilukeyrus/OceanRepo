@@ -1,0 +1,34 @@
+{
+	"name": "ds_mbr_sql_currency",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ocean_db",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "bu_sequence",
+				"type": "nvarchar"
+			},
+			{
+				"name": "bu_name",
+				"type": "nvarchar"
+			},
+			{
+				"name": "currency_code",
+				"type": "nvarchar"
+			},
+			{
+				"name": "bu_select",
+				"type": "nvarchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "ods",
+			"table": "R_MBR_Currency"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

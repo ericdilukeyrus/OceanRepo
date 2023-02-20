@@ -1,0 +1,206 @@
+{
+	"name": "ds_ocean_stg_nonecrypted",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ocean_db_nonencrypted",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"pRawTableName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "Index",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Anaplant_Index",
+				"type": "nvarchar"
+			},
+			{
+				"name": "PBI_Index",
+				"type": "nvarchar"
+			},
+			{
+				"name": "K_Nature",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_LY_01",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_LY_02",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_LY_03",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_LY_04",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_LY_05",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_LY_06",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_LY_07",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_LY_08",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_LY_09",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_LY_10",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_LY_11",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_LY_12",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Budget_CY_01",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Budget_CY_02",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Budget_CY_03",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Budget_CY_04",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Budget_CY_05",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Budget_CY_06",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Budget_CY_07",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Budget_CY_08",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Budget_CY_09",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Budget_CY_10",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Budget_CY_11",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Budget_CY_12",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_CY_01",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_CY_02",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_CY_03",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_CY_04",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_CY_05",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_CY_06",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_CY_07",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_CY_08",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_CY_09",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_CY_10",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_CY_11",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_CY_12",
+				"type": "nvarchar"
+			},
+			{
+				"name": "BU_Code",
+				"type": "nvarchar"
+			},
+			{
+				"name": "BU_Name",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Currency_Code",
+				"type": "nvarchar"
+			},
+			{
+				"name": "MBR_Scope",
+				"type": "nvarchar"
+			},
+			{
+				"name": "MBR_Month",
+				"type": "nvarchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "ods",
+			"table": {
+				"value": "@dataset().pRawTableName",
+				"type": "Expression"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

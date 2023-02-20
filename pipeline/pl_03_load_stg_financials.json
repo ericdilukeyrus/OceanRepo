@@ -1,0 +1,195 @@
+{
+	"name": "pl_03_load_stg_financials",
+	"properties": {
+		"activities": [
+			{
+				"name": "ForEach Unpvt Data Table",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "ForEach Truncate Staging Table",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get All Unpvt Table').output.value",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"activities": [
+						{
+							"name": "Staging Financial Table",
+							"type": "ExecuteDataFlow",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataflow": {
+									"referenceName": "df_stg_financials",
+									"type": "DataFlowReference",
+									"parameters": {
+										"unpvtTableName": {
+											"value": "'@{item().MBR_UnpvtTableName}'",
+											"type": "Expression"
+										}
+									},
+									"datasetParameters": {
+										"GetMBRUnpvtData": {
+											"vTableName": {
+												"value": "@item().MBR_UnpvtTableName",
+												"type": "Expression"
+											}
+										},
+										"sink1": {
+											"stgFinancialTable": {
+												"value": "@item().StgFinancialTableName",
+												"type": "Expression"
+											}
+										}
+									}
+								},
+								"compute": {
+									"coreCount": 8,
+									"computeType": "General"
+								},
+								"traceLevel": "Fine"
+							}
+						},
+						{
+							"name": "Truncate Unpivot Tables",
+							"type": "Script",
+							"dependsOn": [
+								{
+									"activity": "Staging Financial Table",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"linkedServiceName": {
+								"referenceName": "ocean_db",
+								"type": "LinkedServiceReference"
+							},
+							"typeProperties": {
+								"scripts": [
+									{
+										"type": "Query",
+										"text": {
+											"value": "truncate table [ods].[@{item().MBR_UnpvtTableName}]",
+											"type": "Expression"
+										}
+									}
+								],
+								"scriptBlockExecutionTimeout": "02:00:00"
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Get All Unpvt Table",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "select distinct MBR_UnpvtTableName, CONCAT('P&L_FI_', MBR_BU_Code) AS StgFinancialTableName  from  [ods].[Sources_Config]",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_ocean_ods",
+						"type": "DatasetReference",
+						"parameters": {
+							"vTableName": "Sources_Config"
+						}
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach Truncate Staging Table",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Get All Unpvt Table",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get All Unpvt Table').output.value",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Truncate Staging Table",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[ods].[prc_stg_truncate_table]",
+								"storedProcedureParameters": {
+									"schema_name": {
+										"value": "stg",
+										"type": "String"
+									},
+									"table_name": {
+										"value": {
+											"value": "@item().StgFinancialTableName",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "ocean_db",
+								"type": "LinkedServiceReference"
+							}
+						}
+					]
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2023-02-20T11:30:45Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

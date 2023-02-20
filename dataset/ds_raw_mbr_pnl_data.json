@@ -1,0 +1,43 @@
+{
+	"name": "ds_raw_mbr_pnl_data",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "dimensions_source",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"vSheetName": {
+				"type": "string"
+			},
+			"vFileName": {
+				"type": "string"
+			},
+			"vFolderName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Excel",
+		"typeProperties": {
+			"sheetName": {
+				"value": "@dataset().vSheetName",
+				"type": "Expression"
+			},
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@dataset().vFileName",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().vFolderName",
+					"type": "Expression"
+				},
+				"container": "mbr-landing-zone"
+			},
+			"range": "A10:AS378"
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

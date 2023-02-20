@@ -1,0 +1,225 @@
+{
+	"name": "ods_mbr_kpi_pyramid",
+	"properties": {
+		"activities": [
+			{
+				"name": "stg_mbr_kpi_pyramid",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "ExcelSource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						}
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": "TRUNCATE TABLE stg.R_MBR_kpi_pyramid",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false,
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "BU",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "BU",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Version",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Version",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Period",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Period",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Cost center",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Cost center",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "People type",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "People type",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Level of seniority",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Level of seniority",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "End of month FTE",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "End of month FTE",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Service sales before boni / mali",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Service sales before boni / mali",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Billable days",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Billable days",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Daily rate",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Daily rate",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Annual direct costs",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Annual direct costs",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Annual production days",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Annual production days",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Daily cost",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Daily cost",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "mbr_kpi_pyramide",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_ocean_stg",
+						"type": "DatasetReference",
+						"parameters": {
+							"vTableName": "R_MBR_kpi_pyramid"
+						}
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "00DEV"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-02-13T13:29:14Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

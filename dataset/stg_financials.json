@@ -1,0 +1,56 @@
+{
+	"name": "stg_financials",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ocean_db_nonencrypted",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"stgFinancialTable": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "00DEV"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "BusinessUnit",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Scenario",
+				"type": "nvarchar"
+			},
+			{
+				"name": "NatureID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Nature",
+				"type": "nvarchar"
+			},
+			{
+				"name": "MonthYear",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "Value",
+				"type": "float",
+				"precision": 15
+			}
+		],
+		"typeProperties": {
+			"schema": "stg",
+			"table": {
+				"value": "@dataset().stgFinancialTable",
+				"type": "Expression"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

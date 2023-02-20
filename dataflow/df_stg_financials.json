@@ -1,0 +1,90 @@
+{
+	"name": "df_stg_financials",
+	"properties": {
+		"folder": {
+			"name": "EDI"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_ocean_ods",
+						"type": "DatasetReference"
+					},
+					"name": "GetMBRUnpvtData"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "stg_financials",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "AddColumns",
+					"description": "Add Columns : \nScenario\nMonthYear"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     unpvtTableName as string",
+				"}",
+				"source(output(",
+				"          Index as string,",
+				"          Anaplant_Index as string,",
+				"          PBI_Index as string,",
+				"          K_Nature as string,",
+				"          BU_Code as string,",
+				"          BU_Name as string,",
+				"          Currency_Code as string,",
+				"          MBR_Scope as string,",
+				"          MBR_Month as string,",
+				"          Period as string,",
+				"          Value as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: (\"select * from [ods].[{$unpvtTableName}]\"),",
+				"     format: 'query') ~> GetMBRUnpvtData",
+				"GetMBRUnpvtData derive(Scenario = case( like(Period, 'Actual%'),'Actual','Budget'),",
+				"          MonthYear = case(like(Period,'%CY%'),\r",
+				"toDate(concat(toString(year(toDate(MBR_Month))), '-',right(Period,2))),\r",
+				"toDate(concat(toString(year(toDate(MBR_Month))-1), '-',right(Period,2)))),",
+				"          Index = toInteger(Index),",
+				"          Value = toFloat(Value)) ~> AddColumns",
+				"AddColumns sink(allowSchemaDrift: false,",
+				"     validateSchema: false,",
+				"     input(",
+				"          BusinessUnit as string,",
+				"          Scenario as string,",
+				"          NatureID as integer,",
+				"          Nature as string,",
+				"          MonthYear as timestamp,",
+				"          Value as double",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          BusinessUnit = BU_Name,",
+				"          Scenario,",
+				"          NatureID = Index,",
+				"          Nature = K_Nature,",
+				"          MonthYear,",
+				"          Value",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}

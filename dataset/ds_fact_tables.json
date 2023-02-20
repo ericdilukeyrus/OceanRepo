@@ -1,0 +1,72 @@
+{
+	"name": "ds_fact_tables",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ocean_db_nonencrypted",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "FactFinID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "ScenarioID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "NatureID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "OrganisationID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "MonthYearID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "MonthYear",
+				"type": "date"
+			},
+			{
+				"name": "Value",
+				"type": "float",
+				"precision": 15
+			},
+			{
+				"name": "CreatedOn",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "CreatedBy",
+				"type": "nvarchar"
+			},
+			{
+				"name": "ModifiedOn",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "ModifiedBy",
+				"type": "nvarchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dwh",
+			"table": "FactFinancials"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,67 @@
+{
+	"name": "mbr_u_actual",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ocean_db",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "00DEV"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "nature_code",
+				"type": "varchar"
+			},
+			{
+				"name": "nature_name",
+				"type": "varchar"
+			},
+			{
+				"name": "cost_center_code",
+				"type": "varchar"
+			},
+			{
+				"name": "cost_center_name",
+				"type": "varchar"
+			},
+			{
+				"name": "reference_date",
+				"type": "varchar"
+			},
+			{
+				"name": "cost_amount",
+				"type": "varchar"
+			},
+			{
+				"name": "mbr_scope_bu",
+				"type": "varchar"
+			},
+			{
+				"name": "file_month",
+				"type": "varchar"
+			},
+			{
+				"name": "currency_code",
+				"type": "varchar"
+			},
+			{
+				"name": "bu_name",
+				"type": "varchar"
+			},
+			{
+				"name": "upload_date",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "ods",
+			"table": "U_MBR_Actual"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

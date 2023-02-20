@@ -1,0 +1,283 @@
+{
+	"name": "df_Load_Fact_Financials",
+	"properties": {
+		"folder": {
+			"name": "EDI"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_ocean_stg",
+						"type": "DatasetReference"
+					},
+					"name": "getMBRStagingData"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_ocean_dwh",
+						"type": "DatasetReference"
+					},
+					"name": "getDimScenario"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_ocean_dwh",
+						"type": "DatasetReference"
+					},
+					"name": "getDimNature"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_ocean_dwh",
+						"type": "DatasetReference"
+					},
+					"name": "getDimOrganisation"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_fact_tables",
+						"type": "DatasetReference"
+					},
+					"name": "getFactData"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_fact_tables",
+						"type": "DatasetReference"
+					},
+					"name": "loadFactTable"
+				}
+			],
+			"transformations": [
+				{
+					"name": "addYearMonthID"
+				},
+				{
+					"name": "joinDimScenario"
+				},
+				{
+					"name": "joinDimNature"
+				},
+				{
+					"name": "getOrigationID"
+				},
+				{
+					"name": "joinDimOrganisation"
+				},
+				{
+					"name": "cleanColumns"
+				},
+				{
+					"name": "join1"
+				},
+				{
+					"name": "factDataClean"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "insertOrUpdate"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "derivedColumn2"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          BusinessUnit as string,",
+				"          Scenario as string,",
+				"          NatureID as integer,",
+				"          Nature as string,",
+				"          MonthYear as timestamp,",
+				"          Value as double",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> getMBRStagingData",
+				"source(output(",
+				"          Scenario_Name0 as string,",
+				"          Scenario_Code0 as string,",
+				"          Comment as string,",
+				"          Scenario_Index as long",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> getDimScenario",
+				"source(output(",
+				"          NatureGroupID as long,",
+				"          NatureGroup as string,",
+				"          NatureSubGroupID as long,",
+				"          NatureSubGroup as string,",
+				"          Nature as string,",
+				"          NatureID as long",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> getDimNature",
+				"source(output(",
+				"          {Business Unit} as string,",
+				"          {MBR Scope} as string,",
+				"          Area as string,",
+				"          Zone as string,",
+				"          {Keyrus Group} as string,",
+				"          Total as string,",
+				"          {MBR Scope_1} as string,",
+				"          Management_hierarchy_1 as string,",
+				"          Management_hierarchy_2 as string,",
+				"          Management_hierarchy_3 as string,",
+				"          Management_hierarchy_4 as string,",
+				"          Currency_Name0 as string,",
+				"          Currency_Code0 as string,",
+				"          BusinessLine_Name as string,",
+				"          Country_Name as string,",
+				"          {Financial manager} as string,",
+				"          {Managing Director} as string,",
+				"          {MBR file user(s)} as string,",
+				"          OrganisationID as long",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> getDimOrganisation",
+				"source(output(",
+				"          FactFinID as long,",
+				"          ScenarioID as integer,",
+				"          NatureID as integer,",
+				"          OrganisationID as integer,",
+				"          MonthYearID as integer,",
+				"          MonthYear as date,",
+				"          Value as double,",
+				"          CreatedOn as timestamp,",
+				"          CreatedBy as string,",
+				"          ModifiedOn as timestamp,",
+				"          ModifiedBy as string",
+				"     ),",
+				"     allowSchemaDrift: false,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> getFactData",
+				"getMBRStagingData derive(MonthYearID = toInteger(concat(toString(year(MonthYear)), lpad(toString(month(MonthYear)),2,'0'), '01'))) ~> addYearMonthID",
+				"addYearMonthID, getDimScenario join(Scenario == Scenario_Name0,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinDimScenario",
+				"joinDimScenario, getDimNature join(getMBRStagingData@NatureID == getDimNature@NatureID,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinDimNature",
+				"getDimOrganisation select(mapColumn(",
+				"          {Business Unit},",
+				"          OrganisationID",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> getOrigationID",
+				"joinDimNature, getOrigationID join(BusinessUnit == {Business Unit},",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinDimOrganisation",
+				"joinDimOrganisation select(mapColumn(",
+				"          ScenarioID = Scenario_Index,",
+				"          NatureID = getDimNature@NatureID,",
+				"          OrganisationID,",
+				"          MonthYearID,",
+				"          MonthYear,",
+				"          Value",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> cleanColumns",
+				"derivedColumn2, factDataClean join(derivedColumn2@ScenarioID == factDataClean@ScenarioID",
+				"     && derivedColumn2@NatureID == factDataClean@NatureID",
+				"     && derivedColumn2@OrganisationID == factDataClean@OrganisationID",
+				"     && cleanColumns@MonthYearID == factDataClean@MonthYearID,",
+				"     joinType:'left',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"getFactData select(mapColumn(",
+				"          ScenarioID,",
+				"          NatureID,",
+				"          OrganisationID,",
+				"          MonthYearID,",
+				"          Value",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> factDataClean",
+				"join1 derive(InsertOrUpdate = iif(isNull(factDataClean@ScenarioID) && isNull(factDataClean@NatureID) && isNull(factDataClean@OrganisationID) && isNull(factDataClean@MonthYearID) \r",
+				", 'I',\r",
+				"iif(cleanColumns@Value == factDataClean@Value, 'P','U')\r",
+				")) ~> derivedColumn1",
+				"select1 alterRow(insertIf(InsertOrUpdate=='I'),",
+				"     updateIf(InsertOrUpdate=='U')) ~> insertOrUpdate",
+				"derivedColumn1 filter(in(['I','U'],InsertOrUpdate)) ~> filter1",
+				"filter1 select(mapColumn(",
+				"          ScenarioID = derivedColumn2@ScenarioID,",
+				"          NatureID = derivedColumn2@NatureID,",
+				"          OrganisationID = derivedColumn2@OrganisationID,",
+				"          MonthYearID = cleanColumns@MonthYearID,",
+				"          MonthYear,",
+				"          Value = cleanColumns@Value,",
+				"          ScenarioID = factDataClean@ScenarioID,",
+				"          NatureID = factDataClean@NatureID,",
+				"          OrganisationID = factDataClean@OrganisationID,",
+				"          MonthYearID = factDataClean@MonthYearID,",
+				"          Value = factDataClean@Value,",
+				"          InsertOrUpdate",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"cleanColumns derive(ScenarioID = toInteger(ScenarioID),",
+				"          NatureID = toInteger(NatureID),",
+				"          OrganisationID = toInteger(OrganisationID)) ~> derivedColumn2",
+				"insertOrUpdate sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          FactFinID as long,",
+				"          ScenarioID as integer,",
+				"          NatureID as integer,",
+				"          OrganisationID as integer,",
+				"          MonthYearID as integer,",
+				"          MonthYear as date,",
+				"          Value as double,",
+				"          CreatedOn as timestamp,",
+				"          CreatedBy as string,",
+				"          ModifiedOn as timestamp,",
+				"          ModifiedBy as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:true,",
+				"     upsertable:false,",
+				"     keys:['ScenarioID','NatureID','OrganisationID','MonthYearID'],",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          ScenarioID,",
+				"          NatureID,",
+				"          OrganisationID,",
+				"          MonthYearID,",
+				"          MonthYear,",
+				"          Value",
+				"     )) ~> loadFactTable"
+			]
+		}
+	}
+}

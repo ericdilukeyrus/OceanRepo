@@ -1,0 +1,79 @@
+{
+	"name": "mbr_kpi_pyramide",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "dimensions_source",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "00DEV"
+		},
+		"annotations": [],
+		"type": "Excel",
+		"typeProperties": {
+			"sheetName": "KPI Pyramid",
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "MBR Reporting_2023_v22 - 02 BUs (Example).xlsx",
+				"container": "mbr-landing-zone"
+			},
+			"range": "B78:N846",
+			"firstRowAsHeader": true
+		},
+		"schema": [
+			{
+				"name": "BU",
+				"type": "String"
+			},
+			{
+				"name": "Version",
+				"type": "String"
+			},
+			{
+				"name": "Period",
+				"type": "String"
+			},
+			{
+				"name": "Cost center",
+				"type": "String"
+			},
+			{
+				"name": "People type",
+				"type": "String"
+			},
+			{
+				"name": "Level of seniority",
+				"type": "String"
+			},
+			{
+				"name": "End of month FTE",
+				"type": "String"
+			},
+			{
+				"name": "Service sales before boni / mali",
+				"type": "String"
+			},
+			{
+				"name": "Billable days",
+				"type": "String"
+			},
+			{
+				"name": "Daily rate",
+				"type": "String"
+			},
+			{
+				"name": "Annual direct costs",
+				"type": "String"
+			},
+			{
+				"name": "Annual production days",
+				"type": "String"
+			},
+			{
+				"name": "Daily cost",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

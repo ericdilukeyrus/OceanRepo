@@ -1,0 +1,101 @@
+{
+	"name": "pl_04_load_fact_financials",
+	"properties": {
+		"activities": [
+			{
+				"name": "Get All Staging Data",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "select distinct MBR_UnpvtTableName, CONCAT('P&L_FI_', MBR_BU_Code) AS StgFinancialTableName  from  [ods].[Sources_Config]",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_ocean_ods",
+						"type": "DatasetReference",
+						"parameters": {
+							"vTableName": "Sources_Config"
+						}
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach Staging Table",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Get All Staging Data",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get All Staging Data').output.value",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Load Fact Financials",
+							"type": "ExecuteDataFlow",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataflow": {
+									"referenceName": "df_Load_Fact_Financials",
+									"type": "DataFlowReference",
+									"datasetParameters": {
+										"getMBRStagingData": {
+											"vTableName": {
+												"value": "@item().StgFinancialTableName",
+												"type": "Expression"
+											}
+										},
+										"getDimScenario": {
+											"vTableName": "DimScenario"
+										},
+										"getDimNature": {
+											"vTableName": "DimNature"
+										},
+										"getDimOrganisation": {
+											"vTableName": "DimOrganisation"
+										}
+									}
+								},
+								"compute": {
+									"coreCount": 8,
+									"computeType": "General"
+								},
+								"traceLevel": "Fine"
+							}
+						}
+					]
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2023-02-17T16:37:57Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

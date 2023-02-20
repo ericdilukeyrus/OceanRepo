@@ -1,0 +1,25 @@
+{
+	"name": "ds_unpvtdata_table",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ocean_db_nonencrypted",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"UnpvtTableName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "ods",
+			"table": {
+				"value": "@dataset().UnpvtTableName",
+				"type": "Expression"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,25 @@
+{
+	"name": "ds_ocean_cfg",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ocean_db",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"vTableName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "cfg",
+			"table": {
+				"value": "@dataset().vTableName",
+				"type": "Expression"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

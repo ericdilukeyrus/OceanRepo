@@ -1,0 +1,127 @@
+{
+	"name": "stg_dimensions",
+	"properties": {
+		"activities": [
+			{
+				"name": "ForEach Sheets",
+				"type": "ForEach",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@pipeline().parameters.SheetName",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Load Dimensions to Azure SQL",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "ExcelSource",
+									"storeSettings": {
+										"type": "AzureBlobStorageReadSettings",
+										"recursive": true,
+										"enablePartitionDiscovery": false
+									}
+								},
+								"sink": {
+									"type": "AzureSqlSink",
+									"preCopyScript": {
+										"value": "TRUNCATE TABLE ods.[@{item().SheetName}]",
+										"type": "Expression"
+									},
+									"writeBehavior": "insert",
+									"sqlWriterUseTableLock": false,
+									"disableMetricsCollection": false
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "mbr_dimensions",
+									"type": "DatasetReference",
+									"parameters": {
+										"vSheetName": {
+											"value": "@item().SheetName",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_ocean_ods",
+									"type": "DatasetReference",
+									"parameters": {
+										"vTableName": "@item().SheetName"
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"SheetName": {
+				"type": "array",
+				"defaultValue": [
+					{
+						"SheetName": "D_Organization"
+					},
+					{
+						"SheetName": "D_MBR_scope"
+					},
+					{
+						"SheetName": "D_Currency"
+					},
+					{
+						"SheetName": "D_Version"
+					},
+					{
+						"SheetName": "D_EmployeeType"
+					},
+					{
+						"SheetName": "D_LevelOfSeniority"
+					},
+					{
+						"SheetName": "D_SoftwarePartner"
+					},
+					{
+						"SheetName": "D_CostCenter"
+					},
+					{
+						"SheetName": "D_ServiceProductionCategory"
+					},
+					{
+						"SheetName": "D_Nature"
+					}
+				]
+			}
+		},
+		"folder": {
+			"name": "00DEV"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-02-13T10:38:02Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

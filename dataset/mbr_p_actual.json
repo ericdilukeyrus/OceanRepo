@@ -1,0 +1,665 @@
+{
+	"name": "mbr_p_actual",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ocean_db",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "00DEV"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "Index",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Anaplant_Index",
+				"type": "nvarchar"
+			},
+			{
+				"name": "PBI_Index",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column4",
+				"type": "nvarchar"
+			},
+			{
+				"name": "KCAD",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_LY_01",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_LY_02",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_LY_03",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_LY_04",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_LY_05",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_LY_06",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_LY_07",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_LY_08",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_LY_09",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_LY_10",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_LY_11",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_LY_12",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_LY_FY",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column19",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Budget_CY_01",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Budget_CY_02",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Budget_CY_03",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Budget_CY_04",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Budget_CY_05",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Budget_CY_06",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Budget_CY_07",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Budget_CY_08",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Budget_CY_09",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Budget_CY_10",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Budget_CY_11",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Budget_CY_12",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Budget_CY_FY",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column33",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_CY_01",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_CY_02",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_CY_03",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_CY_04",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_CY_05",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_CY_06",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_CY_07",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_CY_08",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_CY_09",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_CY_10",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_CY_11",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_CY_12",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Working_FCT_CY_FY",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Working_FCT_NY_01",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Working_FCT_NY_02",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Working_FCT_NY_03",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column50",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_CY_01_01",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_CY_02_02",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_CY_03_03",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_CY_04_04",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_CY_05_05",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_CY_06_06",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_CY_07_07",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_CY_08_08",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_CY_09_09",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_CY_10_10",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_CY_11_11",
+				"type": "nvarchar"
+			},
+			{
+				"name": "M1_FCT_CY_12",
+				"type": "nvarchar"
+			},
+			{
+				"name": "M1_FCT_CY_FY",
+				"type": "nvarchar"
+			},
+			{
+				"name": "M1_FCT_NY_01",
+				"type": "nvarchar"
+			},
+			{
+				"name": "M1_FCT_NY_02",
+				"type": "nvarchar"
+			},
+			{
+				"name": "M1_FCT_NY_03",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column67",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_YTD_01",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_YTD_02",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_YTD_03",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_YTD_04",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_YTD_05",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_YTD_06",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_YTD_07",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_YTD_08",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_YTD_09",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_YTD_10",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_YTD_11",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_YTD_12",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column80",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Budget_YTD_01",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Budget_YTD_02",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Budget_YTD_03",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Budget_YTD_04",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Budget_YTD_05",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Budget_YTD_06",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Budget_YTD_07",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Budget_YTD_08",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Budget_YTD_09",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Budget_YTD_10",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Budget_YTD_11",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Budget_YTD_12",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column93",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_YTD_01_01",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_YTD_02_02",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_YTD_03_03",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_YTD_04_04",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_YTD_05_05",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_YTD_06_06",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_YTD_07_07",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_YTD_08_08",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_YTD_09_09",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_YTD_10_10",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_YTD_11_11",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_YTD_12_12",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column106",
+				"type": "nvarchar"
+			},
+			{
+				"name": "M1_YTD_01",
+				"type": "nvarchar"
+			},
+			{
+				"name": "M1_YTD_02",
+				"type": "nvarchar"
+			},
+			{
+				"name": "M1_YTD_03",
+				"type": "nvarchar"
+			},
+			{
+				"name": "M1_YTD_04",
+				"type": "nvarchar"
+			},
+			{
+				"name": "M1_YTD_05",
+				"type": "nvarchar"
+			},
+			{
+				"name": "M1_YTD_06",
+				"type": "nvarchar"
+			},
+			{
+				"name": "M1_YTD_07",
+				"type": "nvarchar"
+			},
+			{
+				"name": "M1_YTD_08",
+				"type": "nvarchar"
+			},
+			{
+				"name": "M1_YTD_09",
+				"type": "nvarchar"
+			},
+			{
+				"name": "M1_YTD_10",
+				"type": "nvarchar"
+			},
+			{
+				"name": "M1_YTD_11",
+				"type": "nvarchar"
+			},
+			{
+				"name": "M1_YTD_12",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column119",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Comments",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column121",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column122",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column123",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column124",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column125",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column126",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column127",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column128",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column129",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column130",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column131",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column132",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column133",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column134",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column135",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column136",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column137",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column138",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column139",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column140",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column141",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column142",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column143",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column144",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column145",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column146",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column147",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column148",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column149",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column150",
+				"type": "nvarchar"
+			},
+			{
+				"name": "CC_Name",
+				"type": "nvarchar"
+			},
+			{
+				"name": "CC_Code",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Nature_Name",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Nature_Code",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column155",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column156",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column157",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column158",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column159",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column160",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Column161",
+				"type": "nvarchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "ods",
+			"table": "R_PNL_FI_TEST"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

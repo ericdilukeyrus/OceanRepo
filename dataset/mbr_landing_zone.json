@@ -1,0 +1,20 @@
+{
+	"name": "mbr_landing_zone",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_files_to_load",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "MBR Reporting_2023_v22 - 02 BUs (Example).xlsx",
+				"folderPath": "toload",
+				"container": "mbr-landing-zone"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

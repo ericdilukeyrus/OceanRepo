@@ -1,0 +1,11 @@
+{
+	"name": "AzureKeyVaultOceanProject",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://ocean-project.vault.azure.net/"
+		}
+	}
+}

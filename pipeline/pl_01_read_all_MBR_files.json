@@ -1,0 +1,98 @@
+{
+	"name": "pl_01_read_all_MBR_files",
+	"properties": {
+		"activities": [
+			{
+				"name": "Get MBR files list",
+				"type": "GetMetadata",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "ds_mbr_landing_folder",
+						"type": "DatasetReference",
+						"parameters": {
+							"MBRScope": {
+								"value": "@pipeline().parameters.MBRScope_Folder",
+								"type": "Expression"
+							}
+						}
+					},
+					"fieldList": [
+						"childItems"
+					],
+					"storeSettings": {
+						"type": "AzureBlobStorageReadSettings",
+						"recursive": true,
+						"enablePartitionDiscovery": false
+					}
+				}
+			},
+			{
+				"name": "ForEach MBR Files by Scope",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Get MBR files list",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get MBR files list').output.childItems",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "pl_02_ingest_mbr_data",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "pl_02_ingest_mbr_data_ods",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"pFileName": {
+										"value": "@item().name",
+										"type": "Expression"
+									},
+									"pFolderName": {
+										"value": "@pipeline().parameters.MBRScope_Folder",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"MBRScope_Folder": {
+				"type": "string"
+			}
+		},
+		"variables": {
+			"test": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-02-20T08:54:30Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

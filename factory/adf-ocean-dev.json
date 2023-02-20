@@ -1,0 +1,14 @@
+{
+	"name": "adf-ocean-dev",
+	"properties": {
+		"globalConfigurations": {
+			"PipelineBillingEnabled": "false"
+		}
+	},
+	"location": "francecentral",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "642a7422-1161-43d9-baab-f9911d9bdbe4",
+		"tenantId": "168e48b2-81f0-4aac-bc77-d58d07d205e2"
+	}
+}
