@@ -90,7 +90,7 @@
 					"name": "select1"
 				},
 				{
-					"name": "derivedColumn2"
+					"name": "convertToInteger"
 				}
 			],
 			"scriptLines": [
@@ -202,9 +202,9 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> cleanColumns",
-				"derivedColumn2, factDataClean join(derivedColumn2@ScenarioID == factDataClean@ScenarioID",
-				"     && derivedColumn2@NatureID == factDataClean@NatureID",
-				"     && derivedColumn2@OrganisationID == factDataClean@OrganisationID",
+				"convertToInteger, factDataClean join(convertToInteger@ScenarioID == factDataClean@ScenarioID",
+				"     && convertToInteger@NatureID == factDataClean@NatureID",
+				"     && convertToInteger@OrganisationID == factDataClean@OrganisationID",
 				"     && cleanColumns@MonthYearID == factDataClean@MonthYearID,",
 				"     joinType:'left',",
 				"     matchType:'exact',",
@@ -227,9 +227,9 @@
 				"     updateIf(InsertOrUpdate=='U')) ~> insertOrUpdate",
 				"derivedColumn1 filter(in(['I','U'],InsertOrUpdate)) ~> filter1",
 				"filter1 select(mapColumn(",
-				"          ScenarioID = derivedColumn2@ScenarioID,",
-				"          NatureID = derivedColumn2@NatureID,",
-				"          OrganisationID = derivedColumn2@OrganisationID,",
+				"          ScenarioID = convertToInteger@ScenarioID,",
+				"          NatureID = convertToInteger@NatureID,",
+				"          OrganisationID = convertToInteger@OrganisationID,",
 				"          MonthYearID = cleanColumns@MonthYearID,",
 				"          MonthYear,",
 				"          Value = cleanColumns@Value,",
@@ -244,7 +244,7 @@
 				"     skipDuplicateMapOutputs: true) ~> select1",
 				"cleanColumns derive(ScenarioID = toInteger(ScenarioID),",
 				"          NatureID = toInteger(NatureID),",
-				"          OrganisationID = toInteger(OrganisationID)) ~> derivedColumn2",
+				"          OrganisationID = toInteger(OrganisationID)) ~> convertToInteger",
 				"insertOrUpdate sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
