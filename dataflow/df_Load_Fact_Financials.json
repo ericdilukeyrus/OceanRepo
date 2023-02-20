@@ -127,6 +127,9 @@
 				},
 				{
 					"name": "cleanColumnsToUpsertKPI"
+				},
+				{
+					"name": "insertOrUpdateKPI"
 				}
 			],
 			"scriptLines": [
@@ -321,10 +324,13 @@
 				"          NatureID = FINorKPI@KPI@NatureID,",
 				"          MonthYearID = FINorKPI@KPI@MonthYearID,",
 				"          MonthYear,",
-				"          Value = FINorKPI@KPI@Value",
+				"          Value = FINorKPI@KPI@Value,",
+				"          InsertOrUpdate",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> cleanColumnsToUpsertKPI",
+				"cleanColumnsToUpsertKPI alterRow(insertIf(InsertOrUpdate=='I'),",
+				"     updateIf(InsertOrUpdate=='U')) ~> insertOrUpdateKPI",
 				"insertOrUpdate sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
@@ -341,9 +347,9 @@
 				"          ModifiedBy as string",
 				"     ),",
 				"     deletable:false,",
-				"     insertable:false,",
-				"     updateable:false,",
-				"     upsertable:true,",
+				"     insertable:true,",
+				"     updateable:true,",
+				"     upsertable:false,",
 				"     keys:['ScenarioID','NatureID','OrganisationID','MonthYearID'],",
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
@@ -357,7 +363,7 @@
 				"          MonthYear,",
 				"          Value",
 				"     )) ~> insertFactFinancials",
-				"cleanColumnsToUpsertKPI sink(allowSchemaDrift: true,",
+				"insertOrUpdateKPI sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          FactFinID as long,",
