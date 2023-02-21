@@ -60,7 +60,7 @@
 				},
 				{
 					"dataset": {
-						"referenceName": "ds_fact_financials",
+						"referenceName": "ds_fact_drivers",
 						"type": "DatasetReference"
 					},
 					"name": "insertFactDrivers"
@@ -321,7 +321,7 @@
 				"includesUpsertKPI select(mapColumn(",
 				"          ScenarioID = FINorKPI@KPI@ScenarioID,",
 				"          OrganisationID = FINorKPI@KPI@OrganisationID,",
-				"          NatureID,",
+				"          KPIID,",
 				"          MonthYearID = FINorKPI@KPI@MonthYearID,",
 				"          MonthYear,",
 				"          Value = FINorKPI@KPI@Value,",
@@ -366,9 +366,9 @@
 				"insertOrUpdateKPI sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
-				"          FactFinID as long,",
+				"          FactDriversID as long,",
 				"          ScenarioID as integer,",
-				"          NatureID as integer,",
+				"          KPIID as integer,",
 				"          OrganisationID as integer,",
 				"          MonthYearID as integer,",
 				"          MonthYear as date,",
@@ -388,12 +388,11 @@
 				"     errorHandlingOption: 'stopOnFirstError',",
 				"     mapColumn(",
 				"          ScenarioID,",
+				"          KPIID,",
 				"          OrganisationID,",
-				"          NatureID,",
 				"          MonthYearID,",
 				"          MonthYear,",
-				"          Value,",
-				"          InsertOrUpdate",
+				"          Value",
 				"     )) ~> insertFactDrivers"
 			]
 		}
