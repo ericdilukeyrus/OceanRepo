@@ -16,6 +16,9 @@
 				"type": "string"
 			}
 		},
+		"folder": {
+			"name": "01ODS"
+		},
 		"annotations": [],
 		"type": "Excel",
 		"typeProperties": {

@@ -5,6 +5,9 @@
 			"referenceName": "SharepointOceanProject",
 			"type": "LinkedServiceReference"
 		},
+		"folder": {
+			"name": "01ODS"
+		},
 		"annotations": [],
 		"type": "Binary",
 		"typeProperties": {
