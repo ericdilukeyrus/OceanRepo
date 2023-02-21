@@ -5,6 +5,9 @@
 			"referenceName": "ocean_db",
 			"type": "LinkedServiceReference"
 		},
+		"folder": {
+			"name": "01ODS"
+		},
 		"annotations": [],
 		"type": "AzureSqlTable",
 		"schema": [

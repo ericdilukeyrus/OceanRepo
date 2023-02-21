@@ -2,7 +2,7 @@
 	"name": "df_stg_financials",
 	"properties": {
 		"folder": {
-			"name": "EDI"
+			"name": "02STG"
 		},
 		"type": "MappingDataFlow",
 		"typeProperties": {

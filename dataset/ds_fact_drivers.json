@@ -1,0 +1,80 @@
+{
+	"name": "ds_fact_drivers",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ocean_db_nonencrypted",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"FactName": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "03DWH"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "FactDriversID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "ScenarioID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "KPIID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "OrganisationID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "MonthYearID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "MonthYear",
+				"type": "date"
+			},
+			{
+				"name": "Value",
+				"type": "float",
+				"precision": 15
+			},
+			{
+				"name": "CreatedOn",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "CreatedBy",
+				"type": "nvarchar"
+			},
+			{
+				"name": "ModifiedOn",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "ModifiedBy",
+				"type": "nvarchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dwh",
+			"table": "FactDrivers"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

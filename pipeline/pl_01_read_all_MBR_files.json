@@ -91,6 +91,9 @@
 				"type": "String"
 			}
 		},
+		"folder": {
+			"name": "01ODS"
+		},
 		"annotations": [],
 		"lastPublishTime": "2023-02-20T08:54:30Z"
 	},

@@ -2,7 +2,7 @@
 	"name": "df_copy_all_mbr",
 	"properties": {
 		"folder": {
-			"name": "EDI"
+			"name": "01ODS"
 		},
 		"type": "MappingDataFlow",
 		"typeProperties": {

@@ -1,9 +1,17 @@
 {
-	"name": "ds_fact_tables",
+	"name": "ds_fact_financials",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ocean_db_nonencrypted",
 			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"FactName": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "03DWH"
 		},
 		"annotations": [],
 		"type": "AzureSqlTable",

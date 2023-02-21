@@ -5,6 +5,9 @@
 			"referenceName": "ls_files_to_load",
 			"type": "LinkedServiceReference"
 		},
+		"folder": {
+			"name": "01ODS"
+		},
 		"annotations": [],
 		"type": "Binary",
 		"typeProperties": {
