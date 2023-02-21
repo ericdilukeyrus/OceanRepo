@@ -13,6 +13,423 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/ods_mbr_ic_declaration')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "stg_mbr_ic_declaration",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "ExcelSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"preCopyScript": "TRUNCATE TABLE stg.R_MBR_Licence_maintenance",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false,
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 1
+										},
+										"sink": {
+											"name": "BU",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 2
+										},
+										"sink": {
+											"name": "Version",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 3
+										},
+										"sink": {
+											"name": "Period",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 4
+										},
+										"sink": {
+											"name": "Software partners",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 5
+										},
+										"sink": {
+											"name": "License - Perpetual",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 6
+										},
+										"sink": {
+											"name": "License - New subscription",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 7
+										},
+										"sink": {
+											"name": "Maintenance - 1st year",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 8
+										},
+										"sink": {
+											"name": "License - Renewed subscription",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 9
+										},
+										"sink": {
+											"name": "Maintenance - Renewal",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 10
+										},
+										"sink": {
+											"name": "License - Referrals",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 11
+										},
+										"sink": {
+											"name": "Total Revenue",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 12
+										},
+										"sink": {
+											"name": "License purchases - Perpetual",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 13
+										},
+										"sink": {
+											"name": "License purchases - New subscription",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 14
+										},
+										"sink": {
+											"name": "Maintenance purchases - 1st year",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 15
+										},
+										"sink": {
+											"name": "License purchases - Renewed subscription",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 16
+										},
+										"sink": {
+											"name": "Maintenance purchases - Renewal",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 17
+										},
+										"sink": {
+											"name": "Total cost",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 18
+										},
+										"sink": {
+											"name": "Licenses - Perpetual - Margin",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 19
+										},
+										"sink": {
+											"name": "Licenses - New Subscription - Margin",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 20
+										},
+										"sink": {
+											"name": "Maintenance - 1st year - Margin",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 21
+										},
+										"sink": {
+											"name": "Licenses - Renewed subscription - Margin",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 22
+										},
+										"sink": {
+											"name": "Maintenance - Renewal - Margin",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 23
+										},
+										"sink": {
+											"name": "Licenses - Referrals - Margin",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 24
+										},
+										"sink": {
+											"name": "Total Margin",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 25
+										},
+										"sink": {
+											"name": "Licenses - Perpetual - Margin %",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 26
+										},
+										"sink": {
+											"name": "Licenses - New Subscription - Margin %",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 27
+										},
+										"sink": {
+											"name": "Maintenance - 1st year - Margin %",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 28
+										},
+										"sink": {
+											"name": "Licenses - Renewed subscription - Margin %",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 29
+										},
+										"sink": {
+											"name": "Maintenance - Renewal - Margin %",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 30
+										},
+										"sink": {
+											"name": "Licenses - Referrals - Margin %",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 31
+										},
+										"sink": {
+											"name": "Total Margin %",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "mbr_licence_maintenance",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ds_ocean_stg",
+								"type": "DatasetReference",
+								"parameters": {
+									"vTableName": "R_MBR_licence_maintenance"
+								}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"folder": {
+					"name": "00DEV"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-13T13:29:14Z"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ods_mbr_index')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -1194,7 +1611,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"folder": {
-					"name": "EDI"
+					"name": "03DWH"
 				},
 				"type": "MappingDataFlow",
 				"typeProperties": {
@@ -1229,19 +1646,40 @@
 						},
 						{
 							"dataset": {
-								"referenceName": "ds_fact_tables",
+								"referenceName": "ds_fact_financials",
 								"type": "DatasetReference"
 							},
-							"name": "getFactData"
+							"name": "getFactFinancials"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_ocean_dwh",
+								"type": "DatasetReference"
+							},
+							"name": "getFactDrivers"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_ocean_dwh",
+								"type": "DatasetReference"
+							},
+							"name": "getDimKPI"
 						}
 					],
 					"sinks": [
 						{
 							"dataset": {
-								"referenceName": "ds_fact_tables",
+								"referenceName": "ds_fact_financials",
 								"type": "DatasetReference"
 							},
-							"name": "loadFactTable"
+							"name": "insertFactFinancials"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_fact_drivers",
+								"type": "DatasetReference"
+							},
+							"name": "insertFactDrivers"
 						}
 					],
 					"transformations": [
@@ -1252,10 +1690,6 @@
 						{
 							"name": "joinDimScenario",
 							"description": "Inner join with 'getDimScenario'"
-						},
-						{
-							"name": "joinDimNature",
-							"description": "Inner join with 'getDimNature'"
 						},
 						{
 							"name": "getOrganizationID"
@@ -1271,7 +1705,7 @@
 							"name": "joinFactFinancials"
 						},
 						{
-							"name": "factDataClean"
+							"name": "factFinancialsClean"
 						},
 						{
 							"name": "insertOrUpdateColumns"
@@ -1288,6 +1722,33 @@
 						{
 							"name": "convertToInteger",
 							"description": "Convert Surrogate Key to Integer"
+						},
+						{
+							"name": "FINorKPI"
+						},
+						{
+							"name": "joinDimNature"
+						},
+						{
+							"name": "factDriversClean"
+						},
+						{
+							"name": "joinFactKPI"
+						},
+						{
+							"name": "upsertColumn"
+						},
+						{
+							"name": "includesUpsertKPI"
+						},
+						{
+							"name": "cleanColumnsToUpsertKPI"
+						},
+						{
+							"name": "insertOrUpdateKPI"
+						},
+						{
+							"name": "joinDimKPI"
 						}
 					],
 					"scriptLines": [
@@ -1366,48 +1827,71 @@
 						"     allowSchemaDrift: false,",
 						"     validateSchema: false,",
 						"     isolationLevel: 'READ_UNCOMMITTED',",
-						"     format: 'table') ~> getFactData",
+						"     format: 'table') ~> getFactFinancials",
+						"source(output(",
+						"          FactDriversID as long,",
+						"          ScenarioID as integer,",
+						"          KPIID as integer,",
+						"          OrganisationID as integer,",
+						"          MonthYearID as integer,",
+						"          MonthYear as date,",
+						"          Value as double,",
+						"          CreatedOn as timestamp,",
+						"          CreatedBy as string,",
+						"          ModifiedOn as timestamp,",
+						"          ModifiedBy as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> getFactDrivers",
+						"source(output(",
+						"          Index as long,",
+						"          PeopleType as string,",
+						"          PeopleTypeID as long,",
+						"          KPI as string,",
+						"          IsKPI as long",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> getDimKPI",
 						"getMBRStagingData derive(MonthYearID = toInteger(concat(toString(year(MonthYear)), lpad(toString(month(MonthYear)),2,'0'), '01'))) ~> addYearMonthID",
 						"addYearMonthID, getDimScenario join(Scenario == Scenario_Name0,",
 						"     joinType:'inner',",
 						"     matchType:'exact',",
 						"     ignoreSpaces: false,",
 						"     broadcast: 'auto')~> joinDimScenario",
-						"joinDimScenario, getDimNature join(getMBRStagingData@NatureID == getDimNature@NatureID,",
-						"     joinType:'inner',",
-						"     matchType:'exact',",
-						"     ignoreSpaces: false,",
-						"     broadcast: 'auto')~> joinDimNature",
 						"getDimOrganisation select(mapColumn(",
 						"          {Business Unit},",
 						"          OrganisationID",
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true) ~> getOrganizationID",
-						"joinDimNature, getOrganizationID join(BusinessUnit == {Business Unit},",
+						"joinDimScenario, getOrganizationID join(BusinessUnit == {Business Unit},",
 						"     joinType:'inner',",
 						"     matchType:'exact',",
 						"     ignoreSpaces: false,",
 						"     broadcast: 'auto')~> joinDimOrganisation",
 						"joinDimOrganisation select(mapColumn(",
 						"          ScenarioID = Scenario_Index,",
-						"          NatureID = getDimNature@NatureID,",
 						"          OrganisationID,",
+						"          NatureID,",
 						"          MonthYearID,",
 						"          MonthYear,",
 						"          Value",
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true) ~> cleanColumns",
-						"convertToInteger, factDataClean join(convertToInteger@ScenarioID == factDataClean@ScenarioID",
-						"     && convertToInteger@NatureID == factDataClean@NatureID",
-						"     && convertToInteger@OrganisationID == factDataClean@OrganisationID",
-						"     && cleanColumns@MonthYearID == factDataClean@MonthYearID,",
+						"joinDimNature, factFinancialsClean join(FINorKPI@FIN@ScenarioID == factFinancialsClean@ScenarioID",
+						"     && getDimNature@NatureID == factFinancialsClean@NatureID",
+						"     && FINorKPI@FIN@OrganisationID == factFinancialsClean@OrganisationID",
+						"     && FINorKPI@FIN@MonthYearID == factFinancialsClean@MonthYearID,",
 						"     joinType:'left',",
 						"     matchType:'exact',",
 						"     ignoreSpaces: false,",
 						"     broadcast: 'auto')~> joinFactFinancials",
-						"getFactData select(mapColumn(",
+						"getFactFinancials select(mapColumn(",
 						"          ScenarioID,",
 						"          NatureID,",
 						"          OrganisationID,",
@@ -1415,33 +1899,73 @@
 						"          Value",
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> factDataClean",
-						"joinFactFinancials derive(InsertOrUpdate = iif(isNull(factDataClean@ScenarioID) && isNull(factDataClean@NatureID) && isNull(factDataClean@OrganisationID) && isNull(factDataClean@MonthYearID) \r",
+						"     skipDuplicateMapOutputs: true) ~> factFinancialsClean",
+						"joinFactFinancials derive(InsertOrUpdate = iif(isNull(factFinancialsClean@ScenarioID) && isNull(factFinancialsClean@NatureID) && isNull(factFinancialsClean@OrganisationID) && isNull(factFinancialsClean@MonthYearID) \r",
 						", 'I',\r",
-						"iif(cleanColumns@Value == factDataClean@Value, 'P','U')\r",
+						"iif(FINorKPI@FIN@Value == factFinancialsClean@Value, 'P','U')\r",
 						")) ~> insertOrUpdateColumns",
 						"cleanColumnsToUpsert alterRow(insertIf(InsertOrUpdate=='I'),",
 						"     updateIf(InsertOrUpdate=='U')) ~> insertOrUpdate",
 						"insertOrUpdateColumns filter(in(['I','U'],InsertOrUpdate)) ~> includesUpsert",
 						"includesUpsert select(mapColumn(",
-						"          ScenarioID = convertToInteger@ScenarioID,",
-						"          NatureID = convertToInteger@NatureID,",
-						"          OrganisationID = convertToInteger@OrganisationID,",
-						"          MonthYearID = cleanColumns@MonthYearID,",
+						"          ScenarioID = FINorKPI@FIN@ScenarioID,",
+						"          OrganisationID = FINorKPI@FIN@OrganisationID,",
+						"          NatureID = getDimNature@NatureID,",
+						"          MonthYearID = FINorKPI@FIN@MonthYearID,",
 						"          MonthYear,",
-						"          Value = cleanColumns@Value,",
-						"          ScenarioID = factDataClean@ScenarioID,",
-						"          NatureID = factDataClean@NatureID,",
-						"          OrganisationID = factDataClean@OrganisationID,",
-						"          MonthYearID = factDataClean@MonthYearID,",
-						"          Value = factDataClean@Value,",
+						"          Value = FINorKPI@FIN@Value,",
 						"          InsertOrUpdate",
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true) ~> cleanColumnsToUpsert",
 						"cleanColumns derive(ScenarioID = toInteger(ScenarioID),",
-						"          NatureID = toInteger(NatureID),",
-						"          OrganisationID = toInteger(OrganisationID)) ~> convertToInteger",
+						"          OrganisationID = toInteger(OrganisationID),",
+						"          FactIndicator = iif(NatureID >= 372, 'KPI', 'FIN')) ~> convertToInteger",
+						"convertToInteger split(FactIndicator == 'FIN',",
+						"     disjoint: false) ~> FINorKPI@(FIN, KPI)",
+						"FINorKPI@FIN, getDimNature join(FINorKPI@FIN@NatureID == getDimNature@NatureID,",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> joinDimNature",
+						"getFactDrivers select(mapColumn(",
+						"          ScenarioID,",
+						"          KPIID,",
+						"          OrganisationID,",
+						"          MonthYearID,",
+						"          Value",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> factDriversClean",
+						"joinDimKPI, factDriversClean join(FINorKPI@KPI@ScenarioID == factDriversClean@ScenarioID",
+						"     && FINorKPI@KPI@OrganisationID == factDriversClean@OrganisationID",
+						"     && Index == KPIID",
+						"     && FINorKPI@KPI@MonthYearID == factDriversClean@MonthYearID,",
+						"     joinType:'left',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> joinFactKPI",
+						"joinFactKPI derive(InsertOrUpdate = iif(isNull(factDriversClean@ScenarioID) && isNull(KPIID) && isNull(factDriversClean@OrganisationID) && isNull(factDriversClean@MonthYearID) , \r",
+						"'I',iif(FINorKPI@KPI@Value == factDriversClean@Value, 'P','U'))) ~> upsertColumn",
+						"upsertColumn filter(in(['I','U'],InsertOrUpdate)) ~> includesUpsertKPI",
+						"includesUpsertKPI select(mapColumn(",
+						"          ScenarioID = FINorKPI@KPI@ScenarioID,",
+						"          KPIID = Index,",
+						"          OrganisationID = FINorKPI@KPI@OrganisationID,",
+						"          MonthYearID = FINorKPI@KPI@MonthYearID,",
+						"          MonthYear,",
+						"          Value = FINorKPI@KPI@Value,",
+						"          InsertOrUpdate",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> cleanColumnsToUpsertKPI",
+						"cleanColumnsToUpsertKPI alterRow(insertIf(InsertOrUpdate=='I'),",
+						"     updateIf(InsertOrUpdate=='U')) ~> insertOrUpdateKPI",
+						"FINorKPI@KPI, getDimKPI join(NatureID == Index,",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> joinDimKPI",
 						"insertOrUpdate sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     input(",
@@ -1473,7 +1997,38 @@
 						"          MonthYearID,",
 						"          MonthYear,",
 						"          Value",
-						"     )) ~> loadFactTable"
+						"     )) ~> insertFactFinancials",
+						"insertOrUpdateKPI sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          FactDriversID as long,",
+						"          ScenarioID as integer,",
+						"          KPIID as integer,",
+						"          OrganisationID as integer,",
+						"          MonthYearID as integer,",
+						"          MonthYear as date,",
+						"          Value as double,",
+						"          CreatedOn as timestamp,",
+						"          CreatedBy as string,",
+						"          ModifiedOn as timestamp,",
+						"          ModifiedBy as string",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          ScenarioID,",
+						"          KPIID,",
+						"          OrganisationID,",
+						"          MonthYearID,",
+						"          MonthYear,",
+						"          Value",
+						"     )) ~> insertFactDrivers"
 					]
 				}
 			},
@@ -1485,7 +2040,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"folder": {
-					"name": "EDI"
+					"name": "01ODS"
 				},
 				"type": "MappingDataFlow",
 				"typeProperties": {
@@ -1745,7 +2300,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"folder": {
-					"name": "EDI"
+					"name": "02STG"
 				},
 				"type": "MappingDataFlow",
 				"typeProperties": {
@@ -1838,7 +2393,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"folder": {
-					"name": "EDI"
+					"name": "01ODS"
 				},
 				"type": "MappingDataFlow",
 				"typeProperties": {
@@ -2447,6 +3002,9 @@
 						"type": "String"
 					}
 				},
+				"folder": {
+					"name": "01ODS"
+				},
 				"annotations": [],
 				"lastPublishTime": "2023-02-20T10:35:32Z"
 			},
@@ -2515,8 +3073,7 @@
 														"type": "Expression"
 													}
 												}
-											},
-											"linkedServiceParameters": {}
+											}
 										},
 										"staging": {},
 										"compute": {
@@ -2653,6 +3210,9 @@
 					"elapsedTimeMetric": {},
 					"cancelAfter": {}
 				},
+				"folder": {
+					"name": "02STG"
+				},
 				"annotations": [],
 				"lastPublishTime": "2023-02-20T11:30:45Z"
 			},
@@ -2746,8 +3306,21 @@
 												"getDimOrganisation": {
 													"vTableName": "DimOrganisation"
 												},
-												"getFactData": {},
-												"loadFactTable": {}
+												"getFactFinancials": {
+													"FactName": "FactFinancials"
+												},
+												"getFactDrivers": {
+													"vTableName": "FactDrivers"
+												},
+												"getDimKPI": {
+													"vTableName": "DimKPI"
+												},
+												"insertFactFinancials": {
+													"FactName": "FactFinancials"
+												},
+												"insertFactDrivers": {
+													"FactName": "FactDrivers"
+												}
 											}
 										},
 										"staging": {},
@@ -2765,6 +3338,9 @@
 				"policy": {
 					"elapsedTimeMetric": {},
 					"cancelAfter": {}
+				},
+				"folder": {
+					"name": "03DWH"
 				},
 				"annotations": [],
 				"lastPublishTime": "2023-02-17T16:37:57Z"
@@ -2871,6 +3447,9 @@
 					"test": {
 						"type": "String"
 					}
+				},
+				"folder": {
+					"name": "01ODS"
 				},
 				"annotations": [],
 				"lastPublishTime": "2023-02-20T08:54:30Z"

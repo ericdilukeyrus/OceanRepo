@@ -192,13 +192,105 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/ds_fact_tables')]",
+			"name": "[concat(parameters('factoryName'), '/ds_fact_drivers')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
 					"referenceName": "ocean_db_nonencrypted",
 					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"FactName": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "03DWH"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "FactDriversID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "ScenarioID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "KPIID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "OrganisationID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "MonthYearID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "MonthYear",
+						"type": "date"
+					},
+					{
+						"name": "Value",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "CreatedOn",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "CreatedBy",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ModifiedOn",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ModifiedBy",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dwh",
+					"table": "FactDrivers"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ocean_db_nonencrypted')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_fact_financials')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ocean_db_nonencrypted",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"FactName": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "03DWH"
 				},
 				"annotations": [],
 				"type": "AzureSqlTable",
@@ -283,6 +375,9 @@
 					"pFolderName": {
 						"type": "string"
 					}
+				},
+				"folder": {
+					"name": "01ODS"
 				},
 				"annotations": [],
 				"type": "Excel",
@@ -786,6 +881,9 @@
 						"type": "string"
 					}
 				},
+				"folder": {
+					"name": "01ODS"
+				},
 				"annotations": [],
 				"type": "Excel",
 				"typeProperties": {
@@ -821,6 +919,9 @@
 					"pFolderName": {
 						"type": "string"
 					}
+				},
+				"folder": {
+					"name": "01ODS"
 				},
 				"annotations": [],
 				"type": "Excel",
@@ -1319,6 +1420,9 @@
 					"referenceName": "ocean_db",
 					"type": "LinkedServiceReference"
 				},
+				"folder": {
+					"name": "01ODS"
+				},
 				"annotations": [],
 				"type": "AzureSqlTable",
 				"schema": [
@@ -1362,6 +1466,9 @@
 						"type": "string"
 					}
 				},
+				"folder": {
+					"name": "03DWH"
+				},
 				"annotations": [],
 				"type": "AzureSqlTable",
 				"schema": [],
@@ -1390,6 +1497,9 @@
 					"vTableName": {
 						"type": "string"
 					}
+				},
+				"folder": {
+					"name": "03DWH"
 				},
 				"annotations": [],
 				"type": "AzureSqlTable",
@@ -1420,6 +1530,9 @@
 						"type": "string"
 					}
 				},
+				"folder": {
+					"name": "01ODS"
+				},
 				"annotations": [],
 				"type": "AzureSqlTable",
 				"schema": [],
@@ -1449,6 +1562,9 @@
 						"type": "string"
 					}
 				},
+				"folder": {
+					"name": "02STG"
+				},
 				"annotations": [],
 				"type": "AzureSqlTable",
 				"schema": [],
@@ -1477,6 +1593,9 @@
 					"pRawTableName": {
 						"type": "string"
 					}
+				},
+				"folder": {
+					"name": "02STG"
 				},
 				"annotations": [],
 				"type": "AzureSqlTable",
@@ -1694,6 +1813,9 @@
 						"type": "string"
 					}
 				},
+				"folder": {
+					"name": "01ODS"
+				},
 				"annotations": [],
 				"type": "Excel",
 				"typeProperties": {
@@ -1713,34 +1835,12 @@
 						},
 						"container": "mbr-landing-zone"
 					},
-					"range": "A10:AS378"
+					"range": "A10:AS482"
 				},
 				"schema": []
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/dimensions_source')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ds_sharepoint_ocean_project')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "SharepointOceanProject",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "Binary",
-				"typeProperties": {
-					"location": {
-						"type": "HttpServerLocation",
-						"relativeUrl": "/sites/OceanProject/_api/web/GetFileByServerRelativeUrl('/sites/OceanProject/Shared Documents/Portugal/MBR Reporting_2023_v22 - 02 BUs (Example).xlsx')/$value"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/SharepointOceanProject')]"
 			]
 		}
 	]
