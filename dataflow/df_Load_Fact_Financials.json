@@ -34,7 +34,7 @@
 				},
 				{
 					"dataset": {
-						"referenceName": "ds_fact_tables",
+						"referenceName": "ds_fact_financials",
 						"type": "DatasetReference"
 					},
 					"name": "getFactFinancials"
@@ -44,23 +44,23 @@
 						"referenceName": "ds_ocean_dwh",
 						"type": "DatasetReference"
 					},
-					"name": "getFactKPI"
+					"name": "getFactDrivers"
 				}
 			],
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "ds_fact_tables",
+						"referenceName": "ds_fact_financials",
 						"type": "DatasetReference"
 					},
 					"name": "insertFactFinancials"
 				},
 				{
 					"dataset": {
-						"referenceName": "ds_fact_tables",
+						"referenceName": "ds_fact_financials",
 						"type": "DatasetReference"
 					},
-					"name": "insertFactKPI"
+					"name": "insertFactDrivers"
 				}
 			],
 			"transformations": [
@@ -111,7 +111,7 @@
 					"name": "joinDimNature"
 				},
 				{
-					"name": "factKPIClean"
+					"name": "factDriversClean"
 				},
 				{
 					"name": "joinFactKPI"
@@ -207,9 +207,9 @@
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     format: 'table') ~> getFactFinancials",
 				"source(output(",
-				"          FactKPIID as long,",
+				"          FactDriversID as long,",
 				"          ScenarioID as integer,",
-				"          NatureID as integer,",
+				"          KPIID as integer,",
 				"          OrganisationID as integer,",
 				"          MonthYearID as integer,",
 				"          MonthYear as date,",
@@ -222,7 +222,7 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
-				"     format: 'table') ~> getFactKPI",
+				"     format: 'table') ~> getFactDrivers",
 				"getMBRStagingData derive(MonthYearID = toInteger(concat(toString(year(MonthYear)), lpad(toString(month(MonthYear)),2,'0'), '01'))) ~> addYearMonthID",
 				"addYearMonthID, getDimScenario join(Scenario == Scenario_Name0,",
 				"     joinType:'inner',",
@@ -295,30 +295,30 @@
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joinDimNature",
-				"getFactKPI select(mapColumn(",
+				"getFactDrivers select(mapColumn(",
 				"          ScenarioID,",
-				"          NatureID,",
+				"          KPIID,",
 				"          OrganisationID,",
 				"          MonthYearID,",
 				"          Value",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> factKPIClean",
-				"FINorKPI@KPI, factKPIClean join(FINorKPI@KPI@ScenarioID == factKPIClean@ScenarioID",
-				"     && FINorKPI@KPI@OrganisationID == factKPIClean@OrganisationID",
-				"     && FINorKPI@KPI@NatureID == factKPIClean@NatureID",
-				"     && FINorKPI@KPI@MonthYearID == factKPIClean@MonthYearID,",
+				"     skipDuplicateMapOutputs: true) ~> factDriversClean",
+				"FINorKPI@KPI, factDriversClean join(FINorKPI@KPI@ScenarioID == factDriversClean@ScenarioID",
+				"     && FINorKPI@KPI@OrganisationID == factDriversClean@OrganisationID",
+				"     && NatureID == KPIID",
+				"     && FINorKPI@KPI@MonthYearID == factDriversClean@MonthYearID,",
 				"     joinType:'left',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joinFactKPI",
-				"joinFactKPI derive(InsertOrUpdate = iif(isNull(factKPIClean@ScenarioID) && isNull(factKPIClean@NatureID) && isNull(factKPIClean@OrganisationID) && isNull(factKPIClean@MonthYearID) , \r",
-				"'I',iif(FINorKPI@KPI@Value == factKPIClean@Value, 'P','U'))) ~> upsertColumn",
+				"joinFactKPI derive(InsertOrUpdate = iif(isNull(factDriversClean@ScenarioID) && isNull(KPIID) && isNull(factDriversClean@OrganisationID) && isNull(factDriversClean@MonthYearID) , \r",
+				"'I',iif(FINorKPI@KPI@Value == factDriversClean@Value, 'P','U'))) ~> upsertColumn",
 				"upsertColumn filter(in(['I','U'],InsertOrUpdate)) ~> includesUpsertKPI",
 				"includesUpsertKPI select(mapColumn(",
 				"          ScenarioID = FINorKPI@KPI@ScenarioID,",
 				"          OrganisationID = FINorKPI@KPI@OrganisationID,",
-				"          NatureID = FINorKPI@KPI@NatureID,",
+				"          NatureID,",
 				"          MonthYearID = FINorKPI@KPI@MonthYearID,",
 				"          MonthYear,",
 				"          Value = FINorKPI@KPI@Value,",
@@ -385,12 +385,13 @@
 				"     errorHandlingOption: 'stopOnFirstError',",
 				"     mapColumn(",
 				"          ScenarioID,",
-				"          NatureID,",
 				"          OrganisationID,",
+				"          NatureID,",
 				"          MonthYearID,",
 				"          MonthYear,",
-				"          Value",
-				"     )) ~> insertFactKPI"
+				"          Value,",
+				"          InsertOrUpdate",
+				"     )) ~> insertFactDrivers"
 			]
 		}
 	}

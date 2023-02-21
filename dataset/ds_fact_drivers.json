@@ -1,5 +1,5 @@
 {
-	"name": "ds_fact_financials",
+	"name": "ds_fact_drivers",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ocean_db_nonencrypted",
@@ -14,7 +14,7 @@
 		"type": "AzureSqlTable",
 		"schema": [
 			{
-				"name": "FactFinID",
+				"name": "FactDriversID",
 				"type": "bigint",
 				"precision": 19
 			},
@@ -24,7 +24,7 @@
 				"precision": 10
 			},
 			{
-				"name": "NatureID",
+				"name": "KPIID",
 				"type": "int",
 				"precision": 10
 			},
@@ -70,7 +70,7 @@
 		],
 		"typeProperties": {
 			"schema": "dwh",
-			"table": "FactFinancials"
+			"table": "FactDrivers"
 		}
 	},
 	"type": "Microsoft.DataFactory/factories/datasets"
