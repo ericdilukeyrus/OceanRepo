@@ -341,7 +341,7 @@
 				"upsertColumn filter(in(['I','U'],InsertOrUpdate)) ~> includesUpsertKPI",
 				"includesUpsertKPI select(mapColumn(",
 				"          ScenarioID = FINorKPI@KPI@ScenarioID,",
-				"          KPIID,",
+				"          KPIID = Index,",
 				"          OrganisationID = FINorKPI@KPI@OrganisationID,",
 				"          MonthYearID = FINorKPI@KPI@MonthYearID,",
 				"          MonthYear,",
