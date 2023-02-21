@@ -1,6 +1,9 @@
 {
 	"name": "df_Load_Fact_Financials",
 	"properties": {
+		"folder": {
+			"name": "03DWH"
+		},
 		"type": "MappingDataFlow",
 		"typeProperties": {
 			"sources": [

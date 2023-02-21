@@ -1,6 +1,9 @@
 {
 	"name": "df_copy_all_mbr",
 	"properties": {
+		"folder": {
+			"name": "01ODS"
+		},
 		"type": "MappingDataFlow",
 		"typeProperties": {
 			"sources": [

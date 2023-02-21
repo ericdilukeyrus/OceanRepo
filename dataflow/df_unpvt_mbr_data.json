@@ -1,6 +1,9 @@
 {
 	"name": "df_unpvt_mbr_data",
 	"properties": {
+		"folder": {
+			"name": "01ODS"
+		},
 		"type": "MappingDataFlow",
 		"typeProperties": {
 			"sources": [

@@ -1,6 +1,9 @@
 {
 	"name": "df_stg_financials",
 	"properties": {
+		"folder": {
+			"name": "02STG"
+		},
 		"type": "MappingDataFlow",
 		"typeProperties": {
 			"sources": [
