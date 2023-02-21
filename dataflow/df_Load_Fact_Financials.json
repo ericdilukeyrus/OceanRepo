@@ -48,6 +48,13 @@
 						"type": "DatasetReference"
 					},
 					"name": "getFactDrivers"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_ocean_dwh",
+						"type": "DatasetReference"
+					},
+					"name": "getDimKPI"
 				}
 			],
 			"sinks": [
@@ -130,6 +137,9 @@
 				},
 				{
 					"name": "insertOrUpdateKPI"
+				},
+				{
+					"name": "joinDimKPI"
 				}
 			],
 			"scriptLines": [
@@ -226,6 +236,20 @@
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     format: 'table') ~> getFactDrivers",
+				"source(output(",
+				"          KPIID as long,",
+				"          KPINameID as long,",
+				"          KPIName as string,",
+				"          SubGroupID as long,",
+				"          SubGroup as string,",
+				"          GroupID as long,",
+				"          Group as string,",
+				"          NatureID as long",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> getDimKPI",
 				"getMBRStagingData derive(MonthYearID = toInteger(concat(toString(year(MonthYear)), lpad(toString(month(MonthYear)),2,'0'), '01'))) ~> addYearMonthID",
 				"addYearMonthID, getDimScenario join(Scenario == Scenario_Name0,",
 				"     joinType:'inner',",
@@ -307,21 +331,21 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> factDriversClean",
-				"FINorKPI@KPI, factDriversClean join(FINorKPI@KPI@ScenarioID == factDriversClean@ScenarioID",
+				"joinDimKPI, factDriversClean join(FINorKPI@KPI@ScenarioID == factDriversClean@ScenarioID",
 				"     && FINorKPI@KPI@OrganisationID == factDriversClean@OrganisationID",
-				"     && NatureID == KPIID",
+				"     && FINorKPI@KPI@NatureID == factDriversClean@KPIID",
 				"     && FINorKPI@KPI@MonthYearID == factDriversClean@MonthYearID,",
 				"     joinType:'left',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joinFactKPI",
-				"joinFactKPI derive(InsertOrUpdate = iif(isNull(factDriversClean@ScenarioID) && isNull(KPIID) && isNull(factDriversClean@OrganisationID) && isNull(factDriversClean@MonthYearID) , \r",
+				"joinFactKPI derive(InsertOrUpdate = iif(isNull(factDriversClean@ScenarioID) && isNull(factDriversClean@KPIID) && isNull(factDriversClean@OrganisationID) && isNull(factDriversClean@MonthYearID) , \r",
 				"'I',iif(FINorKPI@KPI@Value == factDriversClean@Value, 'P','U'))) ~> upsertColumn",
 				"upsertColumn filter(in(['I','U'],InsertOrUpdate)) ~> includesUpsertKPI",
 				"includesUpsertKPI select(mapColumn(",
 				"          ScenarioID = FINorKPI@KPI@ScenarioID,",
 				"          OrganisationID = FINorKPI@KPI@OrganisationID,",
-				"          KPIID = NatureID,",
+				"          KPIID = getDimKPI@KPIID,",
 				"          MonthYearID = FINorKPI@KPI@MonthYearID,",
 				"          MonthYear,",
 				"          Value = FINorKPI@KPI@Value,",
@@ -331,6 +355,11 @@
 				"     skipDuplicateMapOutputs: true) ~> cleanColumnsToUpsertKPI",
 				"cleanColumnsToUpsertKPI alterRow(insertIf(InsertOrUpdate=='I'),",
 				"     updateIf(InsertOrUpdate=='U')) ~> insertOrUpdateKPI",
+				"FINorKPI@KPI, getDimKPI join(FINorKPI@KPI@NatureID == KPIID,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinDimKPI",
 				"insertOrUpdate sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
