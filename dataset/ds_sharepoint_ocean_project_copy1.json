@@ -1,0 +1,21 @@
+{
+	"name": "ds_sharepoint_ocean_project_copy1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SharepointOceanProject",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "01ODS"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": "/sites/OceanProject/_api/web/GetFolderByServerRelativeUrl('/sites/OceanProject/Shared Documents/Canada/')/?$expand=Files"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
