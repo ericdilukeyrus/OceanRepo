@@ -87,6 +87,9 @@
 										"getFactDrivers": {
 											"vTableName": "FactDrivers"
 										},
+										"getDimKPI": {
+											"vTableName": "DimKPI"
+										},
 										"insertFactFinancials": {
 											"FactName": "FactFinancials"
 										},
