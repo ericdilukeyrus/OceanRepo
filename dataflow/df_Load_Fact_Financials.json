@@ -321,7 +321,7 @@
 				"includesUpsertKPI select(mapColumn(",
 				"          ScenarioID = FINorKPI@KPI@ScenarioID,",
 				"          OrganisationID = FINorKPI@KPI@OrganisationID,",
-				"          KPIID,",
+				"          KPIID = NatureID,",
 				"          MonthYearID = FINorKPI@KPI@MonthYearID,",
 				"          MonthYear,",
 				"          Value = FINorKPI@KPI@Value,",
