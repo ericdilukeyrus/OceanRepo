@@ -6,7 +6,14 @@
 			{
 				"name": "Copy MBR Parameters",
 				"type": "Copy",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Truncate ODS Param Curr Tables",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -77,7 +84,14 @@
 			{
 				"name": "Copy MBR Currency",
 				"type": "Copy",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Truncate ODS Param Curr Tables",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -469,6 +483,35 @@
 							}
 						}
 					]
+				}
+			},
+			{
+				"name": "Truncate ODS Param Curr Tables",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[ods].[prc_ods_truncate_paramCurr_tables]",
+					"storedProcedureParameters": {
+						"mbr_scope": {
+							"value": {
+								"value": "@pipeline().parameters.pMBRScope",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ocean_db",
+					"type": "LinkedServiceReference"
 				}
 			}
 		],
