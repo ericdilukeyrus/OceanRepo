@@ -26,7 +26,10 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"preCopyScript": "truncate table ods.R_MBR_Parameters",
+						"preCopyScript": {
+							"value": "truncate table ods.R_MBR_Parameters_@{pipeline().parameters.pMBRScope}",
+							"type": "Expression"
+						},
 						"writeBehavior": "insert",
 						"sqlWriterUseTableLock": false,
 						"tableOption": "autoCreate",
@@ -63,7 +66,10 @@
 						"referenceName": "ds_ocean_ods",
 						"type": "DatasetReference",
 						"parameters": {
-							"vTableName": "R_MBR_Parameters"
+							"vTableName": {
+								"value": "@concat('R_MBR_Parameters_',pipeline().parameters.pMBRScope)",
+								"type": "Expression"
+							}
 						}
 					}
 				]
@@ -91,7 +97,10 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"preCopyScript": "truncate table ods.R_MBR_Currency",
+						"preCopyScript": {
+							"value": "truncate table ods.R_MBR_Currency_@{pipeline().parameters.pMBRScope}",
+							"type": "Expression"
+						},
 						"writeBehavior": "insert",
 						"sqlWriterUseTableLock": false,
 						"tableOption": "autoCreate",
@@ -170,7 +179,10 @@
 						"referenceName": "ds_ocean_ods",
 						"type": "DatasetReference",
 						"parameters": {
-							"vTableName": "R_MBR_Currency"
+							"vTableName": {
+								"value": "@concat('R_MBR_Currency_',pipeline().parameters.pMBRScope)",
+								"type": "Expression"
+							}
 						}
 					}
 				]
@@ -211,7 +223,10 @@
 						"referenceName": "ds_ocean_ods",
 						"type": "DatasetReference",
 						"parameters": {
-							"vTableName": "R_MBR_currency"
+							"vTableName": {
+								"value": "@concat('R_MBR_Currency_',pipeline().parameters.pMBRScope)",
+								"type": "Expression"
+							}
 						}
 					},
 					"firstRowOnly": false
@@ -312,8 +327,7 @@
 									"coreCount": 8,
 									"computeType": "General"
 								},
-								"traceLevel": "Fine",
-								"runConcurrently": false
+								"traceLevel": "Fine"
 							}
 						},
 						{
@@ -463,6 +477,9 @@
 				"type": "string"
 			},
 			"pFolderName": {
+				"type": "string"
+			},
+			"pMBRScope": {
 				"type": "string"
 			}
 		},

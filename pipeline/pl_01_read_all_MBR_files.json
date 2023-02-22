@@ -73,6 +73,10 @@
 									"pFolderName": {
 										"value": "@pipeline().parameters.MBRScope_Folder",
 										"type": "Expression"
+									},
+									"pMBRScope": {
+										"value": "@pipeline().parameters.MBR_Scope",
+										"type": "Expression"
 									}
 								}
 							}
@@ -83,6 +87,9 @@
 		],
 		"parameters": {
 			"MBRScope_Folder": {
+				"type": "string"
+			},
+			"MBR_Scope": {
 				"type": "string"
 			}
 		},

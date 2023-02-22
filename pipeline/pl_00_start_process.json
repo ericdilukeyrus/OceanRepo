@@ -72,6 +72,10 @@
 									"MBRScope_Folder": {
 										"value": "@item().MBRScope_Folder",
 										"type": "Expression"
+									},
+									"MBR_Scope": {
+										"value": "@item().MBRScope",
+										"type": "Expression"
 									}
 								}
 							}
