@@ -1378,6 +1378,163 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/pl_05_summary_log')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy Log Data",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": " select [MBR_FileName] as MBRFileName, [MBR_Scope] as MBRScope,[MBR_Month] as MBRMonth\n  ,[MBR_Currency_Code] as MBRCurrCode ,[MBR_BU_Code] as MBRBUCode ,[MBR_BU_Name] as MBRBUName ,[MBR_SheetName] as MBRSheetName from  [ods].[Sources_Config]",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "MBRFileName",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "MBR_FileName",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "MBRScope",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "MBR_Scope",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "MBRMonth",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "MBR_Month",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "MBRCurrCode",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "MBR_Currency_Code",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "MBRBUCode",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "MBR_BU_Code",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "MBRBUName",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "MBR_BU_Name",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "MBRSheetName",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "MBR_SheetName",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "ds_ocean_stg",
+								"type": "DatasetReference",
+								"parameters": {
+									"vTableName": "Sources_Config"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ds_ocean_stg",
+								"type": "DatasetReference",
+								"parameters": {
+									"vTableName": "SummaryLoad"
+								}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"folder": {
+					"name": "03DWH"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/pl_copy_data_sharepoint_dummy')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -2238,6 +2395,7 @@
 						"     insertable:true,",
 						"     updateable:false,",
 						"     upsertable:false,",
+						"     recreate:true,",
 						"     format: 'table',",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true,",
@@ -2370,6 +2528,7 @@
 						"     insertable:true,",
 						"     updateable:false,",
 						"     upsertable:false,",
+						"     recreate:true,",
 						"     format: 'table',",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true,",
@@ -2500,6 +2659,7 @@
 						"     insertable:true,",
 						"     updateable:false,",
 						"     upsertable:false,",
+						"     recreate:true,",
 						"     format: 'table',",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true,",
@@ -2532,7 +2692,14 @@
 					{
 						"name": "Copy MBR Parameters",
 						"type": "Copy",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "Truncate ODS Param Curr Tables",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -2552,7 +2719,10 @@
 							},
 							"sink": {
 								"type": "AzureSqlSink",
-								"preCopyScript": "truncate table ods.R_MBR_Parameters",
+								"preCopyScript": {
+									"value": "truncate table ods.R_MBR_Parameters_@{pipeline().parameters.pMBRScope}",
+									"type": "Expression"
+								},
 								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false,
 								"tableOption": "autoCreate",
@@ -2589,7 +2759,10 @@
 								"referenceName": "ds_ocean_ods",
 								"type": "DatasetReference",
 								"parameters": {
-									"vTableName": "R_MBR_Parameters"
+									"vTableName": {
+										"value": "@concat('R_MBR_Parameters_',pipeline().parameters.pMBRScope)",
+										"type": "Expression"
+									}
 								}
 							}
 						]
@@ -2597,7 +2770,14 @@
 					{
 						"name": "Copy MBR Currency",
 						"type": "Copy",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "Truncate ODS Param Curr Tables",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -2617,7 +2797,10 @@
 							},
 							"sink": {
 								"type": "AzureSqlSink",
-								"preCopyScript": "truncate table ods.R_MBR_Currency",
+								"preCopyScript": {
+									"value": "truncate table ods.R_MBR_Currency_@{pipeline().parameters.pMBRScope}",
+									"type": "Expression"
+								},
 								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false,
 								"tableOption": "autoCreate",
@@ -2696,7 +2879,10 @@
 								"referenceName": "ds_ocean_ods",
 								"type": "DatasetReference",
 								"parameters": {
-									"vTableName": "R_MBR_Currency"
+									"vTableName": {
+										"value": "@concat('R_MBR_Currency_',pipeline().parameters.pMBRScope)",
+										"type": "Expression"
+									}
 								}
 							}
 						]
@@ -2729,7 +2915,10 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
-								"sqlReaderQuery": "select a.Prop_1 as MBR_Scope, b.Prop_1 as MBR_Month,  CONCAT('P&L FI_', bu_sequence ) AS SheetName, bu_sequence AS BU_Code, bu_name as BU_Name,\nCONCAT('R_P&L_FI_', bu_sequence) AS RawTableName,  CONCAT('U_P&L_FI_', bu_sequence) AS UnpvtTableName, currency_code as Currency_Code\nfrom ods.R_MBR_Currency,\n(select Prop_1 from ods.R_MBR_Parameters\nwhere Prop_0 = 'MBR SCOPE') a,\n(select Prop_1 from ods.R_MBR_Parameters\nwhere Prop_0 = 'MONTH') b\nwhere bu_select is not null",
+								"sqlReaderQuery": {
+									"value": "select a.Prop_1 as MBR_Scope, b.Prop_1 as MBR_Month,  CONCAT('P&L FI_', bu_sequence ) AS SheetName, bu_sequence AS BU_Code, bu_name as BU_Name,\nCONCAT('R_P&L_FI_', a.Prop_1, '_',bu_sequence) AS RawTableName,  CONCAT('U_P&L_FI_', a.Prop_1, '_', bu_sequence) AS UnpvtTableName, currency_code as Currency_Code\nfrom ods.R_MBR_Currency_@{pipeline().parameters.pMBRScope},\n(select Prop_1 from ods.R_MBR_Parameters_@{pipeline().parameters.pMBRScope}\nwhere Prop_0 = 'MBR SCOPE') a,\n(select Prop_1 from ods.R_MBR_Parameters_@{pipeline().parameters.pMBRScope}\nwhere Prop_0 = 'MONTH') b\nwhere bu_select is not null",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
@@ -2737,7 +2926,10 @@
 								"referenceName": "ds_ocean_ods",
 								"type": "DatasetReference",
 								"parameters": {
-									"vTableName": "R_MBR_currency"
+									"vTableName": {
+										"value": "@concat('R_MBR_Currency_',pipeline().parameters.pMBRScope)",
+										"type": "Expression"
+									}
 								}
 							},
 							"firstRowOnly": false
@@ -2765,14 +2957,7 @@
 								{
 									"name": "Copy MBR Files to ODS",
 									"type": "ExecuteDataFlow",
-									"dependsOn": [
-										{
-											"activity": "Truncate ODS Table",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
+									"dependsOn": [],
 									"policy": {
 										"timeout": "0.12:00:00",
 										"retry": 0,
@@ -2840,39 +3025,6 @@
 											"computeType": "General"
 										},
 										"traceLevel": "Fine"
-									}
-								},
-								{
-									"name": "Truncate ODS Table",
-									"type": "SqlServerStoredProcedure",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"storedProcedureName": "[[ods].[prc_ods_truncate_table]",
-										"storedProcedureParameters": {
-											"schema_name": {
-												"value": "ods",
-												"type": "String"
-											},
-											"table_name": {
-												"value": {
-													"value": "@item().RawTableName",
-													"type": "Expression"
-												},
-												"type": "String"
-											}
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "ocean_db",
-										"type": "LinkedServiceReference"
 									}
 								}
 							]
@@ -2983,6 +3135,35 @@
 								}
 							]
 						}
+					},
+					{
+						"name": "Truncate ODS Param Curr Tables",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[ods].[prc_ods_truncate_paramCurr_tables]",
+							"storedProcedureParameters": {
+								"mbr_scope": {
+									"value": {
+										"value": "@pipeline().parameters.pMBRScope",
+										"type": "Expression"
+									},
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "ocean_db",
+							"type": "LinkedServiceReference"
+						}
 					}
 				],
 				"policy": {
@@ -2994,6 +3175,9 @@
 						"type": "string"
 					},
 					"pFolderName": {
+						"type": "string"
+					},
+					"pMBRScope": {
 						"type": "string"
 					}
 				},
@@ -3024,7 +3208,7 @@
 						"type": "ForEach",
 						"dependsOn": [
 							{
-								"activity": "ForEach Truncate Staging Table",
+								"activity": "Get All Unpvt Table",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -3082,42 +3266,6 @@
 										},
 										"traceLevel": "Fine"
 									}
-								},
-								{
-									"name": "Truncate Unpivot Tables",
-									"type": "Script",
-									"dependsOn": [
-										{
-											"activity": "Staging Financial Table",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"linkedServiceName": {
-										"referenceName": "ocean_db",
-										"type": "LinkedServiceReference"
-									},
-									"typeProperties": {
-										"scripts": [
-											{
-												"type": "Query",
-												"text": {
-													"value": "truncate table [ods].[@{item().MBR_UnpvtTableName}]",
-													"type": "Expression"
-												}
-											}
-										],
-										"scriptBlockExecutionTimeout": "02:00:00"
-									}
 								}
 							]
 						}
@@ -3137,7 +3285,7 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
-								"sqlReaderQuery": "select distinct MBR_UnpvtTableName, CONCAT('P&L_FI_', MBR_BU_Code) AS StgFinancialTableName  from  [ods].[Sources_Config]",
+								"sqlReaderQuery": "select  MBR_UnpvtTableName, CONCAT('P&L_FI_', MBR_Scope, '_', MBR_BU_Code) AS StgFinancialTableName  from  [ods].[Sources_Config]",
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
@@ -3149,60 +3297,6 @@
 								}
 							},
 							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "ForEach Truncate Staging Table",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Get All Unpvt Table",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Get All Unpvt Table').output.value",
-								"type": "Expression"
-							},
-							"activities": [
-								{
-									"name": "Truncate Staging Table",
-									"type": "SqlServerStoredProcedure",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"storedProcedureName": "[[ods].[prc_stg_truncate_table]",
-										"storedProcedureParameters": {
-											"schema_name": {
-												"value": "stg",
-												"type": "String"
-											},
-											"table_name": {
-												"value": {
-													"value": "@item().StgFinancialTableName",
-													"type": "Expression"
-												},
-												"type": "String"
-											}
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "ocean_db",
-										"type": "LinkedServiceReference"
-									}
-								}
-							]
 						}
 					}
 				],
@@ -3241,7 +3335,7 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
-								"sqlReaderQuery": "select distinct MBR_UnpvtTableName, CONCAT('P&L_FI_', MBR_BU_Code) AS StgFinancialTableName  from  [ods].[Sources_Config]",
+								"sqlReaderQuery": "select  MBR_UnpvtTableName, CONCAT('P&L_FI_', MBR_Scope, '_', MBR_BU_Code) AS StgFinancialTableName  from  [ods].[Sources_Config]",
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
@@ -3333,6 +3427,27 @@
 								}
 							]
 						}
+					},
+					{
+						"name": "Summary Log Data",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "ForEach Staging Table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "pl_05_summary_log",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": false,
+							"parameters": {}
+						}
 					}
 				],
 				"policy": {
@@ -3346,6 +3461,7 @@
 				"lastPublishTime": "2023-02-17T16:37:57Z"
 			},
 			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/pl_05_summary_log')]",
 				"[concat(variables('factoryId'), '/dataflows/df_Load_Fact_Financials')]"
 			]
 		},
@@ -3405,7 +3521,7 @@
 								"value": "@activity('Get MBR All Files').output.childItems",
 								"type": "Expression"
 							},
-							"isSequential": true,
+							"isSequential": false,
 							"activities": [
 								{
 									"name": "Ingest MBR Data",
@@ -3426,6 +3542,10 @@
 											"pFolderName": {
 												"value": "@pipeline().parameters.MBRScope_Folder",
 												"type": "Expression"
+											},
+											"pMBRScope": {
+												"value": "@pipeline().parameters.MBR_Scope",
+												"type": "Expression"
 											}
 										}
 									}
@@ -3440,6 +3560,9 @@
 				},
 				"parameters": {
 					"MBRScope_Folder": {
+						"type": "string"
+					},
+					"MBR_Scope": {
 						"type": "string"
 					}
 				},
@@ -3517,7 +3640,7 @@
 								"value": "@activity('Get All Active MBR Scope').output.value",
 								"type": "Expression"
 							},
-							"isSequential": true,
+							"isSequential": false,
 							"activities": [
 								{
 									"name": "Run Process by MBR Scope",
@@ -3533,6 +3656,10 @@
 										"parameters": {
 											"MBRScope_Folder": {
 												"value": "@item().MBRScope_Folder",
+												"type": "Expression"
+											},
+											"MBR_Scope": {
+												"value": "@item().MBRScope",
 												"type": "Expression"
 											}
 										}
