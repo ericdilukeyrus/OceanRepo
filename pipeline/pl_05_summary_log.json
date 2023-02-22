@@ -104,7 +104,7 @@
 							},
 							{
 								"source": {
-									"name": "MBRBUName",
+									"name": "MBRSheetName",
 									"type": "String",
 									"physicalType": "nvarchar"
 								},
