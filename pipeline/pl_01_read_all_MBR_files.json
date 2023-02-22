@@ -52,7 +52,7 @@
 						"value": "@activity('Get MBR All Files').output.childItems",
 						"type": "Expression"
 					},
-					"isSequential": true,
+					"isSequential": false,
 					"activities": [
 						{
 							"name": "Ingest MBR Data",
