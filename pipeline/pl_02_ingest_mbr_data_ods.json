@@ -6,7 +6,14 @@
 			{
 				"name": "Copy MBR Parameters",
 				"type": "Copy",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Truncate ODS Param Curr Tables",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -26,7 +33,10 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"preCopyScript": "truncate table ods.R_MBR_Parameters",
+						"preCopyScript": {
+							"value": "truncate table ods.R_MBR_Parameters_@{pipeline().parameters.pMBRScope}",
+							"type": "Expression"
+						},
 						"writeBehavior": "insert",
 						"sqlWriterUseTableLock": false,
 						"tableOption": "autoCreate",
@@ -63,7 +73,10 @@
 						"referenceName": "ds_ocean_ods",
 						"type": "DatasetReference",
 						"parameters": {
-							"vTableName": "R_MBR_Parameters"
+							"vTableName": {
+								"value": "@concat('R_MBR_Parameters_',pipeline().parameters.pMBRScope)",
+								"type": "Expression"
+							}
 						}
 					}
 				]
@@ -71,7 +84,14 @@
 			{
 				"name": "Copy MBR Currency",
 				"type": "Copy",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Truncate ODS Param Curr Tables",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -91,7 +111,10 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"preCopyScript": "truncate table ods.R_MBR_Currency",
+						"preCopyScript": {
+							"value": "truncate table ods.R_MBR_Currency_@{pipeline().parameters.pMBRScope}",
+							"type": "Expression"
+						},
 						"writeBehavior": "insert",
 						"sqlWriterUseTableLock": false,
 						"tableOption": "autoCreate",
@@ -170,7 +193,10 @@
 						"referenceName": "ds_ocean_ods",
 						"type": "DatasetReference",
 						"parameters": {
-							"vTableName": "R_MBR_Currency"
+							"vTableName": {
+								"value": "@concat('R_MBR_Currency_',pipeline().parameters.pMBRScope)",
+								"type": "Expression"
+							}
 						}
 					}
 				]
@@ -203,7 +229,10 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "select a.Prop_1 as MBR_Scope, b.Prop_1 as MBR_Month,  CONCAT('P&L FI_', bu_sequence ) AS SheetName, bu_sequence AS BU_Code, bu_name as BU_Name,\nCONCAT('R_P&L_FI_', bu_sequence) AS RawTableName,  CONCAT('U_P&L_FI_', bu_sequence) AS UnpvtTableName, currency_code as Currency_Code\nfrom ods.R_MBR_Currency,\n(select Prop_1 from ods.R_MBR_Parameters\nwhere Prop_0 = 'MBR SCOPE') a,\n(select Prop_1 from ods.R_MBR_Parameters\nwhere Prop_0 = 'MONTH') b\nwhere bu_select is not null",
+						"sqlReaderQuery": {
+							"value": "select a.Prop_1 as MBR_Scope, b.Prop_1 as MBR_Month,  CONCAT('P&L FI_', bu_sequence ) AS SheetName, bu_sequence AS BU_Code, bu_name as BU_Name,\nCONCAT('R_P&L_FI_', a.Prop_1, '_',bu_sequence) AS RawTableName,  CONCAT('U_P&L_FI_', a.Prop_1, '_', bu_sequence) AS UnpvtTableName, currency_code as Currency_Code\nfrom ods.R_MBR_Currency_@{pipeline().parameters.pMBRScope},\n(select Prop_1 from ods.R_MBR_Parameters_@{pipeline().parameters.pMBRScope}\nwhere Prop_0 = 'MBR SCOPE') a,\n(select Prop_1 from ods.R_MBR_Parameters_@{pipeline().parameters.pMBRScope}\nwhere Prop_0 = 'MONTH') b\nwhere bu_select is not null",
+							"type": "Expression"
+						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -211,7 +240,10 @@
 						"referenceName": "ds_ocean_ods",
 						"type": "DatasetReference",
 						"parameters": {
-							"vTableName": "R_MBR_currency"
+							"vTableName": {
+								"value": "@concat('R_MBR_Currency_',pipeline().parameters.pMBRScope)",
+								"type": "Expression"
+							}
 						}
 					},
 					"firstRowOnly": false
@@ -239,14 +271,7 @@
 						{
 							"name": "Copy MBR Files to ODS",
 							"type": "ExecuteDataFlow",
-							"dependsOn": [
-								{
-									"activity": "Truncate ODS Table",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
+							"dependsOn": [],
 							"policy": {
 								"timeout": "0.12:00:00",
 								"retry": 0,
@@ -312,41 +337,7 @@
 									"coreCount": 8,
 									"computeType": "General"
 								},
-								"traceLevel": "Fine",
-								"runConcurrently": false
-							}
-						},
-						{
-							"name": "Truncate ODS Table",
-							"type": "SqlServerStoredProcedure",
-							"dependsOn": [],
-							"policy": {
-								"timeout": "0.12:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"storedProcedureName": "[ods].[prc_ods_truncate_table]",
-								"storedProcedureParameters": {
-									"schema_name": {
-										"value": "ods",
-										"type": "String"
-									},
-									"table_name": {
-										"value": {
-											"value": "@item().RawTableName",
-											"type": "Expression"
-										},
-										"type": "String"
-									}
-								}
-							},
-							"linkedServiceName": {
-								"referenceName": "ocean_db",
-								"type": "LinkedServiceReference"
+								"traceLevel": "Fine"
 							}
 						}
 					]
@@ -456,6 +447,35 @@
 						}
 					]
 				}
+			},
+			{
+				"name": "Truncate ODS Param Curr Tables",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[ods].[prc_ods_truncate_paramCurr_tables]",
+					"storedProcedureParameters": {
+						"mbr_scope": {
+							"value": {
+								"value": "@pipeline().parameters.pMBRScope",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ocean_db",
+					"type": "LinkedServiceReference"
+				}
 			}
 		],
 		"parameters": {
@@ -463,6 +483,9 @@
 				"type": "string"
 			},
 			"pFolderName": {
+				"type": "string"
+			},
+			"pMBRScope": {
 				"type": "string"
 			}
 		},

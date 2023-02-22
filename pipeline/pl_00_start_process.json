@@ -55,7 +55,7 @@
 						"value": "@activity('Get All Active MBR Scope').output.value",
 						"type": "Expression"
 					},
-					"isSequential": true,
+					"isSequential": false,
 					"activities": [
 						{
 							"name": "Run Process by MBR Scope",
@@ -71,6 +71,10 @@
 								"parameters": {
 									"MBRScope_Folder": {
 										"value": "@item().MBRScope_Folder",
+										"type": "Expression"
+									},
+									"MBR_Scope": {
+										"value": "@item().MBRScope",
 										"type": "Expression"
 									}
 								}
