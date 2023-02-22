@@ -404,7 +404,14 @@
 						{
 							"name": "Unpivot MBR ODS Table",
 							"type": "ExecuteDataFlow",
-							"dependsOn": [],
+							"dependsOn": [
+								{
+									"activity": "Truncate Unpivot Tables",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
 							"policy": {
 								"timeout": "0.12:00:00",
 								"retry": 0,
@@ -478,6 +485,35 @@
 										"type": "Query",
 										"text": {
 											"value": "INSERT INTO [ods].[Sources_Config]\n           ([MBR_FileName]\n           ,[MBR_Scope]\n           ,[MBR_Month]\n           ,[MBR_SheetName]\n           ,[MBR_BU_Code]\n           ,[MBR_BU_Name]\n           ,[MBR_RawTableName]\n           ,[MBR_UnpvtTableName]\n           ,[MBR_Currency_Code])\n     VALUES\n           ('@{pipeline().parameters.pFileName}'\n           ,'@{item().MBR_Scope}'\n           ,'@{item().MBR_Month}'\n           ,'@{item().SheetName}'\n           ,'@{item().BU_Code}'\n           ,'@{item().BU_Name}'\n           ,'@{item().RawTableName}'\n           ,'@{item().UnpvtTableName}'\n           ,'@{item().Currency_Code}')\n\n",
+											"type": "Expression"
+										}
+									}
+								],
+								"scriptBlockExecutionTimeout": "02:00:00"
+							}
+						},
+						{
+							"name": "Truncate Unpivot Tables",
+							"type": "Script",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"linkedServiceName": {
+								"referenceName": "ocean_db",
+								"type": "LinkedServiceReference"
+							},
+							"typeProperties": {
+								"scripts": [
+									{
+										"type": "Query",
+										"text": {
+											"value": "truncate table [ods].[@{item().UnpvtTableName}]",
 											"type": "Expression"
 										}
 									}

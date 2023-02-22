@@ -64,42 +64,6 @@
 								},
 								"traceLevel": "Fine"
 							}
-						},
-						{
-							"name": "Truncate Unpivot Tables",
-							"type": "Script",
-							"dependsOn": [
-								{
-									"activity": "Staging Financial Table",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"timeout": "0.12:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"linkedServiceName": {
-								"referenceName": "ocean_db",
-								"type": "LinkedServiceReference"
-							},
-							"typeProperties": {
-								"scripts": [
-									{
-										"type": "Query",
-										"text": {
-											"value": "truncate table [ods].[@{item().MBR_UnpvtTableName}]",
-											"type": "Expression"
-										}
-									}
-								],
-								"scriptBlockExecutionTimeout": "02:00:00"
-							}
 						}
 					]
 				}
