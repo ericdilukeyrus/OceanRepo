@@ -119,7 +119,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "select distinct MBR_UnpvtTableName, CONCAT('P&L_FI_', MBR_BU_Code) AS StgFinancialTableName  from  [ods].[Sources_Config]",
+						"sqlReaderQuery": "select  MBR_UnpvtTableName, CONCAT('P&L_FI_', MBR_Scope, '_', MBR_BU_Code) AS StgFinancialTableName  from  [ods].[Sources_Config]",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},

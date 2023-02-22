@@ -17,7 +17,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "select distinct MBR_UnpvtTableName, CONCAT('P&L_FI_', MBR_BU_Code) AS StgFinancialTableName  from  [ods].[Sources_Config]",
+						"sqlReaderQuery": "select  MBR_UnpvtTableName, CONCAT('P&L_FI_', MBR_Scope, '_', MBR_BU_Code) AS StgFinancialTableName  from  [ods].[Sources_Config]",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -82,19 +82,19 @@
 											"vTableName": "DimOrganisation"
 										},
 										"getFactFinancials": {
-											"FactName": "FactFinancials"
+											"FactName": "FactFinancials2"
 										},
 										"getFactDrivers": {
-											"vTableName": "FactDrivers"
+											"vTableName": "FactDrivers2"
 										},
 										"getDimKPI": {
 											"vTableName": "DimKPI"
 										},
 										"insertFactFinancials": {
-											"FactName": "FactFinancials"
+											"FactName": "FactFinancials2"
 										},
 										"insertFactDrivers": {
-											"FactName": "FactDrivers"
+											"FactName": "FactDrivers2"
 										}
 									}
 								},
