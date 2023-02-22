@@ -13,7 +13,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "HttpServerLocation",
-				"relativeUrl": "/sites/OceanProject/_api/web/GetFileByServerRelativeUrl('/sites/OceanProject/Shared Documents/Portugal/MBR Reporting_2023_v22 - 02 BUs (Example).xlsx')/$value"
+				"relativeUrl": "/sites/OceanProject/_api/web/GetFolderByServerRelativeUrl('/sites/OceanProject/Shared Documents/Canada/')/?$expand=Files"
 			}
 		}
 	},

@@ -13,7 +13,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "MBR Reporting_2023_v22 - 02 BUs (Example).xlsx",
+				"fileName": "x.xml",
 				"folderPath": "toload",
 				"container": "mbr-landing-zone"
 			}
