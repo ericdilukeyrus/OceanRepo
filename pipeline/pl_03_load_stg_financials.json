@@ -7,7 +7,7 @@
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "ForEach Truncate Staging Table",
+						"activity": "Get All Unpvt Table",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -95,60 +95,6 @@
 						}
 					},
 					"firstRowOnly": false
-				}
-			},
-			{
-				"name": "ForEach Truncate Staging Table",
-				"type": "ForEach",
-				"dependsOn": [
-					{
-						"activity": "Get All Unpvt Table",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"userProperties": [],
-				"typeProperties": {
-					"items": {
-						"value": "@activity('Get All Unpvt Table').output.value",
-						"type": "Expression"
-					},
-					"activities": [
-						{
-							"name": "Truncate Staging Table",
-							"type": "SqlServerStoredProcedure",
-							"dependsOn": [],
-							"policy": {
-								"timeout": "0.12:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"storedProcedureName": "[ods].[prc_stg_truncate_table]",
-								"storedProcedureParameters": {
-									"schema_name": {
-										"value": "stg",
-										"type": "String"
-									},
-									"table_name": {
-										"value": {
-											"value": "@item().StgFinancialTableName",
-											"type": "Expression"
-										},
-										"type": "String"
-									}
-								}
-							},
-							"linkedServiceName": {
-								"referenceName": "ocean_db",
-								"type": "LinkedServiceReference"
-							}
-						}
-					]
 				}
 			}
 		],

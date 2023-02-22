@@ -271,14 +271,7 @@
 						{
 							"name": "Copy MBR Files to ODS",
 							"type": "ExecuteDataFlow",
-							"dependsOn": [
-								{
-									"activity": "Truncate ODS Table",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
+							"dependsOn": [],
 							"policy": {
 								"timeout": "0.12:00:00",
 								"retry": 0,
@@ -345,39 +338,6 @@
 									"computeType": "General"
 								},
 								"traceLevel": "Fine"
-							}
-						},
-						{
-							"name": "Truncate ODS Table",
-							"type": "SqlServerStoredProcedure",
-							"dependsOn": [],
-							"policy": {
-								"timeout": "0.12:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"storedProcedureName": "[ods].[prc_ods_truncate_table]",
-								"storedProcedureParameters": {
-									"schema_name": {
-										"value": "ods",
-										"type": "String"
-									},
-									"table_name": {
-										"value": {
-											"value": "@item().RawTableName",
-											"type": "Expression"
-										},
-										"type": "String"
-									}
-								}
-							},
-							"linkedServiceName": {
-								"referenceName": "ocean_db",
-								"type": "LinkedServiceReference"
 							}
 						}
 					]
