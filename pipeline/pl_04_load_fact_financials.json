@@ -82,19 +82,19 @@
 											"vTableName": "DimOrganisation"
 										},
 										"getFactFinancials": {
-											"FactName": "FactFinancials2"
+											"FactName": "FactFinancials"
 										},
 										"getFactDrivers": {
-											"vTableName": "FactDrivers2"
+											"vTableName": "FactDrivers"
 										},
 										"getDimKPI": {
 											"vTableName": "DimKPI"
 										},
 										"insertFactFinancials": {
-											"FactName": "FactFinancials2"
+											"FactName": "FactFinancials"
 										},
 										"insertFactDrivers": {
-											"FactName": "FactDrivers2"
+											"FactName": "FactDrivers"
 										}
 									}
 								},
