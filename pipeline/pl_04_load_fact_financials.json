@@ -65,6 +65,12 @@
 								"dataflow": {
 									"referenceName": "df_Load_Fact_Financials",
 									"type": "DataFlowReference",
+									"parameters": {
+										"pPipelineRunID": {
+											"value": "'@{pipeline().RunId}'",
+											"type": "Expression"
+										}
+									},
 									"datasetParameters": {
 										"getMBRStagingData": {
 											"vTableName": {
