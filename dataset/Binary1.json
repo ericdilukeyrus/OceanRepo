@@ -5,12 +5,27 @@
 			"referenceName": "dimensions_source",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"pMBR_Scope": {
+				"type": "string"
+			},
+			"pFileName": {
+				"type": "string"
+			}
+		},
 		"annotations": [],
 		"type": "Binary",
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "test.xlsx",
+				"fileName": {
+					"value": "@dataset().pFileName",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "toload/@{dataset().pMBR_Scope}",
+					"type": "Expression"
+				},
 				"container": "mbr-landing-zone"
 			}
 		}
