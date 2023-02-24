@@ -1,17 +1,25 @@
 {
-	"name": "Json1",
+	"name": "ds_sharepoint_json",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "dimensions_source",
 			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"pMBR_Scope": {
+				"type": "string"
+			}
 		},
 		"annotations": [],
 		"type": "Json",
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "t.json",
-				"folderPath": "toloadSharepoint",
+				"fileName": {
+					"value": "ListFilesToLoad_@{dataset().pMBR_Scope}.json",
+					"type": "Expression"
+				},
+				"folderPath": "toloadSharepoint/02ListFilesToCopy",
 				"container": "mbr-landing-zone"
 			}
 		},
