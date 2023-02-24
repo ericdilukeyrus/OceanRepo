@@ -22,7 +22,7 @@
 					"value": "ListFiles_@{dataset().pMBR_Folder}.xml",
 					"type": "Expression"
 				},
-				"folderPath": "toloadSharepoint",
+				"folderPath": "toloadSharepoint/01ListFilesFromSharepoint",
 				"container": "mbr-landing-zone"
 			}
 		}
