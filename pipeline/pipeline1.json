@@ -17,6 +17,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT  [MBR_Scope]\n      ,[SharepointFolder]\n      ,[Active_fl]\n  FROM [cfg].[Sources1]\n  WHERE [Active_fl]= 'Y'",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
