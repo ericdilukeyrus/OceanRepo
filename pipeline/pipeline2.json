@@ -102,7 +102,7 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"pServerRelativeUrl": {
-											"value": "@item().ServerRelativeUrl",
+											"value": "@item().GetFileUrl",
 											"type": "Expression"
 										}
 									}
