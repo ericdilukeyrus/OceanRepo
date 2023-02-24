@@ -27,6 +27,9 @@
 			"transformations": [
 				{
 					"name": "flattenXML"
+				},
+				{
+					"name": "addFileName"
 				}
 			],
 			"scriptLines": [
@@ -50,7 +53,8 @@
 				"     ),",
 				"     skipDuplicateMapInputs: false,",
 				"     skipDuplicateMapOutputs: false) ~> flattenXML",
-				"flattenXML sink(allowSchemaDrift: true,",
+				"flattenXML derive(FileName = concat('ListFilesToLoad_',$pMBR_Scope,'.json')) ~> addFileName",
+				"addFileName sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          LinkingUri as string,",
@@ -58,9 +62,9 @@
 				"          ServerRelativeUrl as string,",
 				"          Name as string",
 				"     ),",
+				"     rowUrlColumn:'FileName',",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true,",
-				"     partitionBy('hash', 1)) ~> createJSONListofFiles"
+				"     skipDuplicateMapOutputs: true) ~> createJSONListofFiles"
 			]
 		}
 	}
