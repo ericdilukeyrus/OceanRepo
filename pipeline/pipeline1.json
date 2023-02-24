@@ -165,6 +165,32 @@
 								},
 								"traceLevel": "Fine"
 							}
+						},
+						{
+							"name": "Execute Pipeline1",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "df_shrp_listoffiles",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "pipeline2",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"pMBR_Scope": {
+										"value": "@item().MBR_Scope",
+										"type": "Expression"
+									}
+								}
+							}
 						}
 					]
 				}
