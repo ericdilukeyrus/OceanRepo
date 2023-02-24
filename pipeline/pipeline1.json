@@ -137,7 +137,13 @@
 							"typeProperties": {
 								"dataflow": {
 									"referenceName": "df_shrp_listoffiles",
-									"type": "DataFlowReference"
+									"type": "DataFlowReference",
+									"parameters": {
+										"pMBR_Scope": {
+											"value": "'@{item().MBR_Scope}'",
+											"type": "Expression"
+										}
+									}
 								},
 								"compute": {
 									"coreCount": 8,
