@@ -15,6 +15,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'ls_files_to_load'"
 		},
+		"ls_sharepoint_xml_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'ls_sharepoint_xml'"
+		},
 		"ocean_db_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'ocean_db'"
@@ -2533,7 +2537,12 @@
 										"dataflow": {
 											"referenceName": "df_Load_Fact_Financials",
 											"type": "DataFlowReference",
-											"parameters": {},
+											"parameters": {
+												"pPipelineRunID": {
+													"value": "'@{pipeline().RunId}'",
+													"type": "Expression"
+												}
+											},
 											"datasetParameters": {
 												"getMBRStagingData": {
 													"vTableName": {
@@ -2565,7 +2574,8 @@
 												"insertFactDrivers": {
 													"FactName": "FactDrivers"
 												}
-											}
+											},
+											"linkedServiceParameters": {}
 										},
 										"staging": {},
 										"compute": {
@@ -2773,104 +2783,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ds_ocean_stg')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pl_copy_data_sharepoint_dummy')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Get token",
-						"type": "WebActivity",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"url": "https://accounts.accesscontrol.windows.net/168e48b2-81f0-4aac-bc77-d58d07d205e2/tokens/OAuth/2",
-							"method": "POST",
-							"headers": {
-								"Content-Type": "application/x-www-form-urlencoded"
-							},
-							"body": "grant_type=client_credentials&client_id=63bb52e3-0d92-4899-991c-bda347d9dd3b@168e48b2-81f0-4aac-bc77-d58d07d205e2&client_secret=S8v8Q~jvkg-AXO-gSxyxnJQTd9zhR1SiPr0ukcz5&resource=00000003-0000-0ff1-ce00-000000000000/keyrusgroup.sharepoint.com@168e48b2-81f0-4aac-bc77-d58d07d205e2"
-						}
-					},
-					{
-						"name": "Get MBR Scope File",
-						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "Get token",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "BinarySource",
-								"storeSettings": {
-									"type": "HttpReadSettings",
-									"requestMethod": "GET",
-									"additionalHeaders": {
-										"value": "@{concat('Authorization:Bearer ',activity('Get token').output.access_token)}",
-										"type": "Expression"
-									},
-									"requestTimeout": ""
-								},
-								"formatSettings": {
-									"type": "BinaryReadSettings"
-								}
-							},
-							"sink": {
-								"type": "BinarySink",
-								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
-								}
-							},
-							"enableStaging": false
-						},
-						"inputs": [
-							{
-								"referenceName": "ds_sharepoint_ocean_project",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "mbr_landing_zone",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"annotations": [],
-				"lastPublishTime": "2023-02-17T18:10:37Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ds_sharepoint_ocean_project')]",
-				"[concat(variables('factoryId'), '/datasets/mbr_landing_zone')]"
 			]
 		},
 		{
@@ -4701,6 +4613,11 @@
 					"referenceName": "SharepointOceanProject",
 					"type": "LinkedServiceReference"
 				},
+				"parameters": {
+					"pShrepointFolder": {
+						"type": "string"
+					}
+				},
 				"folder": {
 					"name": "01ODS"
 				},
@@ -4709,7 +4626,10 @@
 				"typeProperties": {
 					"location": {
 						"type": "HttpServerLocation",
-						"relativeUrl": "/sites/OceanProject/_api/web/GetFileByServerRelativeUrl('/sites/OceanProject/Shared Documents/Portugal/MBR Reporting_2023_v22 - 02 BUs (Example).xlsx')/$value"
+						"relativeUrl": {
+							"value": "/sites/OceanProject/_api/web/GetFolderByServerRelativeUrl('/sites/OceanProject/Shared Documents/@{dataset().pShrepointFolder}/')/Files\r\n\r\n\r\n",
+							"type": "Expression"
+						}
 					}
 				}
 			},
@@ -8123,6 +8043,11 @@
 					"referenceName": "ls_files_to_load",
 					"type": "LinkedServiceReference"
 				},
+				"parameters": {
+					"pMBR_Folder": {
+						"type": "string"
+					}
+				},
 				"folder": {
 					"name": "01ODS"
 				},
@@ -8131,8 +8056,11 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
-						"fileName": "MBR Reporting_2023_v22 - 02 BUs (Example).xlsx",
-						"folderPath": "toload",
+						"fileName": {
+							"value": "ListFiles_@{dataset().pMBR_Folder}.xml",
+							"type": "Expression"
+						},
+						"folderPath": "toloadSharepoint/01ListFilesFromSharepoint",
 						"container": "mbr-landing-zone"
 					}
 				}
@@ -10019,6 +9947,19 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/ls_sharepoint_xml')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('ls_sharepoint_xml_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ocean_db')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -10191,6 +10132,9 @@
 						}
 					],
 					"scriptLines": [
+						"parameters{",
+						"     pPipelineRunID as string",
+						"}",
 						"source(output(",
 						"          BusinessUnit as string,",
 						"          Scenario as string,",
@@ -10295,7 +10239,8 @@
 						"     validateSchema: false,",
 						"     isolationLevel: 'READ_UNCOMMITTED',",
 						"     format: 'table') ~> getDimKPI",
-						"getMBRStagingData derive(MonthYearID = toInteger(concat(toString(year(MonthYear)), lpad(toString(month(MonthYear)),2,'0'), '01'))) ~> addYearMonthID",
+						"getMBRStagingData derive(MonthYearID = toInteger(concat(toString(year(MonthYear)), lpad(toString(month(MonthYear)),2,'0'), '01')),",
+						"          CreatedBy = $pPipelineRunID) ~> addYearMonthID",
 						"addYearMonthID, getDimScenario join(Scenario == Scenario_Name0,",
 						"     joinType:'inner',",
 						"     matchType:'exact',",
@@ -10318,7 +10263,8 @@
 						"          NatureID,",
 						"          MonthYearID,",
 						"          MonthYear,",
-						"          Value",
+						"          Value,",
+						"          CreatedBy",
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true) ~> cleanColumns",
@@ -10353,7 +10299,8 @@
 						"          MonthYearID = FINorKPI@FIN@MonthYearID,",
 						"          MonthYear,",
 						"          Value = FINorKPI@FIN@Value,",
-						"          InsertOrUpdate",
+						"          InsertOrUpdate,",
+						"          CreatedBy",
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true) ~> cleanColumnsToUpsert",
@@ -10394,7 +10341,8 @@
 						"          MonthYearID = FINorKPI@KPI@MonthYearID,",
 						"          MonthYear,",
 						"          Value = FINorKPI@KPI@Value,",
-						"          InsertOrUpdate",
+						"          InsertOrUpdate,",
+						"          CreatedBy",
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true) ~> cleanColumnsToUpsertKPI",
@@ -10435,7 +10383,8 @@
 						"          OrganisationID,",
 						"          MonthYearID,",
 						"          MonthYear,",
-						"          Value",
+						"          Value,",
+						"          CreatedBy",
 						"     )) ~> insertFactFinancials",
 						"insertOrUpdateKPI sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
@@ -10466,7 +10415,8 @@
 						"          OrganisationID,",
 						"          MonthYearID,",
 						"          MonthYear,",
-						"          Value",
+						"          Value,",
+						"          CreatedBy",
 						"     )) ~> insertFactDrivers"
 					]
 				}
@@ -10976,6 +10926,707 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ds_ocean_ods')]",
 				"[concat(variables('factoryId'), '/datasets/ds_unpvtdata_table')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Get Sharepoint Folder to Load",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "SELECT  [MBR_Scope]\n      ,[SharepointFolder]\n      ,[Active_fl]\n  FROM [cfg].[Sources1]\n  WHERE [Active_fl]= 'Y'",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "ds_ocean_cfg",
+								"type": "DatasetReference",
+								"parameters": {
+									"vTableName": "Sources1"
+								}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEach Sharepoint Folder",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Get Sharepoint Folder to Load",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Get token",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Get Sharepoint Folder to Load').output.value",
+								"type": "Expression"
+							},
+							"isSequential": false,
+							"activities": [
+								{
+									"name": "Get List of Files",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "BinarySource",
+											"storeSettings": {
+												"type": "HttpReadSettings",
+												"requestMethod": "GET",
+												"additionalHeaders": {
+													"value": "@{concat('Authorization:Bearer ',activity('Get token').output.access_token)}",
+													"type": "Expression"
+												},
+												"requestTimeout": ""
+											},
+											"formatSettings": {
+												"type": "BinaryReadSettings"
+											}
+										},
+										"sink": {
+											"type": "BinarySink",
+											"storeSettings": {
+												"type": "AzureBlobStorageWriteSettings"
+											}
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "ds_sharepoint_ocean_project",
+											"type": "DatasetReference",
+											"parameters": {
+												"pShrepointFolder": {
+													"value": "@item().SharepointFolder",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "mbr_landing_zone",
+											"type": "DatasetReference",
+											"parameters": {
+												"pMBR_Folder": {
+													"value": "@item().MBR_Scope",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								},
+								{
+									"name": "df_shrp_listoffiles",
+									"type": "ExecuteDataFlow",
+									"dependsOn": [
+										{
+											"activity": "Get List of Files",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataflow": {
+											"referenceName": "df_shrp_listoffiles",
+											"type": "DataFlowReference",
+											"parameters": {
+												"pMBR_Scope": {
+													"value": "'@{item().MBR_Scope}'",
+													"type": "Expression"
+												}
+											},
+											"datasetParameters": {
+												"getListofFiles": {
+													"pMBR_Scope": {
+														"value": "@item().MBR_Scope",
+														"type": "Expression"
+													}
+												},
+												"createJSONListofFiles": {
+													"pMBR_Scope": {
+														"value": "@item().MBR_Scope",
+														"type": "Expression"
+													}
+												}
+											},
+											"linkedServiceParameters": {}
+										},
+										"staging": {},
+										"compute": {
+											"coreCount": 8,
+											"computeType": "General"
+										},
+										"traceLevel": "Fine"
+									}
+								},
+								{
+									"name": "Execute Pipeline1",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "df_shrp_listoffiles",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "pipeline2",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"pMBR_Scope": {
+												"value": "@item().MBR_Scope",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "Get token",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": "https://accounts.accesscontrol.windows.net/168e48b2-81f0-4aac-bc77-d58d07d205e2/tokens/OAuth/2",
+							"method": "POST",
+							"headers": {
+								"Content-Type": "application/x-www-form-urlencoded"
+							},
+							"body": "grant_type=client_credentials&client_id=63bb52e3-0d92-4899-991c-bda347d9dd3b@168e48b2-81f0-4aac-bc77-d58d07d205e2&client_secret=S8v8Q~jvkg-AXO-gSxyxnJQTd9zhR1SiPr0ukcz5&resource=00000003-0000-0ff1-ce00-000000000000/keyrusgroup.sharepoint.com@168e48b2-81f0-4aac-bc77-d58d07d205e2"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"folder": {
+					"name": "00DEV"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_ocean_cfg')]",
+				"[concat(variables('factoryId'), '/datasets/ds_sharepoint_ocean_project')]",
+				"[concat(variables('factoryId'), '/datasets/mbr_landing_zone')]",
+				"[concat(variables('factoryId'), '/dataflows/df_shrp_listoffiles')]",
+				"[concat(variables('factoryId'), '/pipelines/pipeline2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_shrp_listoffiles')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "01ODS"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_sharepoint_listofiles_xml",
+								"type": "DatasetReference"
+							},
+							"name": "getListofFiles"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_sharepoint_json",
+								"type": "DatasetReference"
+							},
+							"name": "createJSONListofFiles"
+						}
+					],
+					"transformations": [
+						{
+							"name": "flattenXML"
+						},
+						{
+							"name": "addFileName"
+						}
+					],
+					"scriptLines": [
+						"parameters{",
+						"     pMBR_Scope as string",
+						"}",
+						"source(output(",
+						"          {http://www.w3.org/2005/Atom,feed} as ({http://www.w3.org/2005/Atom,entry} as ({http://www.w3.org/2005/Atom,author} as ({http://www.w3.org/2005/Atom,name} as string), {http://www.w3.org/2005/Atom,category} as ({@scheme} as string, {@term} as string), {http://www.w3.org/2005/Atom,content} as ({@type} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,properties} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,CheckInComment} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices,CheckOutType} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as short, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,ContentTag} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices,CustomizedPageStatus} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as boolean, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,ETag} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices,Exists} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as boolean, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,IrmEnabled} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as boolean, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,Length} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as integer, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,Level} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as boolean, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,LinkingUri} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices,LinkingUrl} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices,MajorVersion} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as short, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,MinorVersion} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as boolean, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,Name} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices,ServerRelativeUrl} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices,TimeCreated} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as timestamp, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,TimeLastModified} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as timestamp, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,Title} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices,UIVersion} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as short, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,UIVersionLabel} as double, {http://schemas.microsoft.com/ado/2007/08/dataservices,UniqueId} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string))), {http://www.w3.org/2005/Atom,id} as string, {http://www.w3.org/2005/Atom,link} as ({@href} as string, {@rel} as string, {@title} as string, {@type} as string)[], {http://www.w3.org/2005/Atom,title} as string, {http://www.w3.org/2005/Atom,updated} as timestamp)[], {http://www.w3.org/2005/Atom,id} as string, {http://www.w3.org/2005/Atom,title} as string, {http://www.w3.org/2005/Atom,updated} as timestamp)",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: true,",
+						"     purgeFiles: true,",
+						"     validationMode: 'none',",
+						"     namespaces: true) ~> getListofFiles",
+						"getListofFiles foldDown(unroll({http://www.w3.org/2005/Atom,feed}.{http://www.w3.org/2005/Atom,entry}),",
+						"     mapColumn(",
+						"          GetFileUrl = {http://www.w3.org/2005/Atom,feed}.{http://www.w3.org/2005/Atom,entry}.{http://www.w3.org/2005/Atom,id},",
+						"          LinkingUri = {http://www.w3.org/2005/Atom,feed}.{http://www.w3.org/2005/Atom,entry}.{http://www.w3.org/2005/Atom,content}.{http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,properties}.{http://schemas.microsoft.com/ado/2007/08/dataservices,LinkingUri},",
+						"          LinkingUrl = {http://www.w3.org/2005/Atom,feed}.{http://www.w3.org/2005/Atom,entry}.{http://www.w3.org/2005/Atom,content}.{http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,properties}.{http://schemas.microsoft.com/ado/2007/08/dataservices,ServerRelativeUrl},",
+						"          ServerRelativeUrl = {http://www.w3.org/2005/Atom,feed}.{http://www.w3.org/2005/Atom,entry}.{http://www.w3.org/2005/Atom,content}.{http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,properties}.{http://schemas.microsoft.com/ado/2007/08/dataservices,ServerRelativeUrl},",
+						"          Name = {http://www.w3.org/2005/Atom,feed}.{http://www.w3.org/2005/Atom,entry}.{http://www.w3.org/2005/Atom,content}.{http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,properties}.{http://schemas.microsoft.com/ado/2007/08/dataservices,Name}",
+						"     ),",
+						"     skipDuplicateMapInputs: false,",
+						"     skipDuplicateMapOutputs: false) ~> flattenXML",
+						"flattenXML derive(FileName = concat('toloadSharepoint/02ListFilesToCopy/ListFilesToLoad_',$pMBR_Scope,'.json'),",
+						"          GetFileUrl = concat(replace(GetFileUrl,'https://keyrusgroup.sharepoint.com',''),'/$value')) ~> addFileName",
+						"addFileName sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          LinkingUri as string,",
+						"          LinkingUrl as string,",
+						"          ServerRelativeUrl as string,",
+						"          Name as string",
+						"     ),",
+						"     rowUrlColumn:'FileName',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> createJSONListofFiles"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_sharepoint_listofiles_xml')]",
+				"[concat(variables('factoryId'), '/datasets/ds_sharepoint_json')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_sharepoint_listofiles_xml')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_files_to_load",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"pMBR_Scope": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Xml",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "ListFiles_@{dataset().pMBR_Scope}.xml",
+							"type": "Expression"
+						},
+						"folderPath": "toloadSharepoint/01ListFilesFromSharepoint",
+						"container": "mbr-landing-zone"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_files_to_load')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_sharepoint_foldercontent')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dimensions_source",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": "toload/Canada",
+						"container": "mbr-landing-zone"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/dimensions_source')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_sharepoint_xml')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dimensions_source",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Xml",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": "toloadSharepoint/01ListFilesFromSharepoint",
+						"container": "mbr-landing-zone"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/dimensions_source')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_sharepoint_json')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dimensions_source",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"pMBR_Scope": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "ListFilesToLoad_@{dataset().pMBR_Scope}.json",
+							"type": "Expression"
+						},
+						"folderPath": "toloadSharepoint/02ListFilesToCopy",
+						"container": "mbr-landing-zone"
+					}
+				},
+				"schema": {
+					"type": "object",
+					"properties": {
+						"LinkingUri": {
+							"type": "string"
+						},
+						"LinkingUrl": {
+							"type": "string"
+						},
+						"ServerRelativeUrl": {
+							"type": "string"
+						},
+						"Name": {
+							"type": "string"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/dimensions_source')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline2')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Lookup1",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "JsonSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "JsonReadSettings"
+								}
+							},
+							"dataset": {
+								"referenceName": "ds_sharepoint_json",
+								"type": "DatasetReference",
+								"parameters": {
+									"pMBR_Scope": {
+										"value": "@pipeline().parameters.pMBR_Scope",
+										"type": "Expression"
+									}
+								}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Lookup1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Get token",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Lookup1').output.value",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Get List of Files",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "BinarySource",
+											"storeSettings": {
+												"type": "HttpReadSettings",
+												"requestMethod": "GET",
+												"additionalHeaders": {
+													"value": "@{concat('Authorization:Bearer ',activity('Get token').output.access_token)}",
+													"type": "Expression"
+												},
+												"requestTimeout": ""
+											},
+											"formatSettings": {
+												"type": "BinaryReadSettings"
+											}
+										},
+										"sink": {
+											"type": "BinarySink",
+											"storeSettings": {
+												"type": "AzureBlobStorageWriteSettings"
+											}
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "ds_sharepoint_ocean_project_copy1",
+											"type": "DatasetReference",
+											"parameters": {
+												"pServerRelativeUrl": {
+													"value": "@item().GetFileUrl",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "Binary1",
+											"type": "DatasetReference",
+											"parameters": {
+												"pMBR_Scope": {
+													"value": "@pipeline().parameters.pMBR_Scope",
+													"type": "Expression"
+												},
+												"pFileName": {
+													"value": "@item().Name",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
+						}
+					},
+					{
+						"name": "Get token",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": "https://accounts.accesscontrol.windows.net/168e48b2-81f0-4aac-bc77-d58d07d205e2/tokens/OAuth/2",
+							"method": "POST",
+							"headers": {
+								"Content-Type": "application/x-www-form-urlencoded"
+							},
+							"body": "grant_type=client_credentials&client_id=63bb52e3-0d92-4899-991c-bda347d9dd3b@168e48b2-81f0-4aac-bc77-d58d07d205e2&client_secret=S8v8Q~jvkg-AXO-gSxyxnJQTd9zhR1SiPr0ukcz5&resource=00000003-0000-0ff1-ce00-000000000000/keyrusgroup.sharepoint.com@168e48b2-81f0-4aac-bc77-d58d07d205e2"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"pMBR_Scope": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "00DEV"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_sharepoint_json')]",
+				"[concat(variables('factoryId'), '/datasets/ds_sharepoint_ocean_project_copy1')]",
+				"[concat(variables('factoryId'), '/datasets/Binary1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_sharepoint_ocean_project_copy1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SharepointOceanProject",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"pServerRelativeUrl": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "01ODS"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "HttpServerLocation",
+						"relativeUrl": {
+							"value": "@dataset().pServerRelativeUrl",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SharepointOceanProject')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Binary1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dimensions_source",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"pMBR_Scope": {
+						"type": "string"
+					},
+					"pFileName": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "@dataset().pFileName",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "toload/@{dataset().pMBR_Scope}",
+							"type": "Expression"
+						},
+						"container": "mbr-landing-zone"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/dimensions_source')]"
 			]
 		}
 	]

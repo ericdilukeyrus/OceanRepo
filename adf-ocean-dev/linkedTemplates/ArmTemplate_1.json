@@ -13,6 +13,54 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/ds_raw_mbr_pnl_data')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dimensions_source",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"vSheetName": {
+						"type": "string"
+					},
+					"vFileName": {
+						"type": "string"
+					},
+					"vFolderName": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "01ODS"
+				},
+				"annotations": [],
+				"type": "Excel",
+				"typeProperties": {
+					"sheetName": {
+						"value": "@dataset().vSheetName",
+						"type": "Expression"
+					},
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "@dataset().vFileName",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().vFolderName",
+							"type": "Expression"
+						},
+						"container": "mbr-landing-zone"
+					},
+					"range": "A10:AS482"
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ds_sharepoint_ocean_project')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -20,6 +68,11 @@
 				"linkedServiceName": {
 					"referenceName": "SharepointOceanProject",
 					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"pShrepointFolder": {
+						"type": "string"
+					}
 				},
 				"folder": {
 					"name": "01ODS"
@@ -29,7 +82,10 @@
 				"typeProperties": {
 					"location": {
 						"type": "HttpServerLocation",
-						"relativeUrl": "/sites/OceanProject/_api/web/GetFileByServerRelativeUrl('/sites/OceanProject/Shared Documents/Portugal/MBR Reporting_2023_v22 - 02 BUs (Example).xlsx')/$value"
+						"relativeUrl": {
+							"value": "/sites/OceanProject/_api/web/GetFolderByServerRelativeUrl('/sites/OceanProject/Shared Documents/@{dataset().pShrepointFolder}/')/Files\r\n\r\n\r\n",
+							"type": "Expression"
+						}
 					}
 				}
 			},
@@ -3419,6 +3475,11 @@
 					"referenceName": "ls_files_to_load",
 					"type": "LinkedServiceReference"
 				},
+				"parameters": {
+					"pMBR_Folder": {
+						"type": "string"
+					}
+				},
 				"folder": {
 					"name": "01ODS"
 				},
@@ -3427,8 +3488,11 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
-						"fileName": "MBR Reporting_2023_v22 - 02 BUs (Example).xlsx",
-						"folderPath": "toload",
+						"fileName": {
+							"value": "ListFiles_@{dataset().pMBR_Folder}.xml",
+							"type": "Expression"
+						},
+						"folderPath": "toloadSharepoint/01ListFilesFromSharepoint",
 						"container": "mbr-landing-zone"
 					}
 				}
@@ -5245,93 +5309,6 @@
 				}
 			},
 			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/cfg_file_metadata')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Get File Metadata",
-						"type": "GetMetadata",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataset": {
-								"referenceName": "mbr_file_metadata",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"fieldList": [
-								"exists",
-								"itemName",
-								"lastModified"
-							],
-							"storeSettings": {
-								"type": "AzureBlobStorageReadSettings",
-								"recursive": true,
-								"enablePartitionDiscovery": false
-							}
-						}
-					},
-					{
-						"name": "Stored procedure1",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Get File Metadata",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[cfg].[prc_file_metadata_output]",
-							"storedProcedureParameters": {
-								"JSON": {
-									"value": {
-										"value": "@activity('Get File Metadata').output",
-										"type": "Expression"
-									},
-									"type": "String"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "ocean_db",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"folder": {
-					"name": "00DEV"
-				},
-				"annotations": [],
-				"lastPublishTime": "2023-02-13T11:34:27Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/mbr_file_metadata')]"
-			]
 		}
 	]
 }

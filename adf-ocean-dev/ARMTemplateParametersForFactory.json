@@ -11,6 +11,9 @@
 		"ls_files_to_load_connectionString": {
 			"value": ""
 		},
+		"ls_sharepoint_xml_connectionString": {
+			"value": ""
+		},
 		"ocean_db_connectionString": {
 			"value": ""
 		},

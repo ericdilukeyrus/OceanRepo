@@ -13,6 +13,281 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/ds_sharepoint_listofiles_xml')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_files_to_load",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"pMBR_Scope": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Xml",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "ListFiles_@{dataset().pMBR_Scope}.xml",
+							"type": "Expression"
+						},
+						"folderPath": "toloadSharepoint/01ListFilesFromSharepoint",
+						"container": "mbr-landing-zone"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_sharepoint_foldercontent')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dimensions_source",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": "toload/Canada",
+						"container": "mbr-landing-zone"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_sharepoint_xml')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dimensions_source",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Xml",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": "toloadSharepoint/01ListFilesFromSharepoint",
+						"container": "mbr-landing-zone"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_sharepoint_json')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dimensions_source",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"pMBR_Scope": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "ListFilesToLoad_@{dataset().pMBR_Scope}.json",
+							"type": "Expression"
+						},
+						"folderPath": "toloadSharepoint/02ListFilesToCopy",
+						"container": "mbr-landing-zone"
+					}
+				},
+				"schema": {
+					"type": "object",
+					"properties": {
+						"LinkingUri": {
+							"type": "string"
+						},
+						"LinkingUrl": {
+							"type": "string"
+						},
+						"ServerRelativeUrl": {
+							"type": "string"
+						},
+						"Name": {
+							"type": "string"
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_sharepoint_ocean_project_copy1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SharepointOceanProject",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"pServerRelativeUrl": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "01ODS"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "HttpServerLocation",
+						"relativeUrl": {
+							"value": "@dataset().pServerRelativeUrl",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Binary1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dimensions_source",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"pMBR_Scope": {
+						"type": "string"
+					},
+					"pFileName": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "@dataset().pFileName",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "toload/@{dataset().pMBR_Scope}",
+							"type": "Expression"
+						},
+						"container": "mbr-landing-zone"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/cfg_file_metadata')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Get File Metadata",
+						"type": "GetMetadata",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "mbr_file_metadata",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"fieldList": [
+								"exists",
+								"itemName",
+								"lastModified"
+							],
+							"storeSettings": {
+								"type": "AzureBlobStorageReadSettings",
+								"recursive": true,
+								"enablePartitionDiscovery": false
+							}
+						}
+					},
+					{
+						"name": "Stored procedure1",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "Get File Metadata",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[cfg].[prc_file_metadata_output]",
+							"storedProcedureParameters": {
+								"JSON": {
+									"value": {
+										"value": "@activity('Get File Metadata').output",
+										"type": "Expression"
+									},
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "ocean_db",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"folder": {
+					"name": "00DEV"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-13T11:34:27Z"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ods_mbr_ic_declaration')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -1535,101 +1810,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/pl_copy_data_sharepoint_dummy')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Get token",
-						"type": "WebActivity",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"url": "https://accounts.accesscontrol.windows.net/168e48b2-81f0-4aac-bc77-d58d07d205e2/tokens/OAuth/2",
-							"method": "POST",
-							"headers": {
-								"Content-Type": "application/x-www-form-urlencoded"
-							},
-							"body": "grant_type=client_credentials&client_id=63bb52e3-0d92-4899-991c-bda347d9dd3b@168e48b2-81f0-4aac-bc77-d58d07d205e2&client_secret=S8v8Q~jvkg-AXO-gSxyxnJQTd9zhR1SiPr0ukcz5&resource=00000003-0000-0ff1-ce00-000000000000/keyrusgroup.sharepoint.com@168e48b2-81f0-4aac-bc77-d58d07d205e2"
-						}
-					},
-					{
-						"name": "Get MBR Scope File",
-						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "Get token",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "BinarySource",
-								"storeSettings": {
-									"type": "HttpReadSettings",
-									"requestMethod": "GET",
-									"additionalHeaders": {
-										"value": "@{concat('Authorization:Bearer ',activity('Get token').output.access_token)}",
-										"type": "Expression"
-									},
-									"requestTimeout": ""
-								},
-								"formatSettings": {
-									"type": "BinaryReadSettings"
-								}
-							},
-							"sink": {
-								"type": "BinarySink",
-								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
-								}
-							},
-							"enableStaging": false
-						},
-						"inputs": [
-							{
-								"referenceName": "ds_sharepoint_ocean_project",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "mbr_landing_zone",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"annotations": [],
-				"lastPublishTime": "2023-02-17T18:10:37Z"
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/stg_dimensions')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -1909,6 +2089,9 @@
 						}
 					],
 					"scriptLines": [
+						"parameters{",
+						"     pPipelineRunID as string",
+						"}",
 						"source(output(",
 						"          BusinessUnit as string,",
 						"          Scenario as string,",
@@ -2013,7 +2196,8 @@
 						"     validateSchema: false,",
 						"     isolationLevel: 'READ_UNCOMMITTED',",
 						"     format: 'table') ~> getDimKPI",
-						"getMBRStagingData derive(MonthYearID = toInteger(concat(toString(year(MonthYear)), lpad(toString(month(MonthYear)),2,'0'), '01'))) ~> addYearMonthID",
+						"getMBRStagingData derive(MonthYearID = toInteger(concat(toString(year(MonthYear)), lpad(toString(month(MonthYear)),2,'0'), '01')),",
+						"          CreatedBy = $pPipelineRunID) ~> addYearMonthID",
 						"addYearMonthID, getDimScenario join(Scenario == Scenario_Name0,",
 						"     joinType:'inner',",
 						"     matchType:'exact',",
@@ -2036,7 +2220,8 @@
 						"          NatureID,",
 						"          MonthYearID,",
 						"          MonthYear,",
-						"          Value",
+						"          Value,",
+						"          CreatedBy",
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true) ~> cleanColumns",
@@ -2071,7 +2256,8 @@
 						"          MonthYearID = FINorKPI@FIN@MonthYearID,",
 						"          MonthYear,",
 						"          Value = FINorKPI@FIN@Value,",
-						"          InsertOrUpdate",
+						"          InsertOrUpdate,",
+						"          CreatedBy",
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true) ~> cleanColumnsToUpsert",
@@ -2112,7 +2298,8 @@
 						"          MonthYearID = FINorKPI@KPI@MonthYearID,",
 						"          MonthYear,",
 						"          Value = FINorKPI@KPI@Value,",
-						"          InsertOrUpdate",
+						"          InsertOrUpdate,",
+						"          CreatedBy",
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true) ~> cleanColumnsToUpsertKPI",
@@ -2153,7 +2340,8 @@
 						"          OrganisationID,",
 						"          MonthYearID,",
 						"          MonthYear,",
-						"          Value",
+						"          Value,",
+						"          CreatedBy",
 						"     )) ~> insertFactFinancials",
 						"insertOrUpdateKPI sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
@@ -2184,7 +2372,8 @@
 						"          OrganisationID,",
 						"          MonthYearID,",
 						"          MonthYear,",
-						"          Value",
+						"          Value,",
+						"          CreatedBy",
 						"     )) ~> insertFactDrivers"
 					]
 				}
@@ -2683,1059 +2872,83 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/pl_02_ingest_mbr_data_ods')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
+			"name": "[concat(parameters('factoryName'), '/df_shrp_listoffiles')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"description": "Move all import tables from the source systems",
-				"activities": [
-					{
-						"name": "Copy MBR Parameters",
-						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "Truncate ODS Param Curr Tables",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "ExcelSource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true,
-									"enablePartitionDiscovery": false
-								}
-							},
-							"sink": {
-								"type": "AzureSqlSink",
-								"preCopyScript": {
-									"value": "truncate table ods.R_MBR_Parameters_@{pipeline().parameters.pMBRScope}",
-									"type": "Expression"
-								},
-								"writeBehavior": "insert",
-								"sqlWriterUseTableLock": false,
-								"tableOption": "autoCreate",
-								"disableMetricsCollection": false
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "ds_mbr_parameters",
-								"type": "DatasetReference",
-								"parameters": {
-									"pFileName": {
-										"value": "@pipeline().parameters.pFileName",
-										"type": "Expression"
-									},
-									"pFolderName": {
-										"value": "@pipeline().parameters.pFolderName",
-										"type": "Expression"
-									}
-								}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "ds_ocean_ods",
-								"type": "DatasetReference",
-								"parameters": {
-									"vTableName": {
-										"value": "@concat('R_MBR_Parameters_',pipeline().parameters.pMBRScope)",
-										"type": "Expression"
-									}
-								}
-							}
-						]
-					},
-					{
-						"name": "Copy MBR Currency",
-						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "Truncate ODS Param Curr Tables",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "ExcelSource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true,
-									"enablePartitionDiscovery": false
-								}
-							},
-							"sink": {
-								"type": "AzureSqlSink",
-								"preCopyScript": {
-									"value": "truncate table ods.R_MBR_Currency_@{pipeline().parameters.pMBRScope}",
-									"type": "Expression"
-								},
-								"writeBehavior": "insert",
-								"sqlWriterUseTableLock": false,
-								"tableOption": "autoCreate",
-								"disableMetricsCollection": false
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"type": "String",
-											"ordinal": 1
-										},
-										"sink": {
-											"name": "bu_sequence",
-											"physicalType": "String"
-										}
-									},
-									{
-										"source": {
-											"type": "String",
-											"ordinal": 2
-										},
-										"sink": {
-											"name": "bu_name",
-											"physicalType": "String"
-										}
-									},
-									{
-										"source": {
-											"type": "String",
-											"ordinal": 3
-										},
-										"sink": {
-											"name": "currency_code",
-											"physicalType": "String"
-										}
-									},
-									{
-										"source": {
-											"type": "String",
-											"ordinal": 4
-										},
-										"sink": {
-											"name": "bu_select",
-											"physicalType": "String"
-										}
-									}
-								],
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "ds_mbr_currency",
-								"type": "DatasetReference",
-								"parameters": {
-									"pFileName": {
-										"value": "@pipeline().parameters.pFileName",
-										"type": "Expression"
-									},
-									"pFolderName": {
-										"value": "@pipeline().parameters.pFolderName",
-										"type": "Expression"
-									}
-								}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "ds_ocean_ods",
-								"type": "DatasetReference",
-								"parameters": {
-									"vTableName": {
-										"value": "@concat('R_MBR_Currency_',pipeline().parameters.pMBRScope)",
-										"type": "Expression"
-									}
-								}
-							}
-						]
-					},
-					{
-						"name": "Get MBR Parameters",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "Copy MBR Parameters",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "Copy MBR Currency",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "select a.Prop_1 as MBR_Scope, b.Prop_1 as MBR_Month,  CONCAT('P&L FI_', bu_sequence ) AS SheetName, bu_sequence AS BU_Code, bu_name as BU_Name,\nCONCAT('R_P&L_FI_', a.Prop_1, '_',bu_sequence) AS RawTableName,  CONCAT('U_P&L_FI_', a.Prop_1, '_', bu_sequence) AS UnpvtTableName, currency_code as Currency_Code\nfrom ods.R_MBR_Currency_@{pipeline().parameters.pMBRScope},\n(select Prop_1 from ods.R_MBR_Parameters_@{pipeline().parameters.pMBRScope}\nwhere Prop_0 = 'MBR SCOPE') a,\n(select Prop_1 from ods.R_MBR_Parameters_@{pipeline().parameters.pMBRScope}\nwhere Prop_0 = 'MONTH') b\nwhere bu_select is not null",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "ds_ocean_ods",
-								"type": "DatasetReference",
-								"parameters": {
-									"vTableName": {
-										"value": "@concat('R_MBR_Currency_',pipeline().parameters.pMBRScope)",
-										"type": "Expression"
-									}
-								}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "ForEach Business Units sheets",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Get MBR Parameters",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Get MBR Parameters').output.value",
-								"type": "Expression"
-							},
-							"isSequential": false,
-							"activities": [
-								{
-									"name": "Copy MBR Files to ODS",
-									"type": "ExecuteDataFlow",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"dataflow": {
-											"referenceName": "df_copy_all_mbr",
-											"type": "DataFlowReference",
-											"parameters": {
-												"pBU_Code": {
-													"value": "'@{item().BU_Code}'",
-													"type": "Expression"
-												},
-												"pRawTableName": {
-													"value": "'@{item().RawTableName}'",
-													"type": "Expression"
-												},
-												"pMBR_Scope": {
-													"value": "'@{item().MBR_Scope}'",
-													"type": "Expression"
-												},
-												"pMBR_Month": {
-													"value": "'@{item().MBR_Month}'",
-													"type": "Expression"
-												},
-												"pBU_Name": {
-													"value": "'@{item().BU_Name}'",
-													"type": "Expression"
-												},
-												"pCurrency_Code": {
-													"value": "'@{item().Currency_Code}'",
-													"type": "Expression"
-												}
-											},
-											"datasetParameters": {
-												"getMBRData": {
-													"vSheetName": {
-														"value": "@item().SheetName",
-														"type": "Expression"
-													},
-													"vFileName": {
-														"value": "@pipeline().parameters.pFileName",
-														"type": "Expression"
-													},
-													"vFolderName": {
-														"value": "@pipeline().parameters.pFolderName",
-														"type": "Expression"
-													}
-												},
-												"insertRawMBRData": {
-													"pRawTableName": {
-														"value": "@item().RawTableName",
-														"type": "Expression"
-													}
-												}
-											}
-										},
-										"staging": {},
-										"compute": {
-											"coreCount": 8,
-											"computeType": "General"
-										},
-										"traceLevel": "Fine"
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "ForEach BU Raw ODS Table",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "ForEach Business Units sheets",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Get MBR Parameters').output.value",
-								"type": "Expression"
-							},
-							"activities": [
-								{
-									"name": "Unpivot MBR ODS Table",
-									"type": "ExecuteDataFlow",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"dataflow": {
-											"referenceName": "df_unpvt_mbr_data",
-											"type": "DataFlowReference",
-											"parameters": {
-												"RawTableName": {
-													"value": "'@{item().RawTableName}'",
-													"type": "Expression"
-												},
-												"UnpivotTableName": {
-													"value": "'@{item().UnpvtTableName}'",
-													"type": "Expression"
-												}
-											},
-											"datasetParameters": {
-												"getMBRData": {
-													"vTableName": {
-														"value": "@item().RawTableName",
-														"type": "Expression"
-													}
-												},
-												"InsertUnpvtMBRData": {
-													"UnpvtTableName": {
-														"value": "@item().UnpvtTableName",
-														"type": "Expression"
-													}
-												}
-											}
-										},
-										"staging": {},
-										"compute": {
-											"coreCount": 8,
-											"computeType": "General"
-										},
-										"traceLevel": "Fine"
-									}
-								},
-								{
-									"name": "Insert Sources Cfg Info",
-									"type": "Script",
-									"dependsOn": [
-										{
-											"activity": "Unpivot MBR ODS Table",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"linkedServiceName": {
-										"referenceName": "ocean_db",
-										"type": "LinkedServiceReference"
-									},
-									"typeProperties": {
-										"scripts": [
-											{
-												"type": "Query",
-												"text": {
-													"value": "INSERT INTO [ods].[Sources_Config]\n           ([MBR_FileName]\n           ,[MBR_Scope]\n           ,[MBR_Month]\n           ,[MBR_SheetName]\n           ,[MBR_BU_Code]\n           ,[MBR_BU_Name]\n           ,[MBR_RawTableName]\n           ,[MBR_UnpvtTableName]\n           ,[MBR_Currency_Code])\n     VALUES\n           ('@{pipeline().parameters.pFileName}'\n           ,'@{item().MBR_Scope}'\n           ,'@{item().MBR_Month}'\n           ,'@{item().SheetName}'\n           ,'@{item().BU_Code}'\n           ,'@{item().BU_Name}'\n           ,'@{item().RawTableName}'\n           ,'@{item().UnpvtTableName}'\n           ,'@{item().Currency_Code}')\n\n",
-													"type": "Expression"
-												}
-											}
-										],
-										"scriptBlockExecutionTimeout": "02:00:00"
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "Truncate ODS Param Curr Tables",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[ods].[prc_ods_truncate_paramCurr_tables]",
-							"storedProcedureParameters": {
-								"mbr_scope": {
-									"value": {
-										"value": "@pipeline().parameters.pMBRScope",
-										"type": "Expression"
-									},
-									"type": "String"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "ocean_db",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"parameters": {
-					"pFileName": {
-						"type": "string"
-					},
-					"pFolderName": {
-						"type": "string"
-					},
-					"pMBRScope": {
-						"type": "string"
-					}
-				},
-				"variables": {
-					"vplShetName": {
-						"type": "String"
-					}
-				},
 				"folder": {
 					"name": "01ODS"
 				},
-				"annotations": [],
-				"lastPublishTime": "2023-02-20T10:35:32Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/df_copy_all_mbr')]",
-				"[concat(variables('factoryId'), '/dataflows/df_unpvt_mbr_data')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pl_03_load_stg_financials')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "ForEach Unpvt Data Table",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Get All Unpvt Table",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Get All Unpvt Table').output.value",
-								"type": "Expression"
-							},
-							"isSequential": false,
-							"activities": [
-								{
-									"name": "Staging Financial Table",
-									"type": "ExecuteDataFlow",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"dataflow": {
-											"referenceName": "df_stg_financials",
-											"type": "DataFlowReference",
-											"parameters": {
-												"unpvtTableName": {
-													"value": "'@{item().MBR_UnpvtTableName}'",
-													"type": "Expression"
-												}
-											},
-											"datasetParameters": {
-												"getMBRUnpvtData": {
-													"vTableName": {
-														"value": "@item().MBR_UnpvtTableName",
-														"type": "Expression"
-													}
-												},
-												"insertMBRStagingData": {
-													"stgFinancialTable": {
-														"value": "@item().StgFinancialTableName",
-														"type": "Expression"
-													}
-												}
-											}
-										},
-										"staging": {},
-										"compute": {
-											"coreCount": 8,
-											"computeType": "General"
-										},
-										"traceLevel": "Fine"
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "Get All Unpvt Table",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "select  MBR_UnpvtTableName, CONCAT('P&L_FI_', MBR_Scope, '_', MBR_BU_Code) AS StgFinancialTableName  from  [ods].[Sources_Config]",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
 							"dataset": {
-								"referenceName": "ds_ocean_ods",
-								"type": "DatasetReference",
-								"parameters": {
-									"vTableName": "Sources_Config"
-								}
+								"referenceName": "ds_sharepoint_listofiles_xml",
+								"type": "DatasetReference"
 							},
-							"firstRowOnly": false
+							"name": "getListofFiles"
 						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"folder": {
-					"name": "02STG"
-				},
-				"annotations": [],
-				"lastPublishTime": "2023-02-20T11:30:45Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/df_stg_financials')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pl_04_load_fact_financials')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Get All Staging Data",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "select  MBR_UnpvtTableName, CONCAT('P&L_FI_', MBR_Scope, '_', MBR_BU_Code) AS StgFinancialTableName  from  [ods].[Sources_Config]",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
+					],
+					"sinks": [
+						{
 							"dataset": {
-								"referenceName": "ds_ocean_ods",
-								"type": "DatasetReference",
-								"parameters": {
-									"vTableName": "Sources_Config"
-								}
+								"referenceName": "ds_sharepoint_json",
+								"type": "DatasetReference"
 							},
-							"firstRowOnly": false
+							"name": "createJSONListofFiles"
 						}
-					},
-					{
-						"name": "ForEach Staging Table",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Get All Staging Data",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Get All Staging Data').output.value",
-								"type": "Expression"
-							},
-							"activities": [
-								{
-									"name": "Load Fact Financials",
-									"type": "ExecuteDataFlow",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"dataflow": {
-											"referenceName": "df_Load_Fact_Financials",
-											"type": "DataFlowReference",
-											"parameters": {},
-											"datasetParameters": {
-												"getMBRStagingData": {
-													"vTableName": {
-														"value": "@item().StgFinancialTableName",
-														"type": "Expression"
-													}
-												},
-												"getDimScenario": {
-													"vTableName": "DimScenario"
-												},
-												"getDimNature": {
-													"vTableName": "DimNature"
-												},
-												"getDimOrganisation": {
-													"vTableName": "DimOrganisation"
-												},
-												"getFactFinancials": {
-													"FactName": "FactFinancials"
-												},
-												"getFactDrivers": {
-													"vTableName": "FactDrivers"
-												},
-												"getDimKPI": {
-													"vTableName": "DimKPI"
-												},
-												"insertFactFinancials": {
-													"FactName": "FactFinancials"
-												},
-												"insertFactDrivers": {
-													"FactName": "FactDrivers"
-												}
-											}
-										},
-										"staging": {},
-										"compute": {
-											"coreCount": 8,
-											"computeType": "General"
-										},
-										"traceLevel": "Fine"
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "Summary Log Data",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "ForEach Staging Table",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "pl_05_summary_log",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": false,
-							"parameters": {}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"folder": {
-					"name": "03DWH"
-				},
-				"annotations": [],
-				"lastPublishTime": "2023-02-17T16:37:57Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/pl_05_summary_log')]",
-				"[concat(variables('factoryId'), '/dataflows/df_Load_Fact_Financials')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pl_01_read_all_MBR_files')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Get MBR All Files",
-						"type": "GetMetadata",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
+					],
+					"transformations": [
+						{
+							"name": "flattenXML"
 						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataset": {
-								"referenceName": "ds_mbr_landing_folder",
-								"type": "DatasetReference",
-								"parameters": {
-									"MBRScope": {
-										"value": "@pipeline().parameters.MBRScope_Folder",
-										"type": "Expression"
-									}
-								}
-							},
-							"fieldList": [
-								"childItems"
-							],
-							"storeSettings": {
-								"type": "AzureBlobStorageReadSettings",
-								"recursive": true,
-								"enablePartitionDiscovery": false
-							}
+						{
+							"name": "addFileName"
 						}
-					},
-					{
-						"name": "ForEach MBR Files by Scope",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Get MBR All Files",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Get MBR All Files').output.childItems",
-								"type": "Expression"
-							},
-							"isSequential": false,
-							"activities": [
-								{
-									"name": "Ingest MBR Data",
-									"type": "ExecutePipeline",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "pl_02_ingest_mbr_data_ods",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {
-											"pFileName": {
-												"value": "@item().name",
-												"type": "Expression"
-											},
-											"pFolderName": {
-												"value": "@pipeline().parameters.MBRScope_Folder",
-												"type": "Expression"
-											},
-											"pMBRScope": {
-												"value": "@pipeline().parameters.MBR_Scope",
-												"type": "Expression"
-											}
-										}
-									}
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"parameters": {
-					"MBRScope_Folder": {
-						"type": "string"
-					},
-					"MBR_Scope": {
-						"type": "string"
-					}
-				},
-				"variables": {
-					"test": {
-						"type": "String"
-					}
-				},
-				"folder": {
-					"name": "01ODS"
-				},
-				"annotations": [],
-				"lastPublishTime": "2023-02-20T08:54:30Z"
+					],
+					"scriptLines": [
+						"parameters{",
+						"     pMBR_Scope as string",
+						"}",
+						"source(output(",
+						"          {http://www.w3.org/2005/Atom,feed} as ({http://www.w3.org/2005/Atom,entry} as ({http://www.w3.org/2005/Atom,author} as ({http://www.w3.org/2005/Atom,name} as string), {http://www.w3.org/2005/Atom,category} as ({@scheme} as string, {@term} as string), {http://www.w3.org/2005/Atom,content} as ({@type} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,properties} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,CheckInComment} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices,CheckOutType} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as short, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,ContentTag} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices,CustomizedPageStatus} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as boolean, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,ETag} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices,Exists} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as boolean, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,IrmEnabled} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as boolean, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,Length} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as integer, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,Level} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as boolean, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,LinkingUri} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices,LinkingUrl} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices,MajorVersion} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as short, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,MinorVersion} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as boolean, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,Name} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices,ServerRelativeUrl} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices,TimeCreated} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as timestamp, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,TimeLastModified} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as timestamp, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,Title} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices,UIVersion} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as short, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,UIVersionLabel} as double, {http://schemas.microsoft.com/ado/2007/08/dataservices,UniqueId} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string))), {http://www.w3.org/2005/Atom,id} as string, {http://www.w3.org/2005/Atom,link} as ({@href} as string, {@rel} as string, {@title} as string, {@type} as string)[], {http://www.w3.org/2005/Atom,title} as string, {http://www.w3.org/2005/Atom,updated} as timestamp)[], {http://www.w3.org/2005/Atom,id} as string, {http://www.w3.org/2005/Atom,title} as string, {http://www.w3.org/2005/Atom,updated} as timestamp)",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: true,",
+						"     purgeFiles: true,",
+						"     validationMode: 'none',",
+						"     namespaces: true) ~> getListofFiles",
+						"getListofFiles foldDown(unroll({http://www.w3.org/2005/Atom,feed}.{http://www.w3.org/2005/Atom,entry}),",
+						"     mapColumn(",
+						"          GetFileUrl = {http://www.w3.org/2005/Atom,feed}.{http://www.w3.org/2005/Atom,entry}.{http://www.w3.org/2005/Atom,id},",
+						"          LinkingUri = {http://www.w3.org/2005/Atom,feed}.{http://www.w3.org/2005/Atom,entry}.{http://www.w3.org/2005/Atom,content}.{http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,properties}.{http://schemas.microsoft.com/ado/2007/08/dataservices,LinkingUri},",
+						"          LinkingUrl = {http://www.w3.org/2005/Atom,feed}.{http://www.w3.org/2005/Atom,entry}.{http://www.w3.org/2005/Atom,content}.{http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,properties}.{http://schemas.microsoft.com/ado/2007/08/dataservices,ServerRelativeUrl},",
+						"          ServerRelativeUrl = {http://www.w3.org/2005/Atom,feed}.{http://www.w3.org/2005/Atom,entry}.{http://www.w3.org/2005/Atom,content}.{http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,properties}.{http://schemas.microsoft.com/ado/2007/08/dataservices,ServerRelativeUrl},",
+						"          Name = {http://www.w3.org/2005/Atom,feed}.{http://www.w3.org/2005/Atom,entry}.{http://www.w3.org/2005/Atom,content}.{http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,properties}.{http://schemas.microsoft.com/ado/2007/08/dataservices,Name}",
+						"     ),",
+						"     skipDuplicateMapInputs: false,",
+						"     skipDuplicateMapOutputs: false) ~> flattenXML",
+						"flattenXML derive(FileName = concat('toloadSharepoint/02ListFilesToCopy/ListFilesToLoad_',$pMBR_Scope,'.json'),",
+						"          GetFileUrl = concat(replace(GetFileUrl,'https://keyrusgroup.sharepoint.com',''),'/$value')) ~> addFileName",
+						"addFileName sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          LinkingUri as string,",
+						"          LinkingUrl as string,",
+						"          ServerRelativeUrl as string,",
+						"          Name as string",
+						"     ),",
+						"     rowUrlColumn:'FileName',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> createJSONListofFiles"
+					]
+				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/pl_02_ingest_mbr_data_ods')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pl_00_start_process')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Get All Active MBR Scope",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "Initialization",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "SELECT [MBR_Scope] as MBRScope,\n    'toload/' + [MBR_Scope]  as MBRScope_Folder\n  FROM [cfg].[Sources]\nWHERE [Active_fl] = 'Y'",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "ds_ocean_cfg",
-								"type": "DatasetReference",
-								"parameters": {
-									"vTableName": "Sources"
-								}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "ForEach Active MBR Scope",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Get All Active MBR Scope",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Get All Active MBR Scope').output.value",
-								"type": "Expression"
-							},
-							"isSequential": false,
-							"activities": [
-								{
-									"name": "Run Process by MBR Scope",
-									"type": "ExecutePipeline",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "pl_01_read_all_MBR_files",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {
-											"MBRScope_Folder": {
-												"value": "@item().MBRScope_Folder",
-												"type": "Expression"
-											},
-											"MBR_Scope": {
-												"value": "@item().MBRScope",
-												"type": "Expression"
-											}
-										}
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "Load Staging Tables",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "ForEach Active MBR Scope",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "pl_03_load_stg_financials",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					},
-					{
-						"name": "Load Fact Tables",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "Load Staging Tables",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "pl_04_load_fact_financials",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					},
-					{
-						"name": "Initialization",
-						"type": "ExecutePipeline",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "pl_01_initialization",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"annotations": [],
-				"lastPublishTime": "2023-02-17T13:38:45Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/pl_03_load_stg_financials')]",
-				"[concat(variables('factoryId'), '/pipelines/pl_04_load_fact_financials')]",
-				"[concat(variables('factoryId'), '/pipelines/pl_01_read_all_MBR_files')]"
+				"[concat(variables('factoryId'), '/datasets/ds_sharepoint_listofiles_xml')]",
+				"[concat(variables('factoryId'), '/datasets/ds_sharepoint_json')]"
 			]
 		}
 	]
