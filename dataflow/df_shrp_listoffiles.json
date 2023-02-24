@@ -21,7 +21,7 @@
 						"referenceName": "ds_sharepoint_json",
 						"type": "DatasetReference"
 					},
-					"name": "sink1"
+					"name": "createJSONListofFiles"
 				}
 			],
 			"transformations": [
@@ -52,10 +52,15 @@
 				"     skipDuplicateMapOutputs: false) ~> flattenXML",
 				"flattenXML sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     partitionFileNames:['test.json'],",
+				"     input(",
+				"          LinkingUri as string,",
+				"          LinkingUrl as string,",
+				"          ServerRelativeUrl as string,",
+				"          Name as string",
+				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
-				"     partitionBy('hash', 1)) ~> sink1"
+				"     partitionBy('hash', 1)) ~> createJSONListofFiles"
 			]
 		}
 	}

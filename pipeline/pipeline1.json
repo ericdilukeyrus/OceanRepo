@@ -143,6 +143,20 @@
 											"value": "'@{item().MBR_Scope}'",
 											"type": "Expression"
 										}
+									},
+									"datasetParameters": {
+										"getListofFiles": {
+											"pMBR_Scope": {
+												"value": "@item().MBR_Scope",
+												"type": "Expression"
+											}
+										},
+										"createJSONListofFiles": {
+											"pMBR_Scope": {
+												"value": "@item().MBR_Scope",
+												"type": "Expression"
+											}
+										}
 									}
 								},
 								"compute": {

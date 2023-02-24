@@ -23,6 +23,22 @@
 				"container": "mbr-landing-zone"
 			}
 		},
-		"schema": {}
+		"schema": {
+			"type": "object",
+			"properties": {
+				"LinkingUri": {
+					"type": "string"
+				},
+				"LinkingUrl": {
+					"type": "string"
+				},
+				"ServerRelativeUrl": {
+					"type": "string"
+				},
+				"Name": {
+					"type": "string"
+				}
+			}
+		}
 	}
 }
