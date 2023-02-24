@@ -264,7 +264,7 @@
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> getOrganizationID",
 				"joinDimScenario, getOrganizationID join(BusinessUnit == {Business Unit},",
-				"     joinType:'inner',",
+				"     joinType:'left',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joinDimOrganisation",
