@@ -5,6 +5,11 @@
 			"referenceName": "SharepointOceanProject",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"pShrepointFolder": {
+				"type": "string"
+			}
+		},
 		"folder": {
 			"name": "01ODS"
 		},
@@ -13,7 +18,10 @@
 		"typeProperties": {
 			"location": {
 				"type": "HttpServerLocation",
-				"relativeUrl": "/sites/OceanProject/_api/web/GetFolderByServerRelativeUrl('/sites/OceanProject/Shared Documents/Canada/')/?$expand=Files"
+				"relativeUrl": {
+					"value": "/sites/OceanProject/_api/web/GetFolderByServerRelativeUrl('/sites/OceanProject/Shared Documents/@{dataset().pShrepointFolder}/')/Files\r\n\r\n\r\n",
+					"type": "Expression"
+				}
 			}
 		}
 	},

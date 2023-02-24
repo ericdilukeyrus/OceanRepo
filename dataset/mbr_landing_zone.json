@@ -5,6 +5,11 @@
 			"referenceName": "ls_files_to_load",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"pMBR_Folder": {
+				"type": "string"
+			}
+		},
 		"folder": {
 			"name": "01ODS"
 		},
@@ -13,8 +18,11 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "x.xml",
-				"folderPath": "toload",
+				"fileName": "ListOfSharepointFolder.xml",
+				"folderPath": {
+					"value": "toload/@{dataset().pMBR_Folder}",
+					"type": "Expression"
+				},
 				"container": "mbr-landing-zone"
 			}
 		}
