@@ -30,7 +30,10 @@
 						"referenceName": "ds_sharepoint_json",
 						"type": "DatasetReference",
 						"parameters": {
-							"pMBR_Scope": "Canada"
+							"pMBR_Scope": {
+								"value": "@pipeline().parameters.pMBR_Scope",
+								"type": "Expression"
+							}
 						}
 					},
 					"firstRowOnly": false
