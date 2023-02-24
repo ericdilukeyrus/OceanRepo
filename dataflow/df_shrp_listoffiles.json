@@ -53,7 +53,7 @@
 				"     ),",
 				"     skipDuplicateMapInputs: false,",
 				"     skipDuplicateMapOutputs: false) ~> flattenXML",
-				"flattenXML derive(FileName = concat('ListFilesToLoad_',$pMBR_Scope,'.json')) ~> addFileName",
+				"flattenXML derive(FileName = concat('toloadSharepoint/02ListFilesToCopy/ListFilesToLoad_',$pMBR_Scope,'.json')) ~> addFileName",
 				"addFileName sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
