@@ -42,6 +42,7 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: true,",
+				"     purgeFiles: true,",
 				"     validationMode: 'none',",
 				"     namespaces: true) ~> getListofFiles",
 				"getListofFiles foldDown(unroll({http://www.w3.org/2005/Atom,feed}.{http://www.w3.org/2005/Atom,entry}),",
