@@ -1,0 +1,29 @@
+{
+	"name": "ds_sharepoint_ocean_project_copy1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SharepointOceanProject",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"pServerRelativeUrl": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "01ODS"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": {
+					"value": "@dataset().pServerRelativeUrl",
+					"type": "Expression"
+				}
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

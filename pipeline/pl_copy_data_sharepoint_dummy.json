@@ -74,7 +74,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "mbr_landing_zone",
+						"referenceName": "Binary1",
 						"type": "DatasetReference"
 					}
 				]
