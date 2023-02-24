@@ -1,17 +1,25 @@
 {
-	"name": "Xml1",
+	"name": "ds_sharepoint_listofiles_xml",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_files_to_load",
 			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"pMBR_Scope": {
+				"type": "string"
+			}
 		},
 		"annotations": [],
 		"type": "Xml",
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "x.xml",
-				"folderPath": "toload",
+				"fileName": {
+					"value": "ListFiles_@{dataset().pMBR_Scope}.xml",
+					"type": "Expression"
+				},
+				"folderPath": "toloadSharepoint/01ListFilesFromSharepoint",
 				"container": "mbr-landing-zone"
 			}
 		}
