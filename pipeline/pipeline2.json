@@ -111,7 +111,17 @@
 							"outputs": [
 								{
 									"referenceName": "Binary1",
-									"type": "DatasetReference"
+									"type": "DatasetReference",
+									"parameters": {
+										"pMBR_Scope": {
+											"value": "@pipeline().parameters.pMBR_Scope",
+											"type": "Expression"
+										},
+										"pFileName": {
+											"value": "@item().Name",
+											"type": "Expression"
+										}
+									}
 								}
 							]
 						}
