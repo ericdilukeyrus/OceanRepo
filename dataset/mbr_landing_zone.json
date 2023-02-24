@@ -18,11 +18,11 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "ListOfSharepointFolder.xml",
-				"folderPath": {
-					"value": "toload/@{dataset().pMBR_Folder}",
+				"fileName": {
+					"value": "ListFiles_@{dataset().pMBR_Folder}.xml",
 					"type": "Expression"
 				},
+				"folderPath": "toloadSharepoint",
 				"container": "mbr-landing-zone"
 			}
 		}

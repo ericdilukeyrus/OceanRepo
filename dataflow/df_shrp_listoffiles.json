@@ -1,5 +1,5 @@
 {
-	"name": "dataflow1",
+	"name": "df_shrp_listoffiles",
 	"properties": {
 		"folder": {
 			"name": "01ODS"
@@ -15,7 +15,15 @@
 					"name": "source1"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "Json1",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
 			"transformations": [
 				{
 					"name": "flatten1"
@@ -46,7 +54,13 @@
 				"          ServerRelativeUrl = {http://www.w3.org/2005/Atom,feed}.{http://schemas.microsoft.com/ado/2007/08/dataservices,ServerRelativeUrl}",
 				"     ),",
 				"     skipDuplicateMapInputs: false,",
-				"     skipDuplicateMapOutputs: false) ~> select1"
+				"     skipDuplicateMapOutputs: false) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['test.json'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
 			]
 		}
 	}
