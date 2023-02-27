@@ -5,6 +5,9 @@
 			"referenceName": "dimensions_source",
 			"type": "LinkedServiceReference"
 		},
+		"folder": {
+			"name": "00INIT"
+		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
