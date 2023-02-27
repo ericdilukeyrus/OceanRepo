@@ -664,7 +664,17 @@
 				"inputs": [
 					{
 						"referenceName": "ds_mbr_kpi_pyramid",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"pFileName": {
+								"value": "@pipeline().parameters.pFileName",
+								"type": "Expression"
+							},
+							"pFolderName": {
+								"value": "@pipeline().parameters.pFolderName",
+								"type": "Expression"
+							}
+						}
 					}
 				],
 				"outputs": [
@@ -672,7 +682,10 @@
 						"referenceName": "ds_ocean_ods",
 						"type": "DatasetReference",
 						"parameters": {
-							"vTableName": "R_KPI_Pyramid_Canada"
+							"vTableName": {
+								"value": "@concat('R_KPI_Pyramid_',pipeline().parameters.pMBRScope)",
+								"type": "Expression"
+							}
 						}
 					}
 				]
