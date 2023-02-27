@@ -230,7 +230,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "select a.Prop_1 as MBR_Scope, b.Prop_1 as MBR_Month,  CONCAT('P&L FI_', bu_sequence ) AS SheetName, bu_sequence AS BU_Code, bu_name as BU_Name,\nCONCAT('R_P&L_FI_', a.Prop_1, '_',bu_sequence) AS RawTableName,  CONCAT('U_P&L_FI_', a.Prop_1, '_', bu_sequence) AS UnpvtTableName, currency_code as Currency_Code\nfrom ods.R_MBR_Currency_@{pipeline().parameters.pMBRScope},\n(select Prop_1 from ods.R_MBR_Parameters_@{pipeline().parameters.pMBRScope}\nwhere Prop_0 = 'MBR SCOPE') a,\n(select Prop_1 from ods.R_MBR_Parameters_@{pipeline().parameters.pMBRScope}\nwhere Prop_0 = 'MONTH') b\nwhere bu_select is not null",
+							"value": "select a.Prop_1 as MBR_Scope, b.Prop_1 as MBR_Month,  CONCAT('P&L FI_', bu_sequence ) AS SheetName, bu_sequence AS BU_Code, bu_name as BU_Name,\nCONCAT('R_P&L_FI_', a.Prop_1, '_',bu_sequence) AS RawTableName,  CONCAT('U_P&L_FI_', a.Prop_1, '_', bu_sequence) AS UnpvtTableName, currency_code as Currency_Code,\nCONCAT('R_KPI_Pyramid_', a.Prop_1) AS KPIPyramidTableName\nfrom ods.R_MBR_Currency_@{pipeline().parameters.pMBRScope},\n(select Prop_1 from ods.R_MBR_Parameters_@{pipeline().parameters.pMBRScope}\nwhere Prop_0 = 'MBR SCOPE') a,\n(select Prop_1 from ods.R_MBR_Parameters_@{pipeline().parameters.pMBRScope}\nwhere Prop_0 = 'MONTH') b\nwhere bu_select is not null",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -441,7 +441,7 @@
 									{
 										"type": "Query",
 										"text": {
-											"value": "INSERT INTO [@{pipeline().globalParameters.gODSSchemaName}].[@{pipeline().globalParameters.gSourcesConfigTableName}]\n           ([MBR_FileName]\n           ,[MBR_Scope]\n           ,[MBR_Month]\n           ,[MBR_SheetName]\n           ,[MBR_BU_Code]\n           ,[MBR_BU_Name]\n           ,[MBR_RawTableName]\n           ,[MBR_UnpvtTableName]\n           ,[MBR_Currency_Code])\n     VALUES\n           ('@{pipeline().parameters.pFileName}'\n           ,'@{item().MBR_Scope}'\n           ,'@{item().MBR_Month}'\n           ,'@{item().SheetName}'\n           ,'@{item().BU_Code}'\n           ,'@{item().BU_Name}'\n           ,'@{item().RawTableName}'\n           ,'@{item().UnpvtTableName}'\n           ,'@{item().Currency_Code}')\n\n",
+											"value": "INSERT INTO [@{pipeline().globalParameters.gODSSchemaName}].[@{pipeline().globalParameters.gSourcesConfigTableName}]\n           ([MBR_FileName]\n           ,[MBR_Scope]\n           ,[MBR_Month]\n           ,[MBR_SheetName]\n           ,[MBR_BU_Code]\n           ,[MBR_BU_Name]\n           ,[MBR_RawTableName]\n           ,[MBR_UnpvtTableName]\n           ,[MBR_Currency_Code]\n           ,[MBR_KPIPyramid_TableName])\n     VALUES\n           ('@{pipeline().parameters.pFileName}'\n           ,'@{item().MBR_Scope}'\n           ,'@{item().MBR_Month}'\n           ,'@{item().SheetName}'\n           ,'@{item().BU_Code}'\n           ,'@{item().BU_Name}'\n           ,'@{item().RawTableName}'\n           ,'@{item().UnpvtTableName}'\n           ,'@{item().Currency_Code}'\n           ,'@{item().KPIPyramidTableName}')\n\n",
 											"type": "Expression"
 										}
 									}
