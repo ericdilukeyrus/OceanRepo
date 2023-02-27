@@ -130,7 +130,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "pl_01_initialization",
+						"referenceName": "pl_00_initialization",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true

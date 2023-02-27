@@ -1,5 +1,5 @@
 {
-	"name": "pipeline1",
+	"name": "pl_01_get_files_sharepoint",
 	"properties": {
 		"activities": [
 			{
@@ -182,7 +182,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"pipeline": {
-									"referenceName": "pipeline2",
+									"referenceName": "pl_02_copy_files_to_blob",
 									"type": "PipelineReference"
 								},
 								"waitOnCompletion": true,
@@ -220,7 +220,7 @@
 			}
 		],
 		"folder": {
-			"name": "00DEV"
+			"name": "00INIT"
 		},
 		"annotations": []
 	}
