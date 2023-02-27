@@ -33,6 +33,10 @@
 			"gDimKPITableName": {
 				"type": "string",
 				"value": "DimKPI"
+			},
+			"gFactDriversTableName": {
+				"type": "string",
+				"value": "FactDrivers"
 			}
 		},
 		"globalConfigurations": {
