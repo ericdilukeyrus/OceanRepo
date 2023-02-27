@@ -25,6 +25,10 @@
 			"gDimNature": {
 				"type": "string",
 				"value": "DimNature"
+			},
+			"gDimOrganisationTableName": {
+				"type": "string",
+				"value": "DimOrganisation"
 			}
 		},
 		"globalConfigurations": {
