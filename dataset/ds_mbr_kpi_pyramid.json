@@ -5,14 +5,28 @@
 			"referenceName": "dimensions_source",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"pFileName": {
+				"type": "string"
+			},
+			"pFolderName": {
+				"type": "string"
+			}
+		},
 		"annotations": [],
 		"type": "Excel",
 		"typeProperties": {
 			"sheetName": "KPI Pyramid",
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "Canada_MBR Reporting_2023_12.2023 (test) v2.xlsx",
-				"folderPath": "toload/Canada",
+				"fileName": {
+					"value": "@dataset().pFileName",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().pFolderName",
+					"type": "Expression"
+				},
 				"container": "mbr-landing-zone"
 			},
 			"range": "B79:N110"
