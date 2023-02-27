@@ -59,7 +59,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('Lookup1').output.value",
+						"value": "@activity('Get List of Files by Scope').output.value",
 						"type": "Expression"
 					},
 					"activities": [
