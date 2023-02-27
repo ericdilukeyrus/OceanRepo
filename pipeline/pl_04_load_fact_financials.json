@@ -103,19 +103,34 @@
 											}
 										},
 										"getFactFinancials": {
-											"FactName": "FactFinancials"
+											"FactName": {
+												"value": "@pipeline().globalParameters.gFactFinancialsTableName",
+												"type": "Expression"
+											}
 										},
 										"getFactDrivers": {
-											"vTableName": "FactDrivers"
+											"vTableName": {
+												"value": "@pipeline().globalParameters.gFactDriversTableName",
+												"type": "Expression"
+											}
 										},
 										"getDimKPI": {
-											"vTableName": "DimKPI"
+											"vTableName": {
+												"value": "@pipeline().globalParameters.gDimKPITableName",
+												"type": "Expression"
+											}
 										},
 										"insertFactFinancials": {
-											"FactName": "FactFinancials"
+											"FactName": {
+												"value": "@pipeline().globalParameters.gFactFinancialsTableName",
+												"type": "Expression"
+											}
 										},
 										"insertFactDrivers": {
-											"FactName": "FactDrivers"
+											"FactName": {
+												"value": "@pipeline().globalParameters.gFactDriversTableName",
+												"type": "Expression"
+											}
 										}
 									}
 								},
