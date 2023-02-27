@@ -308,6 +308,10 @@
 										"pCurrency_Code": {
 											"value": "'@{item().Currency_Code}'",
 											"type": "Expression"
+										},
+										"pFileName": {
+											"value": "'@{pipeline().parameters.pFileName}'",
+											"type": "Expression"
 										}
 									},
 									"datasetParameters": {
