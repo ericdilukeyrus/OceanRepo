@@ -1,6 +1,12 @@
 {
 	"name": "adf-ocean-dev",
 	"properties": {
+		"globalParameters": {
+			"gBaseURL": {
+				"type": "string",
+				"value": "https://keyrusgroup.sharepoint.com"
+			}
+		},
 		"globalConfigurations": {
 			"PipelineBillingEnabled": "false"
 		}
