@@ -1,0 +1,86 @@
+{
+	"name": "ds_mbr_kpi_pyramid",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "dimensions_source",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Excel",
+		"typeProperties": {
+			"sheetName": "KPI Pyramid",
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "Canada_MBR Reporting_2023_12.2023 (test) v2.xlsx",
+				"folderPath": "toload/Canada",
+				"container": "mbr-landing-zone"
+			},
+			"range": "B79:N110"
+		},
+		"schema": [
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			}
+		]
+	}
+}
