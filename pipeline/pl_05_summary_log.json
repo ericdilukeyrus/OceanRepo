@@ -17,7 +17,10 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": " select [MBR_FileName] as MBRFileName, [MBR_Scope] as MBRScope,[MBR_Month] as MBRMonth\n  ,[MBR_Currency_Code] as MBRCurrCode ,[MBR_BU_Code] as MBRBUCode ,[MBR_BU_Name] as MBRBUName ,[MBR_SheetName] as MBRSheetName from  [ods].[Sources_Config]",
+						"sqlReaderQuery": {
+							"value": "select [MBR_FileName] as MBRFileName, [MBR_Scope] as MBRScope,[MBR_Month] as MBRMonth\n  ,[MBR_Currency_Code] as MBRCurrCode ,[MBR_BU_Code] as MBRBUCode ,[MBR_BU_Name] as MBRBUName ,[MBR_SheetName] as MBRSheetName from  [@{pipeline().globalParameters.gODSSchemaName}].[@{pipeline().globalParameters.gSourcesConfigTableName}]",
+							"type": "Expression"
+						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -127,7 +130,10 @@
 						"referenceName": "ds_ocean_stg",
 						"type": "DatasetReference",
 						"parameters": {
-							"vTableName": "Sources_Config"
+							"vTableName": {
+								"value": "@pipeline().globalParameters.gSourcesConfigTableName",
+								"type": "Expression"
+							}
 						}
 					}
 				],
