@@ -5,6 +5,10 @@
 			"gBaseURL": {
 				"type": "string",
 				"value": "https://keyrusgroup.sharepoint.com"
+			},
+			"gSourcesTableName": {
+				"type": "string",
+				"value": "Sources"
 			}
 		},
 		"globalConfigurations": {
