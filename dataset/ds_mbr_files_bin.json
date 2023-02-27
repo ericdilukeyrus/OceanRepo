@@ -1,5 +1,5 @@
 {
-	"name": "Binary1",
+	"name": "ds_mbr_files_bin",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "dimensions_source",

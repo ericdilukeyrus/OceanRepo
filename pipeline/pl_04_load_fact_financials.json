@@ -17,7 +17,10 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "select  MBR_UnpvtTableName, CONCAT('P&L_FI_', MBR_Scope, '_', MBR_BU_Code) AS StgFinancialTableName  from  [ods].[Sources_Config]",
+						"sqlReaderQuery": {
+							"value": "select  MBR_UnpvtTableName, CONCAT('P&L_FI_', MBR_Scope, '_', MBR_BU_Code) AS StgFinancialTableName  from  [@{pipeline().globalParameters.gODSSchemaName}].[@{pipeline().globalParameters.gSourcesConfigTableName}]",
+							"type": "Expression"
+						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -25,7 +28,10 @@
 						"referenceName": "ds_ocean_ods",
 						"type": "DatasetReference",
 						"parameters": {
-							"vTableName": "Sources_Config"
+							"vTableName": {
+								"value": "@pipeline().globalParameters.gSourcesConfigTableName",
+								"type": "Expression"
+							}
 						}
 					},
 					"firstRowOnly": false
@@ -79,13 +85,22 @@
 											}
 										},
 										"getDimScenario": {
-											"vTableName": "DimScenario"
+											"vTableName": {
+												"value": "@pipeline().globalParameters.gDimScenarioTableName",
+												"type": "Expression"
+											}
 										},
 										"getDimNature": {
-											"vTableName": "DimNature"
+											"vTableName": {
+												"value": "@pipeline().globalParameters.gDimNatureTableName",
+												"type": "Expression"
+											}
 										},
 										"getDimOrganisation": {
-											"vTableName": "DimOrganisation"
+											"vTableName": {
+												"value": "@pipeline().globalParameters.gDimOrganisationTableName",
+												"type": "Expression"
+											}
 										},
 										"getFactFinancials": {
 											"FactName": "FactFinancials"

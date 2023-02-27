@@ -113,7 +113,7 @@
 							],
 							"outputs": [
 								{
-									"referenceName": "Binary1",
+									"referenceName": "ds_mbr_files_bin",
 									"type": "DatasetReference",
 									"parameters": {
 										"pMBR_Scope": {
