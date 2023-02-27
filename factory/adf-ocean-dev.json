@@ -9,6 +9,10 @@
 			"gSourcesTableName": {
 				"type": "string",
 				"value": "Sources"
+			},
+			"gODSSchemaName": {
+				"type": "string",
+				"value": "ods"
 			}
 		},
 		"globalConfigurations": {
