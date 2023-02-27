@@ -32,7 +32,10 @@
 						"referenceName": "ds_ocean_cfg",
 						"type": "DatasetReference",
 						"parameters": {
-							"vTableName": "Sources"
+							"vTableName": {
+								"value": "@pipeline().globalParameters.gSourcesTableName",
+								"type": "Expression"
+							}
 						}
 					},
 					"firstRowOnly": false

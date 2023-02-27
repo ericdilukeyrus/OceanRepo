@@ -22,7 +22,10 @@
 					"scripts": [
 						{
 							"type": "Query",
-							"text": "truncate table [ods].[Sources_Config]"
+							"text": {
+								"value": "truncate table [ods].[@{pipeline().globalParameters.gSourcesTableName}]",
+								"type": "Expression"
+							}
 						}
 					],
 					"scriptBlockExecutionTimeout": "02:00:00"
