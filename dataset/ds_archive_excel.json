@@ -1,0 +1,34 @@
+{
+	"name": "ds_archive_excel",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_files_to_load",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"pPath": {
+				"type": "string"
+			},
+			"pFileName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Excel",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@dataset().pFileName",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().pPath",
+					"type": "Expression"
+				},
+				"container": "mbr-landing-zone"
+			}
+		},
+		"schema": []
+	}
+}
