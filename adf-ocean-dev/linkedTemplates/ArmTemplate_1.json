@@ -13,6 +13,217 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/ds_ocean_stg_nonecrypted')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ocean_db_nonencrypted",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"pRawTableName": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "02STG"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "Index",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Anaplant_Index",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PBI_Index",
+						"type": "nvarchar"
+					},
+					{
+						"name": "K_Nature",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Actual_LY_01",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Actual_LY_02",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Actual_LY_03",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Actual_LY_04",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Actual_LY_05",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Actual_LY_06",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Actual_LY_07",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Actual_LY_08",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Actual_LY_09",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Actual_LY_10",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Actual_LY_11",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Actual_LY_12",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Budget_CY_01",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Budget_CY_02",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Budget_CY_03",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Budget_CY_04",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Budget_CY_05",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Budget_CY_06",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Budget_CY_07",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Budget_CY_08",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Budget_CY_09",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Budget_CY_10",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Budget_CY_11",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Budget_CY_12",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Actual_CY_01",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Actual_CY_02",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Actual_CY_03",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Actual_CY_04",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Actual_CY_05",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Actual_CY_06",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Actual_CY_07",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Actual_CY_08",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Actual_CY_09",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Actual_CY_10",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Actual_CY_11",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Actual_CY_12",
+						"type": "nvarchar"
+					},
+					{
+						"name": "BU_Code",
+						"type": "nvarchar"
+					},
+					{
+						"name": "BU_Name",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Currency_Code",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MBR_Scope",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MBR_Month",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "ods",
+					"table": {
+						"value": "@dataset().pRawTableName",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ds_raw_mbr_pnl_data')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -61,6 +272,108 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/ds_sharepoint_foldercontent')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dimensions_source",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": "toload/Canada",
+						"container": "mbr-landing-zone"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_sharepoint_json')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dimensions_source",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"pMBR_Scope": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "ListFilesToLoad_@{dataset().pMBR_Scope}.json",
+							"type": "Expression"
+						},
+						"folderPath": "toloadSharepoint/02ListFilesToCopy",
+						"container": "mbr-landing-zone"
+					}
+				},
+				"schema": {
+					"type": "object",
+					"properties": {
+						"LinkingUri": {
+							"type": "string"
+						},
+						"LinkingUrl": {
+							"type": "string"
+						},
+						"ServerRelativeUrl": {
+							"type": "string"
+						},
+						"Name": {
+							"type": "string"
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_sharepoint_listofiles_xml')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_files_to_load",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"pMBR_Scope": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Xml",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "ListFiles_@{dataset().pMBR_Scope}.xml",
+							"type": "Expression"
+						},
+						"folderPath": "toloadSharepoint/01ListFilesFromSharepoint",
+						"container": "mbr-landing-zone"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ds_sharepoint_ocean_project')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -86,6 +399,58 @@
 							"value": "/sites/OceanProject/_api/web/GetFolderByServerRelativeUrl('/sites/OceanProject/Shared Documents/@{dataset().pShrepointFolder}/')/Files\r\n\r\n\r\n",
 							"type": "Expression"
 						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_sharepoint_ocean_project_copy1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SharepointOceanProject",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"pServerRelativeUrl": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "01ODS"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "HttpServerLocation",
+						"relativeUrl": {
+							"value": "@dataset().pServerRelativeUrl",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_sharepoint_xml')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dimensions_source",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Xml",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": "toloadSharepoint/01ListFilesFromSharepoint",
+						"container": "mbr-landing-zone"
 					}
 				}
 			},
@@ -3494,1817 +3859,6 @@
 						},
 						"folderPath": "toloadSharepoint/01ListFilesFromSharepoint",
 						"container": "mbr-landing-zone"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/mbr_licence_maintenance')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "dimensions_source",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "00DEV"
-				},
-				"annotations": [],
-				"type": "Excel",
-				"typeProperties": {
-					"sheetName": "License & Maintenance",
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"fileName": "MBR Reporting_2023_v22 - 02 BUs (Example).xlsx",
-						"container": "mbr-landing-zone"
-					},
-					"range": "b126:AF800",
-					"firstRowAsHeader": false
-				},
-				"schema": [
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					}
-				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/mbr_nature')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "dimensions_source",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "00DEV"
-				},
-				"annotations": [],
-				"type": "Excel",
-				"typeProperties": {
-					"sheetName": "P&L FI_BU01",
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"fileName": "MBR Reporting_2023_v22 - 02 BUs (Example).xlsx",
-						"container": "mbr-landing-zone"
-					},
-					"range": "EU9:EX504",
-					"firstRowAsHeader": true
-				},
-				"schema": [
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					}
-				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/mbr_p_actual')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "ocean_db",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "00DEV"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "Index",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Anaplant_Index",
-						"type": "nvarchar"
-					},
-					{
-						"name": "PBI_Index",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column4",
-						"type": "nvarchar"
-					},
-					{
-						"name": "KCAD",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_LY_01",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_LY_02",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_LY_03",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_LY_04",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_LY_05",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_LY_06",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_LY_07",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_LY_08",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_LY_09",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_LY_10",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_LY_11",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_LY_12",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_LY_FY",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column19",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Budget_CY_01",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Budget_CY_02",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Budget_CY_03",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Budget_CY_04",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Budget_CY_05",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Budget_CY_06",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Budget_CY_07",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Budget_CY_08",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Budget_CY_09",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Budget_CY_10",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Budget_CY_11",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Budget_CY_12",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Budget_CY_FY",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column33",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_CY_01",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_CY_02",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_CY_03",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_CY_04",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_CY_05",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_CY_06",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_CY_07",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_CY_08",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_CY_09",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_CY_10",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_CY_11",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_CY_12",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Working_FCT_CY_FY",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Working_FCT_NY_01",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Working_FCT_NY_02",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Working_FCT_NY_03",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column50",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_CY_01_01",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_CY_02_02",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_CY_03_03",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_CY_04_04",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_CY_05_05",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_CY_06_06",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_CY_07_07",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_CY_08_08",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_CY_09_09",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_CY_10_10",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_CY_11_11",
-						"type": "nvarchar"
-					},
-					{
-						"name": "M1_FCT_CY_12",
-						"type": "nvarchar"
-					},
-					{
-						"name": "M1_FCT_CY_FY",
-						"type": "nvarchar"
-					},
-					{
-						"name": "M1_FCT_NY_01",
-						"type": "nvarchar"
-					},
-					{
-						"name": "M1_FCT_NY_02",
-						"type": "nvarchar"
-					},
-					{
-						"name": "M1_FCT_NY_03",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column67",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_YTD_01",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_YTD_02",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_YTD_03",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_YTD_04",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_YTD_05",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_YTD_06",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_YTD_07",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_YTD_08",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_YTD_09",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_YTD_10",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_YTD_11",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_YTD_12",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column80",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Budget_YTD_01",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Budget_YTD_02",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Budget_YTD_03",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Budget_YTD_04",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Budget_YTD_05",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Budget_YTD_06",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Budget_YTD_07",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Budget_YTD_08",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Budget_YTD_09",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Budget_YTD_10",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Budget_YTD_11",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Budget_YTD_12",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column93",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_YTD_01_01",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_YTD_02_02",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_YTD_03_03",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_YTD_04_04",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_YTD_05_05",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_YTD_06_06",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_YTD_07_07",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_YTD_08_08",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_YTD_09_09",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_YTD_10_10",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_YTD_11_11",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Actual_YTD_12_12",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column106",
-						"type": "nvarchar"
-					},
-					{
-						"name": "M1_YTD_01",
-						"type": "nvarchar"
-					},
-					{
-						"name": "M1_YTD_02",
-						"type": "nvarchar"
-					},
-					{
-						"name": "M1_YTD_03",
-						"type": "nvarchar"
-					},
-					{
-						"name": "M1_YTD_04",
-						"type": "nvarchar"
-					},
-					{
-						"name": "M1_YTD_05",
-						"type": "nvarchar"
-					},
-					{
-						"name": "M1_YTD_06",
-						"type": "nvarchar"
-					},
-					{
-						"name": "M1_YTD_07",
-						"type": "nvarchar"
-					},
-					{
-						"name": "M1_YTD_08",
-						"type": "nvarchar"
-					},
-					{
-						"name": "M1_YTD_09",
-						"type": "nvarchar"
-					},
-					{
-						"name": "M1_YTD_10",
-						"type": "nvarchar"
-					},
-					{
-						"name": "M1_YTD_11",
-						"type": "nvarchar"
-					},
-					{
-						"name": "M1_YTD_12",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column119",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Comments",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column121",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column122",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column123",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column124",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column125",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column126",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column127",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column128",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column129",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column130",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column131",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column132",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column133",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column134",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column135",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column136",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column137",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column138",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column139",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column140",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column141",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column142",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column143",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column144",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column145",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column146",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column147",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column148",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column149",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column150",
-						"type": "nvarchar"
-					},
-					{
-						"name": "CC_Name",
-						"type": "nvarchar"
-					},
-					{
-						"name": "CC_Code",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Nature_Name",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Nature_Code",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column155",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column156",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column157",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column158",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column159",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column160",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Column161",
-						"type": "nvarchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "ods",
-					"table": "R_PNL_FI_TEST"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/mbr_pnl_fi')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "dimensions_source",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"vSheetName": {
-						"type": "string"
-					}
-				},
-				"folder": {
-					"name": "00DEV"
-				},
-				"annotations": [],
-				"type": "Excel",
-				"typeProperties": {
-					"sheetName": {
-						"value": "@dataset().vSheetName",
-						"type": "Expression"
-					},
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"fileName": "MBR Reporting_2023_v22 - 02 BUs (Example).xlsx",
-						"container": "mbr-landing-zone"
-					},
-					"range": "A10:EX504"
-				},
-				"schema": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/mbr_u_actual')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "ocean_db",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "00DEV"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "nature_code",
-						"type": "varchar"
-					},
-					{
-						"name": "nature_name",
-						"type": "varchar"
-					},
-					{
-						"name": "cost_center_code",
-						"type": "varchar"
-					},
-					{
-						"name": "cost_center_name",
-						"type": "varchar"
-					},
-					{
-						"name": "reference_date",
-						"type": "varchar"
-					},
-					{
-						"name": "cost_amount",
-						"type": "varchar"
-					},
-					{
-						"name": "mbr_scope_bu",
-						"type": "varchar"
-					},
-					{
-						"name": "file_month",
-						"type": "varchar"
-					},
-					{
-						"name": "currency_code",
-						"type": "varchar"
-					},
-					{
-						"name": "bu_name",
-						"type": "varchar"
-					},
-					{
-						"name": "upload_date",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					}
-				],
-				"typeProperties": {
-					"schema": "ods",
-					"table": "U_MBR_Actual"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/stg_financials')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "ocean_db_nonencrypted",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"stgFinancialTable": {
-						"type": "string"
-					}
-				},
-				"folder": {
-					"name": "00DEV"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "BusinessUnit",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Scenario",
-						"type": "nvarchar"
-					},
-					{
-						"name": "NatureID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "Nature",
-						"type": "nvarchar"
-					},
-					{
-						"name": "MonthYear",
-						"type": "datetime2",
-						"scale": 7
-					},
-					{
-						"name": "Value",
-						"type": "float",
-						"precision": 15
-					}
-				],
-				"typeProperties": {
-					"schema": "stg",
-					"table": {
-						"value": "@dataset().stgFinancialTable",
-						"type": "Expression"
 					}
 				}
 			},

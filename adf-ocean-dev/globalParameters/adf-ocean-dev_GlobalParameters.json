@@ -1,1 +1,6 @@
-{}
+{
+	"gBaseURL": {
+		"type": "string",
+		"value": "https://keyrusgroup.sharepoint.com"
+	}
+}

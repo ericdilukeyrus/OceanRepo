@@ -13,13 +13,149 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/pipeline2')]",
+			"name": "[concat(parameters('factoryName'), '/df_unpvt_mbr_data')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "01ODS"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_ocean_ods",
+								"type": "DatasetReference"
+							},
+							"name": "getMBRData",
+							"description": "Retrieve data from the raw MBR sql table"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_unpvtdata_table",
+								"type": "DatasetReference"
+							},
+							"name": "InsertUnpvtMBRData",
+							"description": "Create and insert unpivot MBR data in the corresponding table"
+						}
+					],
+					"transformations": [
+						{
+							"name": "UnpivotMBRData",
+							"description": "Unpivot MBR Data to group by Period"
+						}
+					],
+					"scriptLines": [
+						"parameters{",
+						"     RawTableName as string,",
+						"     UnpivotTableName as string",
+						"}",
+						"source(output(",
+						"          Index as string,",
+						"          Anaplant_Index as string,",
+						"          PBI_Index as string,",
+						"          K_Nature as string,",
+						"          Actual_LY_01 as string,",
+						"          Actual_LY_02 as string,",
+						"          Actual_LY_03 as string,",
+						"          Actual_LY_04 as string,",
+						"          Actual_LY_05 as string,",
+						"          Actual_LY_06 as string,",
+						"          Actual_LY_07 as string,",
+						"          Actual_LY_08 as string,",
+						"          Actual_LY_09 as string,",
+						"          Actual_LY_10 as string,",
+						"          Actual_LY_11 as string,",
+						"          Actual_LY_12 as string,",
+						"          Budget_CY_01 as string,",
+						"          Budget_CY_02 as string,",
+						"          Budget_CY_03 as string,",
+						"          Budget_CY_04 as string,",
+						"          Budget_CY_05 as string,",
+						"          Budget_CY_06 as string,",
+						"          Budget_CY_07 as string,",
+						"          Budget_CY_08 as string,",
+						"          Budget_CY_09 as string,",
+						"          Budget_CY_10 as string,",
+						"          Budget_CY_11 as string,",
+						"          Budget_CY_12 as string,",
+						"          Actual_CY_01 as string,",
+						"          Actual_CY_02 as string,",
+						"          Actual_CY_03 as string,",
+						"          Actual_CY_04 as string,",
+						"          Actual_CY_05 as string,",
+						"          Actual_CY_06 as string,",
+						"          Actual_CY_07 as string,",
+						"          Actual_CY_08 as string,",
+						"          Actual_CY_09 as string,",
+						"          Actual_CY_10 as string,",
+						"          Actual_CY_11 as string,",
+						"          Actual_CY_12 as string,",
+						"          BU_Code as string,",
+						"          BU_Name as string,",
+						"          Currency_Code as string,",
+						"          MBR_Scope as string,",
+						"          MBR_Month as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> getMBRData",
+						"getMBRData unpivot(output(",
+						"          Period as string,",
+						"          Value as string",
+						"     ),",
+						"     ungroupBy(Index,",
+						"          Anaplant_Index,",
+						"          PBI_Index,",
+						"          K_Nature,",
+						"          BU_Code,",
+						"          BU_Name,",
+						"          Currency_Code,",
+						"          MBR_Scope,",
+						"          MBR_Month),",
+						"     lateral: false,",
+						"     ignoreNullPivots: true) ~> UnpivotMBRData",
+						"UnpivotMBRData sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     recreate:true,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          Index,",
+						"          Anaplant_Index,",
+						"          PBI_Index,",
+						"          K_Nature,",
+						"          BU_Code,",
+						"          BU_Name,",
+						"          Currency_Code,",
+						"          MBR_Scope,",
+						"          MBR_Month,",
+						"          Period,",
+						"          Value",
+						"     )) ~> InsertUnpvtMBRData"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_01_get_files_sharepoint')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"activities": [
 					{
-						"name": "Lookup1",
+						"name": "Get Sharepoint Folder to Load",
 						"type": "Lookup",
 						"dependsOn": [],
 						"policy": {
@@ -32,35 +168,27 @@
 						"userProperties": [],
 						"typeProperties": {
 							"source": {
-								"type": "JsonSource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true,
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "JsonReadSettings"
-								}
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "SELECT  [MBR_Scope]\n      ,[SharepointFolder]\n      ,[Active_fl]\n  FROM [cfg].[Sources1]\n  WHERE [Active_fl]= 'Y'",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
 							},
 							"dataset": {
-								"referenceName": "ds_sharepoint_json",
+								"referenceName": "ds_ocean_cfg",
 								"type": "DatasetReference",
 								"parameters": {
-									"pMBR_Scope": {
-										"value": "@pipeline().parameters.pMBR_Scope",
-										"type": "Expression"
-									}
+									"vTableName": "Sources1"
 								}
 							},
 							"firstRowOnly": false
 						}
 					},
 					{
-						"name": "ForEach1",
+						"name": "ForEach Sharepoint Folder",
 						"type": "ForEach",
 						"dependsOn": [
 							{
-								"activity": "Lookup1",
+								"activity": "Get Sharepoint Folder to Load",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -75,9 +203,10 @@
 						"userProperties": [],
 						"typeProperties": {
 							"items": {
-								"value": "@activity('Lookup1').output.value",
+								"value": "@activity('Get Sharepoint Folder to Load').output.value",
 								"type": "Expression"
 							},
+							"isSequential": false,
 							"activities": [
 								{
 									"name": "Get List of Files",
@@ -117,11 +246,11 @@
 									},
 									"inputs": [
 										{
-											"referenceName": "ds_sharepoint_ocean_project_copy1",
+											"referenceName": "ds_sharepoint_ocean_project",
 											"type": "DatasetReference",
 											"parameters": {
-												"pServerRelativeUrl": {
-													"value": "@item().GetFileUrl",
+												"pShrepointFolder": {
+													"value": "@item().SharepointFolder",
 													"type": "Expression"
 												}
 											}
@@ -129,20 +258,94 @@
 									],
 									"outputs": [
 										{
-											"referenceName": "Binary1",
+											"referenceName": "mbr_landing_zone",
 											"type": "DatasetReference",
 											"parameters": {
-												"pMBR_Scope": {
-													"value": "@pipeline().parameters.pMBR_Scope",
-													"type": "Expression"
-												},
-												"pFileName": {
-													"value": "@item().Name",
+												"pMBR_Folder": {
+													"value": "@item().MBR_Scope",
 													"type": "Expression"
 												}
 											}
 										}
 									]
+								},
+								{
+									"name": "Extract List of files",
+									"type": "ExecuteDataFlow",
+									"dependsOn": [
+										{
+											"activity": "Get List of Files",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataflow": {
+											"referenceName": "df_shrp_listoffiles",
+											"type": "DataFlowReference",
+											"parameters": {
+												"pMBR_Scope": {
+													"value": "'@{item().MBR_Scope}'",
+													"type": "Expression"
+												}
+											},
+											"datasetParameters": {
+												"getListofFiles": {
+													"pMBR_Scope": {
+														"value": "@item().MBR_Scope",
+														"type": "Expression"
+													}
+												},
+												"createJSONListofFiles": {
+													"pMBR_Scope": {
+														"value": "@item().MBR_Scope",
+														"type": "Expression"
+													}
+												}
+											}
+										},
+										"staging": {},
+										"compute": {
+											"coreCount": 8,
+											"computeType": "General"
+										},
+										"traceLevel": "Fine"
+									}
+								},
+								{
+									"name": "Copy file to blob",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "Extract List of files",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "pl_02_copy_files_to_blob",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"pMBR_Scope": {
+												"value": "@item().MBR_Scope",
+												"type": "Expression"
+											}
+										}
+									}
 								}
 							]
 						}
@@ -173,13 +376,8 @@
 					"elapsedTimeMetric": {},
 					"cancelAfter": {}
 				},
-				"parameters": {
-					"pMBR_Scope": {
-						"type": "string"
-					}
-				},
 				"folder": {
-					"name": "00DEV"
+					"name": "00INIT"
 				},
 				"annotations": []
 			},
@@ -695,7 +893,9 @@
 				"annotations": [],
 				"lastPublishTime": "2023-02-20T10:35:32Z"
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/df_unpvt_mbr_data')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/pl_03_load_stg_financials')]",
@@ -918,8 +1118,7 @@
 												"insertFactDrivers": {
 													"FactName": "FactDrivers"
 												}
-											},
-											"linkedServiceParameters": {}
+											}
 										},
 										"staging": {},
 										"compute": {
@@ -965,244 +1164,6 @@
 				"lastPublishTime": "2023-02-17T16:37:57Z"
 			},
 			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Get Sharepoint Folder to Load",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "SELECT  [MBR_Scope]\n      ,[SharepointFolder]\n      ,[Active_fl]\n  FROM [cfg].[Sources1]\n  WHERE [Active_fl]= 'Y'",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "ds_ocean_cfg",
-								"type": "DatasetReference",
-								"parameters": {
-									"vTableName": "Sources1"
-								}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "ForEach Sharepoint Folder",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Get Sharepoint Folder to Load",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "Get token",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Get Sharepoint Folder to Load').output.value",
-								"type": "Expression"
-							},
-							"isSequential": false,
-							"activities": [
-								{
-									"name": "Get List of Files",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "BinarySource",
-											"storeSettings": {
-												"type": "HttpReadSettings",
-												"requestMethod": "GET",
-												"additionalHeaders": {
-													"value": "@{concat('Authorization:Bearer ',activity('Get token').output.access_token)}",
-													"type": "Expression"
-												},
-												"requestTimeout": ""
-											},
-											"formatSettings": {
-												"type": "BinaryReadSettings"
-											}
-										},
-										"sink": {
-											"type": "BinarySink",
-											"storeSettings": {
-												"type": "AzureBlobStorageWriteSettings"
-											}
-										},
-										"enableStaging": false
-									},
-									"inputs": [
-										{
-											"referenceName": "ds_sharepoint_ocean_project",
-											"type": "DatasetReference",
-											"parameters": {
-												"pShrepointFolder": {
-													"value": "@item().SharepointFolder",
-													"type": "Expression"
-												}
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "mbr_landing_zone",
-											"type": "DatasetReference",
-											"parameters": {
-												"pMBR_Folder": {
-													"value": "@item().MBR_Scope",
-													"type": "Expression"
-												}
-											}
-										}
-									]
-								},
-								{
-									"name": "df_shrp_listoffiles",
-									"type": "ExecuteDataFlow",
-									"dependsOn": [
-										{
-											"activity": "Get List of Files",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"dataflow": {
-											"referenceName": "df_shrp_listoffiles",
-											"type": "DataFlowReference",
-											"parameters": {
-												"pMBR_Scope": {
-													"value": "'@{item().MBR_Scope}'",
-													"type": "Expression"
-												}
-											},
-											"datasetParameters": {
-												"getListofFiles": {
-													"pMBR_Scope": {
-														"value": "@item().MBR_Scope",
-														"type": "Expression"
-													}
-												},
-												"createJSONListofFiles": {
-													"pMBR_Scope": {
-														"value": "@item().MBR_Scope",
-														"type": "Expression"
-													}
-												}
-											},
-											"linkedServiceParameters": {}
-										},
-										"staging": {},
-										"compute": {
-											"coreCount": 8,
-											"computeType": "General"
-										},
-										"traceLevel": "Fine"
-									}
-								},
-								{
-									"name": "Execute Pipeline1",
-									"type": "ExecutePipeline",
-									"dependsOn": [
-										{
-											"activity": "df_shrp_listoffiles",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "pipeline2",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {
-											"pMBR_Scope": {
-												"value": "@item().MBR_Scope",
-												"type": "Expression"
-											}
-										}
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "Get token",
-						"type": "WebActivity",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"url": "https://accounts.accesscontrol.windows.net/168e48b2-81f0-4aac-bc77-d58d07d205e2/tokens/OAuth/2",
-							"method": "POST",
-							"headers": {
-								"Content-Type": "application/x-www-form-urlencoded"
-							},
-							"body": "grant_type=client_credentials&client_id=63bb52e3-0d92-4899-991c-bda347d9dd3b@168e48b2-81f0-4aac-bc77-d58d07d205e2&client_secret=S8v8Q~jvkg-AXO-gSxyxnJQTd9zhR1SiPr0ukcz5&resource=00000003-0000-0ff1-ce00-000000000000/keyrusgroup.sharepoint.com@168e48b2-81f0-4aac-bc77-d58d07d205e2"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"folder": {
-					"name": "00DEV"
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/pipeline2')]"
-			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/pl_01_read_all_MBR_files')]",
@@ -1331,7 +1292,7 @@
 						"type": "Lookup",
 						"dependsOn": [
 							{
-								"activity": "Initialization",
+								"activity": "Copy Files from Sharepoint",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -1456,7 +1417,28 @@
 						"userProperties": [],
 						"typeProperties": {
 							"pipeline": {
-								"referenceName": "pl_01_initialization",
+								"referenceName": "pl_00_initialization",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Copy Files from Sharepoint",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Initialization",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "pl_01_get_files_sharepoint",
 								"type": "PipelineReference"
 							},
 							"waitOnCompletion": true,
@@ -1474,6 +1456,7 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/pl_03_load_stg_financials')]",
 				"[concat(variables('factoryId'), '/pipelines/pl_04_load_fact_financials')]",
+				"[concat(variables('factoryId'), '/pipelines/pl_01_get_files_sharepoint')]",
 				"[concat(variables('factoryId'), '/pipelines/pl_01_read_all_MBR_files')]"
 			]
 		}
