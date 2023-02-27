@@ -21,6 +21,10 @@
 			"gDimScenarioTableName": {
 				"type": "string",
 				"value": "DimScenario"
+			},
+			"gDimNature": {
+				"type": "string",
+				"value": "DimNature"
 			}
 		},
 		"globalConfigurations": {
