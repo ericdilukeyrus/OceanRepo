@@ -25,7 +25,7 @@
 						"referenceName": "ds_ocean_cfg",
 						"type": "DatasetReference",
 						"parameters": {
-							"vTableName": "Sources1"
+							"vTableName": "Sources"
 						}
 					},
 					"firstRowOnly": false
