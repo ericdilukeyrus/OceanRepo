@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Lookup1",
+				"name": "Get List of Files by Scope",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
@@ -40,11 +40,11 @@
 				}
 			},
 			{
-				"name": "ForEach1",
+				"name": "ForEach Each MBR File",
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Lookup1",
+						"activity": "Get List of Files by Scope",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -64,7 +64,7 @@
 					},
 					"activities": [
 						{
-							"name": "Get List of Files",
+							"name": "Copy Files to Toload folder",
 							"type": "Copy",
 							"dependsOn": [],
 							"policy": {

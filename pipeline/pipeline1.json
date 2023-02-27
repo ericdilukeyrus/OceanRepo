@@ -54,6 +54,7 @@
 						"value": "@activity('Get Sharepoint Folder to Load').output.value",
 						"type": "Expression"
 					},
+					"isSequential": false,
 					"activities": [
 						{
 							"name": "Get List of Files",
@@ -117,7 +118,7 @@
 							]
 						},
 						{
-							"name": "df_shrp_listoffiles",
+							"name": "Extract List of files",
 							"type": "ExecuteDataFlow",
 							"dependsOn": [
 								{
@@ -168,11 +169,11 @@
 							}
 						},
 						{
-							"name": "Execute Pipeline1",
+							"name": "Copy file to blob",
 							"type": "ExecutePipeline",
 							"dependsOn": [
 								{
-									"activity": "df_shrp_listoffiles",
+									"activity": "Extract List of files",
 									"dependencyConditions": [
 										"Succeeded"
 									]
