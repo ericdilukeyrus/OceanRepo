@@ -109,12 +109,44 @@
 										"enablePartitionDiscovery": false
 									}
 								},
+								"sink": {
+									"type": "BinarySink",
+									"storeSettings": {
+										"type": "AzureBlobStorageWriteSettings"
+									}
+								},
 								"enableStaging": false
 							},
 							"inputs": [
 								{
 									"referenceName": "ds_mbr_archives",
-									"type": "DatasetReference"
+									"type": "DatasetReference",
+									"parameters": {
+										"pFileName": {
+											"value": "@item().name",
+											"type": "Expression"
+										},
+										"pFolderName": {
+											"value": "toload/@{pipeline().parameters.MBR_Scope}",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_mbr_archives_out",
+									"type": "DatasetReference",
+									"parameters": {
+										"pFileName": {
+											"value": "@item().name",
+											"type": "Expression"
+										},
+										"pFolderName": {
+											"value": "archives/@{pipeline().parameters.MBR_Scope}",
+											"type": "Expression"
+										}
+									}
 								}
 							]
 						}

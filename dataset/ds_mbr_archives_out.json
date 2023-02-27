@@ -1,0 +1,36 @@
+{
+	"name": "ds_mbr_archives_out",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_files_to_load",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"pFileName": {
+				"type": "string"
+			},
+			"pFolderName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@dataset().pFileName",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().pFolderName",
+					"type": "Expression"
+				},
+				"container": "mbr-landing-zone"
+			},
+			"compression": {
+				"type": "gzip"
+			}
+		}
+	}
+}
