@@ -13,6 +13,10 @@
 			"gODSSchemaName": {
 				"type": "string",
 				"value": "ods"
+			},
+			"gSourcesConfigTableName": {
+				"type": "string",
+				"value": "Sources_Config"
 			}
 		},
 		"globalConfigurations": {
