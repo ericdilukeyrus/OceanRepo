@@ -160,7 +160,7 @@
 								{
 									"type": "Query",
 									"text": {
-										"value": "truncate table [@{pipeline().globalParameters.gODSSchemaName}].[@{pipeline().globalParameters.gSourcesTableName}]",
+										"value": "truncate table [@{pipeline().globalParameters.gODSSchemaName}].[@{pipeline().globalParameters.gSourcesConfigTableName}]",
 										"type": "Expression"
 									}
 								}
