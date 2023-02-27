@@ -37,6 +37,10 @@
 			"gFactDriversTableName": {
 				"type": "string",
 				"value": "FactDrivers"
+			},
+			"gFactFinancialsTableName": {
+				"type": "string",
+				"value": "FactFinancials"
 			}
 		},
 		"globalConfigurations": {
