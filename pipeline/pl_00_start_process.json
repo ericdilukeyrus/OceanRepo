@@ -7,7 +7,7 @@
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "Initialization",
+						"activity": "Copy Files from Sharepoint",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -131,6 +131,26 @@
 				"typeProperties": {
 					"pipeline": {
 						"referenceName": "pl_00_initialization",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Copy Files from Sharepoint",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Initialization",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_01_get_files_sharepoint",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true
