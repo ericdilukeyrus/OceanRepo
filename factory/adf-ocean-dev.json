@@ -17,6 +17,10 @@
 			"gSourcesConfigTableName": {
 				"type": "string",
 				"value": "Sources_Config"
+			},
+			"gDimScenarioTableName": {
+				"type": "string",
+				"value": "DimScenario"
 			}
 		},
 		"globalConfigurations": {
