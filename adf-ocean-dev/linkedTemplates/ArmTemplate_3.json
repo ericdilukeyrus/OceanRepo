@@ -169,7 +169,10 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
-								"sqlReaderQuery": "SELECT  [MBR_Scope]\n      ,[SharepointFolder]\n      ,[Active_fl]\n  FROM [cfg].[Sources1]\n  WHERE [Active_fl]= 'Y'",
+								"sqlReaderQuery": {
+									"value": "SELECT  [MBR_Scope]\n      ,[SharepointFolder]\n      ,[Active_fl]\n  FROM [cfg].[@{pipeline().globalParameters.gSourcesTableName}]\n  WHERE [Active_fl]= 'Y'",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
@@ -177,7 +180,10 @@
 								"referenceName": "ds_ocean_cfg",
 								"type": "DatasetReference",
 								"parameters": {
-									"vTableName": "Sources1"
+									"vTableName": {
+										"value": "@pipeline().globalParameters.gSourcesTableName",
+										"type": "Expression"
+									}
 								}
 							},
 							"firstRowOnly": false
@@ -695,6 +701,10 @@
 												"pCurrency_Code": {
 													"value": "'@{item().Currency_Code}'",
 													"type": "Expression"
+												},
+												"pFileName": {
+													"value": "'@{pipeline().parameters.pFileName}'",
+													"type": "Expression"
 												}
 											},
 											"datasetParameters": {
@@ -718,7 +728,8 @@
 														"type": "Expression"
 													}
 												}
-											}
+											},
+											"linkedServiceParameters": {}
 										},
 										"staging": {},
 										"compute": {
@@ -826,7 +837,7 @@
 											{
 												"type": "Query",
 												"text": {
-													"value": "INSERT INTO [ods].[Sources_Config]\n           ([MBR_FileName]\n           ,[MBR_Scope]\n           ,[MBR_Month]\n           ,[MBR_SheetName]\n           ,[MBR_BU_Code]\n           ,[MBR_BU_Name]\n           ,[MBR_RawTableName]\n           ,[MBR_UnpvtTableName]\n           ,[MBR_Currency_Code])\n     VALUES\n           ('@{pipeline().parameters.pFileName}'\n           ,'@{item().MBR_Scope}'\n           ,'@{item().MBR_Month}'\n           ,'@{item().SheetName}'\n           ,'@{item().BU_Code}'\n           ,'@{item().BU_Name}'\n           ,'@{item().RawTableName}'\n           ,'@{item().UnpvtTableName}'\n           ,'@{item().Currency_Code}')\n\n",
+													"value": "INSERT INTO [@{pipeline().globalParameters.gODSSchemaName}].[@{pipeline().globalParameters.gSourcesConfigTableName}]\n           ([MBR_FileName]\n           ,[MBR_Scope]\n           ,[MBR_Month]\n           ,[MBR_SheetName]\n           ,[MBR_BU_Code]\n           ,[MBR_BU_Name]\n           ,[MBR_RawTableName]\n           ,[MBR_UnpvtTableName]\n           ,[MBR_Currency_Code])\n     VALUES\n           ('@{pipeline().parameters.pFileName}'\n           ,'@{item().MBR_Scope}'\n           ,'@{item().MBR_Month}'\n           ,'@{item().SheetName}'\n           ,'@{item().BU_Code}'\n           ,'@{item().BU_Name}'\n           ,'@{item().RawTableName}'\n           ,'@{item().UnpvtTableName}'\n           ,'@{item().Currency_Code}')\n\n",
 													"type": "Expression"
 												}
 											}
@@ -850,7 +861,10 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"storedProcedureName": "[[ods].[prc_ods_truncate_paramCurr_tables]",
+							"storedProcedureName": {
+								"value": "[[@{pipeline().globalParameters.gODSSchemaName}].[prc_ods_truncate_paramCurr_tables]",
+								"type": "Expression"
+							},
 							"storedProcedureParameters": {
 								"mbr_scope": {
 									"value": {
@@ -985,7 +999,10 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
-								"sqlReaderQuery": "select  MBR_UnpvtTableName, CONCAT('P&L_FI_', MBR_Scope, '_', MBR_BU_Code) AS StgFinancialTableName  from  [ods].[Sources_Config]",
+								"sqlReaderQuery": {
+									"value": "select  MBR_UnpvtTableName, CONCAT('P&L_FI_', MBR_Scope, '_', MBR_BU_Code) AS StgFinancialTableName  from  [@{pipeline().globalParameters.gODSSchemaName}].[@{pipeline().globalParameters.gSourcesConfigTableName}]",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
@@ -993,7 +1010,10 @@
 								"referenceName": "ds_ocean_ods",
 								"type": "DatasetReference",
 								"parameters": {
-									"vTableName": "Sources_Config"
+									"vTableName": {
+										"value": "@pipeline().globalParameters.gSourcesConfigTableName",
+										"type": "Expression"
+									}
 								}
 							},
 							"firstRowOnly": false
@@ -1033,7 +1053,10 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
-								"sqlReaderQuery": "select  MBR_UnpvtTableName, CONCAT('P&L_FI_', MBR_Scope, '_', MBR_BU_Code) AS StgFinancialTableName  from  [ods].[Sources_Config]",
+								"sqlReaderQuery": {
+									"value": "select  MBR_UnpvtTableName, CONCAT('P&L_FI_', MBR_Scope, '_', MBR_BU_Code) AS StgFinancialTableName  from  [@{pipeline().globalParameters.gODSSchemaName}].[@{pipeline().globalParameters.gSourcesConfigTableName}]",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
@@ -1041,7 +1064,10 @@
 								"referenceName": "ds_ocean_ods",
 								"type": "DatasetReference",
 								"parameters": {
-									"vTableName": "Sources_Config"
+									"vTableName": {
+										"value": "@pipeline().globalParameters.gSourcesConfigTableName",
+										"type": "Expression"
+									}
 								}
 							},
 							"firstRowOnly": false
@@ -1095,30 +1121,55 @@
 													}
 												},
 												"getDimScenario": {
-													"vTableName": "DimScenario"
+													"vTableName": {
+														"value": "@pipeline().globalParameters.gDimScenarioTableName",
+														"type": "Expression"
+													}
 												},
 												"getDimNature": {
-													"vTableName": "DimNature"
+													"vTableName": {
+														"value": "@pipeline().globalParameters.gDimNatureTableName",
+														"type": "Expression"
+													}
 												},
 												"getDimOrganisation": {
-													"vTableName": "DimOrganisation"
+													"vTableName": {
+														"value": "@pipeline().globalParameters.gDimOrganisationTableName",
+														"type": "Expression"
+													}
 												},
 												"getFactFinancials": {
-													"FactName": "FactFinancials"
+													"FactName": {
+														"value": "@pipeline().globalParameters.gFactFinancialsTableName",
+														"type": "Expression"
+													}
 												},
 												"getFactDrivers": {
-													"vTableName": "FactDrivers"
+													"vTableName": {
+														"value": "@pipeline().globalParameters.gFactDriversTableName",
+														"type": "Expression"
+													}
 												},
 												"getDimKPI": {
-													"vTableName": "DimKPI"
+													"vTableName": {
+														"value": "@pipeline().globalParameters.gDimKPITableName",
+														"type": "Expression"
+													}
 												},
 												"insertFactFinancials": {
-													"FactName": "FactFinancials"
+													"FactName": {
+														"value": "@pipeline().globalParameters.gFactFinancialsTableName",
+														"type": "Expression"
+													}
 												},
 												"insertFactDrivers": {
-													"FactName": "FactDrivers"
+													"FactName": {
+														"value": "@pipeline().globalParameters.gFactDriversTableName",
+														"type": "Expression"
+													}
 												}
-											}
+											},
+											"linkedServiceParameters": {}
 										},
 										"staging": {},
 										"compute": {
@@ -1309,7 +1360,10 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
-								"sqlReaderQuery": "SELECT [MBR_Scope] as MBRScope,\n    'toload/' + [MBR_Scope]  as MBRScope_Folder\n  FROM [cfg].[Sources]\nWHERE [Active_fl] = 'Y'",
+								"sqlReaderQuery": {
+									"value": "SELECT [MBR_Scope] as MBRScope,\n    'toload/' + [MBR_Scope]  as MBRScope_Folder\n  FROM [cfg].[@{pipeline().globalParameters.gSourcesTableName}]\nWHERE [Active_fl] = 'Y'",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
@@ -1317,7 +1371,10 @@
 								"referenceName": "ds_ocean_cfg",
 								"type": "DatasetReference",
 								"parameters": {
-									"vTableName": "Sources"
+									"vTableName": {
+										"value": "@pipeline().globalParameters.gSourcesTableName",
+										"type": "Expression"
+									}
 								}
 							},
 							"firstRowOnly": false

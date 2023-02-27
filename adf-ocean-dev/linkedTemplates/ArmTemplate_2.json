@@ -3396,7 +3396,7 @@
 									],
 									"outputs": [
 										{
-											"referenceName": "Binary1",
+											"referenceName": "ds_mbr_files_bin",
 											"type": "DatasetReference",
 											"parameters": {
 												"pMBR_Scope": {
@@ -3473,7 +3473,10 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
-								"sqlReaderQuery": " select [MBR_FileName] as MBRFileName, [MBR_Scope] as MBRScope,[MBR_Month] as MBRMonth\n  ,[MBR_Currency_Code] as MBRCurrCode ,[MBR_BU_Code] as MBRBUCode ,[MBR_BU_Name] as MBRBUName ,[MBR_SheetName] as MBRSheetName from  [ods].[Sources_Config]",
+								"sqlReaderQuery": {
+									"value": "select [MBR_FileName] as MBRFileName, [MBR_Scope] as MBRScope,[MBR_Month] as MBRMonth\n  ,[MBR_Currency_Code] as MBRCurrCode ,[MBR_BU_Code] as MBRBUCode ,[MBR_BU_Name] as MBRBUName ,[MBR_SheetName] as MBRSheetName from  [@{pipeline().globalParameters.gODSSchemaName}].[@{pipeline().globalParameters.gSourcesConfigTableName}]",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
@@ -3583,7 +3586,10 @@
 								"referenceName": "ds_ocean_stg",
 								"type": "DatasetReference",
 								"parameters": {
-									"vTableName": "Sources_Config"
+									"vTableName": {
+										"value": "@pipeline().globalParameters.gSourcesConfigTableName",
+										"type": "Expression"
+									}
 								}
 							}
 						],
@@ -4225,7 +4231,8 @@
 						"     pMBR_Scope as string,",
 						"     pMBR_Month as string,",
 						"     pBU_Name as string,",
-						"     pCurrency_Code as string",
+						"     pCurrency_Code as string,",
+						"     pFileName as string",
 						"}",
 						"source(output(",
 						"          {_col0_} as string,",
@@ -4276,7 +4283,8 @@
 						"     ),",
 						"     allowSchemaDrift: false,",
 						"     validateSchema: false,",
-						"     ignoreNoFilesFound: false) ~> getMBRData",
+						"     ignoreNoFilesFound: false,",
+						"     moveFiles: [(concat('toload/',$pMBR_Scope,'/',$pFileName)),(concat('archives/',$pMBR_Scope,'/',$pFileName))]) ~> getMBRData",
 						"getMBRData derive(BU_Code = $pBU_Code,",
 						"          BU_Name = $pBU_Name,",
 						"          Currency_Code = $pCurrency_Code,",

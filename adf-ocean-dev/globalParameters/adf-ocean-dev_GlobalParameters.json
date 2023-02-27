@@ -2,5 +2,41 @@
 	"gBaseURL": {
 		"type": "string",
 		"value": "https://keyrusgroup.sharepoint.com"
+	},
+	"gSourcesTableName": {
+		"type": "string",
+		"value": "Sources"
+	},
+	"gODSSchemaName": {
+		"type": "string",
+		"value": "ods"
+	},
+	"gSourcesConfigTableName": {
+		"type": "string",
+		"value": "Sources_Config"
+	},
+	"gDimScenarioTableName": {
+		"type": "string",
+		"value": "DimScenario"
+	},
+	"gDimNatureTableName": {
+		"type": "string",
+		"value": "DimNature"
+	},
+	"gDimOrganisationTableName": {
+		"type": "string",
+		"value": "DimOrganisation"
+	},
+	"gDimKPITableName": {
+		"type": "string",
+		"value": "DimKPI"
+	},
+	"gFactDriversTableName": {
+		"type": "string",
+		"value": "FactDrivers"
+	},
+	"gFactFinancialsTableName": {
+		"type": "string",
+		"value": "FactFinancials"
 	}
 }
