@@ -29,6 +29,10 @@
 			"gDimOrganisationTableName": {
 				"type": "string",
 				"value": "DimOrganisation"
+			},
+			"gDimKPITableName": {
+				"type": "string",
+				"value": "DimKPI"
 			}
 		},
 		"globalConfigurations": {
