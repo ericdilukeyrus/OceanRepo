@@ -64,7 +64,7 @@
 				"          DailyCost as float",
 				"     ),",
 				"     errors: true) ~> castColumns",
-				"castColumns sink(allowSchemaDrift: false,",
+				"castColumns sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     deletable:false,",
 				"     insertable:true,",
