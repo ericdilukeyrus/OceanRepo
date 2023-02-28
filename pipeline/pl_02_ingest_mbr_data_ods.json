@@ -485,7 +485,7 @@
 				}
 			},
 			{
-				"name": "Copy data1",
+				"name": "Copy KPI Pyramid to ODS",
 				"type": "Copy",
 				"dependsOn": [
 					{
