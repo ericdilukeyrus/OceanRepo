@@ -213,6 +213,32 @@
 					},
 					"waitOnCompletion": true
 				}
+			},
+			{
+				"name": "Archives MBR Files",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Load Fact Tables",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Load Fact KPI Pyramid",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_04_archive_files",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
 			}
 		],
 		"annotations": [],
