@@ -90,7 +90,7 @@
 				}
 			},
 			{
-				"name": "Load Staging Tables",
+				"name": "Load Financials Staging Tables",
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
@@ -114,7 +114,13 @@
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
-						"activity": "Load Staging Tables",
+						"activity": "Load Financials Staging Tables",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Load KPI Pyramid Staging Tables",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -157,6 +163,26 @@
 				"typeProperties": {
 					"pipeline": {
 						"referenceName": "pl_01_get_files_sharepoint",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Load KPI Pyramid Staging Tables",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "ForEach Active MBR Scope",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_04_load_stg_kpi_pyramid",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true

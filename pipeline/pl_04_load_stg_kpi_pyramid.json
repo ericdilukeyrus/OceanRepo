@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "ForEach Unpvt Data Table",
+				"name": "ForEach KPI Pyramid ODS Table",
 				"type": "ForEach",
 				"dependsOn": [
 					{
@@ -16,13 +16,13 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('Get All Unpvt Table').output.value",
+						"value": "@activity('Get All KPI Pyramid ODS Tables').output.value",
 						"type": "Expression"
 					},
 					"isSequential": false,
 					"activities": [
 						{
-							"name": "Staging Financial Table",
+							"name": "Staging KPI Pyramid Tables",
 							"type": "ExecuteDataFlow",
 							"dependsOn": [],
 							"policy": {
@@ -35,24 +35,24 @@
 							"userProperties": [],
 							"typeProperties": {
 								"dataflow": {
-									"referenceName": "df_stg_financials",
+									"referenceName": "df_stg_kpi_pyramid",
 									"type": "DataFlowReference",
 									"parameters": {
-										"unpvtTableName": {
-											"value": "'@{item().MBR_UnpvtTableName}'",
+										"kpiPyramidTableName": {
+											"value": "'@{item().MBR_KPIPyramid_TableName}'",
 											"type": "Expression"
 										}
 									},
 									"datasetParameters": {
-										"getMBRUnpvtData": {
+										"getMBRKpiPyramid": {
 											"vTableName": {
-												"value": "@item().MBR_UnpvtTableName",
+												"value": "@item().MBR_KPIPyramid_TableName",
 												"type": "Expression"
 											}
 										},
 										"insertMBRStagingData": {
-											"stgFinancialTable": {
-												"value": "@item().StgFinancialTableName",
+											"pKpiPyramidTableName": {
+												"value": "KPI_Pyramid_Canada",
 												"type": "Expression"
 											}
 										}
