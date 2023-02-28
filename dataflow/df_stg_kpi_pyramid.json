@@ -27,6 +27,9 @@
 			"transformations": [
 				{
 					"name": "castColumns"
+				},
+				{
+					"name": "removeEmptyRows"
 				}
 			],
 			"scriptLines": [
@@ -53,7 +56,7 @@
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     query: (\"select * from [ods].[{$kpiPyramidTableName}]\"),",
 				"     format: 'query') ~> getMBRKpiPyramid",
-				"getMBRKpiPyramid cast(output(",
+				"removeEmptyRows cast(output(",
 				"          Period as date 'yyyy-MM-dd',",
 				"          EndOfMonth_FTE as float,",
 				"          SrvcSales_bef_bonimali as float,",
@@ -64,6 +67,7 @@
 				"          DailyCost as float",
 				"     ),",
 				"     errors: true) ~> castColumns",
+				"getMBRKpiPyramid filter(not(isNull(BU))) ~> removeEmptyRows",
 				"castColumns sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     deletable:false,",
