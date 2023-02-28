@@ -199,7 +199,6 @@
 				"     insertable:true,",
 				"     updateable:false,",
 				"     upsertable:false,",
-				"     recreate:true,",
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
@@ -216,8 +215,7 @@
 				"          DailyRate,",
 				"          AnnualDirectCosts,",
 				"          AnnualProductionDays,",
-				"          DailyCost,",
-				"          InsertOrUpdate",
+				"          DailyCost",
 				"     )) ~> insertFactKPIPyramid"
 			]
 		}
