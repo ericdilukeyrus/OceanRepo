@@ -107,26 +107,6 @@
 						}
 					]
 				}
-			},
-			{
-				"name": "Summary Log Data",
-				"type": "ExecutePipeline",
-				"dependsOn": [
-					{
-						"activity": "ForEach Staging Table",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"userProperties": [],
-				"typeProperties": {
-					"pipeline": {
-						"referenceName": "pl_05_summary_log",
-						"type": "PipelineReference"
-					},
-					"waitOnCompletion": false
-				}
 			}
 		],
 		"folder": {
