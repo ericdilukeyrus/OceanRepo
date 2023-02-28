@@ -120,7 +120,7 @@
 				"     broadcast: 'auto')~> joinDimOrganisation",
 				"joinDimOrganisation select(mapColumn(",
 				"          OrganisationID,",
-				"          Scenario_Index,",
+				"          ScenarioID = Scenario_Index,",
 				"          MonthYearID,",
 				"          MonthYear = Period,",
 				"          CostCenter,",
