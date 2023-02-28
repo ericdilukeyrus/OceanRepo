@@ -1,0 +1,132 @@
+{
+	"name": "pl_04_archive_files",
+	"properties": {
+		"activities": [
+			{
+				"name": "Get All Files",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "select distinct concat('toload/',MBR_Scope) as SourcePathFolder,\nconcat('archives/',MBR_Scope) as DestiPathFolder, MBR_FileName as FileName \nfrom  [@{pipeline().globalParameters.gODSSchemaName}].[@{pipeline().globalParameters.gSourcesConfigTableName}]",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_ocean_ods",
+						"type": "DatasetReference",
+						"parameters": {
+							"vTableName": {
+								"value": "@pipeline().globalParameters.gSourcesConfigTableName",
+								"type": "Expression"
+							}
+						}
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach MBR Files",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Get All Files",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get All Files').output.value",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Move File to Archives",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "BinarySource",
+									"storeSettings": {
+										"type": "AzureBlobStorageReadSettings",
+										"recursive": true,
+										"deleteFilesAfterCompletion": true
+									},
+									"formatSettings": {
+										"type": "BinaryReadSettings"
+									}
+								},
+								"sink": {
+									"type": "BinarySink",
+									"storeSettings": {
+										"type": "AzureBlobStorageWriteSettings"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_mbr_excel_files",
+									"type": "DatasetReference",
+									"parameters": {
+										"pFolder": {
+											"value": "@item().SourcePathFolder",
+											"type": "Expression"
+										},
+										"pFileName": {
+											"value": "@item().FileName",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_mbr_excel_files",
+									"type": "DatasetReference",
+									"parameters": {
+										"pFolder": {
+											"value": "@item().DestiPathFolder",
+											"type": "Expression"
+										},
+										"pFileName": {
+											"value": "@item().FileName",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"folder": {
+			"name": "03DWH"
+		},
+		"annotations": []
+	}
+}

@@ -1,0 +1,33 @@
+{
+	"name": "ds_mbr_excel_files",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_files_to_load",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"pFolder": {
+				"type": "string"
+			},
+			"pFileName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@dataset().pFileName",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().pFolder",
+					"type": "Expression"
+				},
+				"container": "mbr-landing-zone"
+			}
+		}
+	}
+}
