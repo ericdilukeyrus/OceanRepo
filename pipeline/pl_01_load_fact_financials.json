@@ -1,5 +1,5 @@
 {
-	"name": "pl_04_load_fact_financials",
+	"name": "pl_01_load_fact_financials",
 	"properties": {
 		"activities": [
 			{
@@ -158,7 +158,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "pl_06_summary_log",
+						"referenceName": "pl_03_summary_log",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": false

@@ -1,5 +1,5 @@
 {
-	"name": "pl_03_load_stg_financials",
+	"name": "pl_01_load_stg_financials",
 	"properties": {
 		"activities": [
 			{
