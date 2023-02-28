@@ -13,6 +13,242 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/df_Load_Fact_KPI_Pyramid')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "03DWH"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_ocean_stg",
+								"type": "DatasetReference"
+							},
+							"name": "getMBRKPIPyramidStaging"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_ocean_dwh",
+								"type": "DatasetReference"
+							},
+							"name": "getDimScenario"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_ocean_dwh",
+								"type": "DatasetReference"
+							},
+							"name": "getDimOrganisation"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_ocean_dwh",
+								"type": "DatasetReference"
+							},
+							"name": "getFactKpi"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_ocean_dwh",
+								"type": "DatasetReference"
+							},
+							"name": "insertFactKPIPyramid"
+						}
+					],
+					"transformations": [
+						{
+							"name": "addYearMonthID"
+						},
+						{
+							"name": "joinDimScenario"
+						},
+						{
+							"name": "joinDimOrganisation"
+						},
+						{
+							"name": "cleanColumns"
+						},
+						{
+							"name": "joinFactKPI"
+						},
+						{
+							"name": "insertOrUpdate"
+						},
+						{
+							"name": "includeUpsert"
+						},
+						{
+							"name": "insertUpdate"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          BU as string,",
+						"          Version as string,",
+						"          Period as date,",
+						"          CostCenter as string,",
+						"          PeopleType as string,",
+						"          LevelSeniority as string,",
+						"          EndOfMonth_FTE as float,",
+						"          SrvcSales_bef_bonimali as float,",
+						"          BillableDays as float,",
+						"          DailyRate as float,",
+						"          AnnualDirectCosts as float,",
+						"          AnnualProductionDays as float,",
+						"          DailyCost as float",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> getMBRKPIPyramidStaging",
+						"source(output(",
+						"          Scenario_Name0 as string,",
+						"          Scenario_Code0 as string,",
+						"          Comment as string,",
+						"          Scenario_Index as long",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> getDimScenario",
+						"source(output(",
+						"          {Business Unit} as string,",
+						"          {MBR Scope} as string,",
+						"          Area as string,",
+						"          Zone as string,",
+						"          {Keyrus Group} as string,",
+						"          Total as string,",
+						"          {MBR Scope_1} as string,",
+						"          Management_hierarchy_1 as string,",
+						"          Management_hierarchy_2 as string,",
+						"          Management_hierarchy_3 as string,",
+						"          Management_hierarchy_4 as string,",
+						"          Currency_Name0 as string,",
+						"          Currency_Code0 as string,",
+						"          BusinessLine_Name as string,",
+						"          Country_Name as string,",
+						"          {Financial manager} as string,",
+						"          {Managing Director} as string,",
+						"          {MBR file user(s)} as string,",
+						"          OrganisationID as long",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> getDimOrganisation",
+						"source(output(",
+						"          FactKpiID as long,",
+						"          OrganisationID as long,",
+						"          ScenarioID as long,",
+						"          MonthYearID as integer,",
+						"          MonthYear as date,",
+						"          CostCenter as string,",
+						"          PeopleType as string,",
+						"          LevelSeniority as string,",
+						"          EndOfMonth_FTE as float,",
+						"          SrvcSales_bef_bonimali as float,",
+						"          BillableDays as float,",
+						"          DailyRate as float,",
+						"          AnnualDirectCosts as float,",
+						"          AnnualProductionDays as float,",
+						"          DailyCost as float,",
+						"          CreatedOn as timestamp,",
+						"          CreatedBy as string,",
+						"          ModifiedOn as timestamp,",
+						"          ModifiedBy as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> getFactKpi",
+						"getMBRKPIPyramidStaging derive(MonthYearID = toInteger(concat(toString(year(Period)), lpad(toString(month(Period)),2,'0'), '01'))) ~> addYearMonthID",
+						"addYearMonthID, getDimScenario join(lower(trim(Version)) == lower(trim(Scenario_Name0)),",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> joinDimScenario",
+						"joinDimScenario, getDimOrganisation join(lower(trim(BU)) == lower(trim({Business Unit})),",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> joinDimOrganisation",
+						"joinDimOrganisation select(mapColumn(",
+						"          OrganisationID,",
+						"          ScenarioID = Scenario_Index,",
+						"          MonthYearID,",
+						"          MonthYear = Period,",
+						"          CostCenter,",
+						"          PeopleType,",
+						"          LevelSeniority,",
+						"          EndOfMonth_FTE,",
+						"          SrvcSales_bef_bonimali,",
+						"          BillableDays,",
+						"          DailyRate,",
+						"          AnnualDirectCosts,",
+						"          AnnualProductionDays,",
+						"          DailyCost",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> cleanColumns",
+						"cleanColumns, getFactKpi join(cleanColumns@OrganisationID == getFactKpi@OrganisationID",
+						"     && cleanColumns@ScenarioID == getFactKpi@ScenarioID",
+						"     && cleanColumns@MonthYearID == getFactKpi@MonthYearID",
+						"     && cleanColumns@CostCenter == getFactKpi@CostCenter",
+						"     && cleanColumns@PeopleType == getFactKpi@PeopleType",
+						"     && cleanColumns@LevelSeniority == getFactKpi@LevelSeniority,",
+						"     joinType:'left',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> joinFactKPI",
+						"joinFactKPI derive(InsertOrUpdate = iif(isNull(getFactKpi@OrganisationID) && isNull(getFactKpi@ScenarioID) && isNull(getFactKpi@MonthYearID) && isNull(getFactKpi@CostCenter)  && isNull(getFactKpi@PeopleType) \r",
+						" && isNull(getFactKpi@LevelSeniority) \r",
+						", 'I',\r",
+						"iif(equals(cleanColumns@EndOfMonth_FTE,getFactKpi@EndOfMonth_FTE) && equals(cleanColumns@SrvcSales_bef_bonimali,getFactKpi@SrvcSales_bef_bonimali) && \r",
+						" equals(cleanColumns@BillableDays,getFactKpi@BillableDays) && equals(cleanColumns@DailyRate,getFactKpi@DailyRate) &&\r",
+						" equals(cleanColumns@AnnualDirectCosts,getFactKpi@AnnualDirectCosts) &&  equals(cleanColumns@AnnualProductionDays,getFactKpi@AnnualProductionDays) &&\r",
+						"  equals(cleanColumns@DailyCost,getFactKpi@DailyCost) , 'P','U')\r",
+						")) ~> insertOrUpdate",
+						"insertOrUpdate filter(in(['I','U'],InsertOrUpdate)) ~> includeUpsert",
+						"includeUpsert alterRow(insertIf(InsertOrUpdate == 'I'),",
+						"     updateIf(InsertOrUpdate == 'U')) ~> insertUpdate",
+						"insertUpdate sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          OrganisationID = cleanColumns@OrganisationID,",
+						"          ScenarioID = cleanColumns@ScenarioID,",
+						"          MonthYearID,",
+						"          MonthYear,",
+						"          CostCenter,",
+						"          PeopleType,",
+						"          LevelSeniority,",
+						"          EndOfMonth_FTE,",
+						"          SrvcSales_bef_bonimali,",
+						"          BillableDays,",
+						"          DailyRate,",
+						"          AnnualDirectCosts,",
+						"          AnnualProductionDays,",
+						"          DailyCost",
+						"     )) ~> insertFactKPIPyramid"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/df_copy_all_mbr')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
@@ -676,6 +912,145 @@
 						"     )) ~> InsertUnpvtMBRData"
 					]
 				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_04_archive_files')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Get All Files",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "select distinct concat('toload/',MBR_Scope) as SourcePathFolder,\nconcat('archives/',MBR_Scope) as DestiPathFolder, MBR_FileName as FileName \nfrom  [@{pipeline().globalParameters.gODSSchemaName}].[@{pipeline().globalParameters.gSourcesConfigTableName}]",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "ds_ocean_ods",
+								"type": "DatasetReference",
+								"parameters": {
+									"vTableName": {
+										"value": "@pipeline().globalParameters.gSourcesConfigTableName",
+										"type": "Expression"
+									}
+								}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEach MBR Files",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Get All Files",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Get All Files').output.value",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Move File to Archives",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "BinarySource",
+											"storeSettings": {
+												"type": "AzureBlobStorageReadSettings",
+												"recursive": true,
+												"deleteFilesAfterCompletion": true
+											},
+											"formatSettings": {
+												"type": "BinaryReadSettings"
+											}
+										},
+										"sink": {
+											"type": "BinarySink",
+											"storeSettings": {
+												"type": "AzureBlobStorageWriteSettings"
+											}
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "ds_mbr_excel_files",
+											"type": "DatasetReference",
+											"parameters": {
+												"pFolder": {
+													"value": "@item().SourcePathFolder",
+													"type": "Expression"
+												},
+												"pFileName": {
+													"value": "@item().FileName",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "ds_mbr_excel_files",
+											"type": "DatasetReference",
+											"parameters": {
+												"pFolder": {
+													"value": "@item().DestiPathFolder",
+													"type": "Expression"
+												},
+												"pFileName": {
+													"value": "@item().FileName",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"folder": {
+					"name": "03DWH"
+				},
+				"annotations": []
 			},
 			"dependsOn": []
 		},
@@ -1651,7 +2026,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/pl_03_load_stg_financials')]",
+			"name": "[concat(parameters('factoryName'), '/pl_01_load_stg_financials')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -1774,7 +2149,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/pl_04_load_fact_financials')]",
+			"name": "[concat(parameters('factoryName'), '/pl_01_load_fact_financials')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -1936,7 +2311,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"pipeline": {
-								"referenceName": "pl_06_summary_log",
+								"referenceName": "pl_03_summary_log",
 								"type": "PipelineReference"
 							},
 							"waitOnCompletion": false,
@@ -1957,7 +2332,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/pl_05_load_fact_kpipyramid')]",
+			"name": "[concat(parameters('factoryName'), '/pl_02_load_fact_kpipyramid')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -2088,10 +2463,12 @@
 				"annotations": [],
 				"lastPublishTime": "2023-02-17T16:37:57Z"
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/df_Load_Fact_KPI_Pyramid')]"
+			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/pl_04_load_stg_kpi_pyramid')]",
+			"name": "[concat(parameters('factoryName'), '/pl_02_load_stg_kpi_pyramid')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -2436,7 +2813,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"pipeline": {
-								"referenceName": "pl_03_load_stg_financials",
+								"referenceName": "pl_01_load_stg_financials",
 								"type": "PipelineReference"
 							},
 							"waitOnCompletion": true,
@@ -2463,7 +2840,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"pipeline": {
-								"referenceName": "pl_04_load_fact_financials",
+								"referenceName": "pl_01_load_fact_financials",
 								"type": "PipelineReference"
 							},
 							"waitOnCompletion": true,
@@ -2519,7 +2896,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"pipeline": {
-								"referenceName": "pl_04_load_stg_kpi_pyramid",
+								"referenceName": "pl_02_load_stg_kpi_pyramid",
 								"type": "PipelineReference"
 							},
 							"waitOnCompletion": true,
@@ -2546,7 +2923,34 @@
 						"userProperties": [],
 						"typeProperties": {
 							"pipeline": {
-								"referenceName": "pl_05_load_fact_kpipyramid",
+								"referenceName": "pl_02_load_fact_kpipyramid",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Archives MBR Files",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load Fact Tables",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Load Fact KPI Pyramid",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "pl_04_archive_files",
 								"type": "PipelineReference"
 							},
 							"waitOnCompletion": true,
@@ -2562,11 +2966,12 @@
 				"lastPublishTime": "2023-02-17T13:38:45Z"
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/pl_03_load_stg_financials')]",
-				"[concat(variables('factoryId'), '/pipelines/pl_04_load_fact_financials')]",
+				"[concat(variables('factoryId'), '/pipelines/pl_01_load_stg_financials')]",
+				"[concat(variables('factoryId'), '/pipelines/pl_01_load_fact_financials')]",
 				"[concat(variables('factoryId'), '/pipelines/pl_01_get_files_sharepoint')]",
-				"[concat(variables('factoryId'), '/pipelines/pl_04_load_stg_kpi_pyramid')]",
-				"[concat(variables('factoryId'), '/pipelines/pl_05_load_fact_kpipyramid')]",
+				"[concat(variables('factoryId'), '/pipelines/pl_02_load_stg_kpi_pyramid')]",
+				"[concat(variables('factoryId'), '/pipelines/pl_02_load_fact_kpipyramid')]",
+				"[concat(variables('factoryId'), '/pipelines/pl_04_archive_files')]",
 				"[concat(variables('factoryId'), '/pipelines/pl_01_read_all_MBR_files')]"
 			]
 		}
