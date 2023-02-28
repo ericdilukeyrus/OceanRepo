@@ -1,0 +1,134 @@
+{
+	"name": "df_Load_Fact_KPI_Pyramid",
+	"properties": {
+		"folder": {
+			"name": "03DWH"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_ocean_stg",
+						"type": "DatasetReference"
+					},
+					"name": "getMBRKPIPyramidStaging"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_ocean_dwh",
+						"type": "DatasetReference"
+					},
+					"name": "getDimScenario"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_ocean_dwh",
+						"type": "DatasetReference"
+					},
+					"name": "getDimOrganisation"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "addYearMonthID"
+				},
+				{
+					"name": "joinDimScenario"
+				},
+				{
+					"name": "joinDimOrganisation"
+				},
+				{
+					"name": "cleanColumns"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          BU as string,",
+				"          Version as string,",
+				"          Period as date,",
+				"          CostCenter as string,",
+				"          PeopleType as string,",
+				"          LevelSeniority as string,",
+				"          EndOfMonth_FTE as float,",
+				"          SrvcSales_bef_bonimali as float,",
+				"          BillableDays as float,",
+				"          DailyRate as float,",
+				"          AnnualDirectCosts as float,",
+				"          AnnualProductionDays as float,",
+				"          DailyCost as float",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> getMBRKPIPyramidStaging",
+				"source(output(",
+				"          Scenario_Name0 as string,",
+				"          Scenario_Code0 as string,",
+				"          Comment as string,",
+				"          Scenario_Index as long",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> getDimScenario",
+				"source(output(",
+				"          {Business Unit} as string,",
+				"          {MBR Scope} as string,",
+				"          Area as string,",
+				"          Zone as string,",
+				"          {Keyrus Group} as string,",
+				"          Total as string,",
+				"          {MBR Scope_1} as string,",
+				"          Management_hierarchy_1 as string,",
+				"          Management_hierarchy_2 as string,",
+				"          Management_hierarchy_3 as string,",
+				"          Management_hierarchy_4 as string,",
+				"          Currency_Name0 as string,",
+				"          Currency_Code0 as string,",
+				"          BusinessLine_Name as string,",
+				"          Country_Name as string,",
+				"          {Financial manager} as string,",
+				"          {Managing Director} as string,",
+				"          {MBR file user(s)} as string,",
+				"          OrganisationID as long",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> getDimOrganisation",
+				"getMBRKPIPyramidStaging derive(MonthYearID = toInteger(concat(toString(year(Period)), lpad(toString(month(Period)),2,'0'), '01'))) ~> addYearMonthID",
+				"addYearMonthID, getDimScenario join(lower(trim(Version)) == lower(trim(Scenario_Name0)),",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinDimScenario",
+				"joinDimScenario, getDimOrganisation join(lower(trim(BU)) == lower(trim({Business Unit})),",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinDimOrganisation",
+				"joinDimOrganisation select(mapColumn(",
+				"          OrganisationID,",
+				"          Scenario_Index,",
+				"          MonthYearID,",
+				"          MonthYear = Period,",
+				"          CostCenter,",
+				"          PeopleType,",
+				"          LevelSeniority,",
+				"          EndOfMonth_FTE,",
+				"          SrvcSales_bef_bonimali,",
+				"          BillableDays,",
+				"          DailyRate,",
+				"          AnnualDirectCosts,",
+				"          AnnualProductionDays,",
+				"          DailyCost",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> cleanColumns"
+			]
+		}
+	}
+}
