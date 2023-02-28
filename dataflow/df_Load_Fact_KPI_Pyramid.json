@@ -27,6 +27,13 @@
 						"type": "DatasetReference"
 					},
 					"name": "getDimOrganisation"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_ocean_dwh",
+						"type": "DatasetReference"
+					},
+					"name": "getFactKpi"
 				}
 			],
 			"sinks": [
@@ -50,6 +57,15 @@
 				},
 				{
 					"name": "cleanColumns"
+				},
+				{
+					"name": "joinFactKPI"
+				},
+				{
+					"name": "insertOrUpdate"
+				},
+				{
+					"name": "includeUpsert"
 				}
 			],
 			"scriptLines": [
@@ -72,41 +88,18 @@
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     format: 'table') ~> getMBRKPIPyramidStaging",
-				"source(output(",
-				"          Scenario_Name0 as string,",
-				"          Scenario_Code0 as string,",
-				"          Comment as string,",
-				"          Scenario_Index as long",
-				"     ),",
-				"     allowSchemaDrift: true,",
+				"source(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     format: 'table') ~> getDimScenario",
-				"source(output(",
-				"          {Business Unit} as string,",
-				"          {MBR Scope} as string,",
-				"          Area as string,",
-				"          Zone as string,",
-				"          {Keyrus Group} as string,",
-				"          Total as string,",
-				"          {MBR Scope_1} as string,",
-				"          Management_hierarchy_1 as string,",
-				"          Management_hierarchy_2 as string,",
-				"          Management_hierarchy_3 as string,",
-				"          Management_hierarchy_4 as string,",
-				"          Currency_Name0 as string,",
-				"          Currency_Code0 as string,",
-				"          BusinessLine_Name as string,",
-				"          Country_Name as string,",
-				"          {Financial manager} as string,",
-				"          {Managing Director} as string,",
-				"          {MBR file user(s)} as string,",
-				"          OrganisationID as long",
-				"     ),",
-				"     allowSchemaDrift: true,",
+				"source(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     format: 'table') ~> getDimOrganisation",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> getFactKpi",
 				"getMBRKPIPyramidStaging derive(MonthYearID = toInteger(concat(toString(year(Period)), lpad(toString(month(Period)),2,'0'), '01'))) ~> addYearMonthID",
 				"addYearMonthID, getDimScenario join(lower(trim(Version)) == lower(trim(Scenario_Name0)),",
 				"     joinType:'inner',",
@@ -136,7 +129,22 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> cleanColumns",
-				"cleanColumns sink(allowSchemaDrift: true,",
+				"cleanColumns, getFactKpi join(cleanColumns@OrganisationID == getFactKpi@OrganisationID",
+				"     && cleanColumns@ScenarioID == getFactKpi@ScenarioID",
+				"     && cleanColumns@MonthYearID == getFactKpi@MonthYearID",
+				"     && cleanColumns@CostCenter == getFactKpi@CostCenter",
+				"     && cleanColumns@PeopleType == getFactKpi@PeopleType",
+				"     && cleanColumns@LevelSeniority == getFactKpi@LevelSeniority,",
+				"     joinType:'left',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinFactKPI",
+				"joinFactKPI derive(InsertOrUpdate = iifNull(isNull(getFactKpi@OrganisationID) && isNull(getFactKpi@ScenarioID) && isNull(getFactKpi@MonthYearID) && isNull(getFactKpi@CostCenter) && isNull(getFactKpi@PeopleType) \r",
+				"&& isNull(getFactKpi@PeopleType) && isNull(getFactKpi@LevelSeniority),\r",
+				"'I',\r",
+				"'P')) ~> insertOrUpdate",
+				"insertOrUpdate filter(in(InsertOrUpdate,'I')) ~> includeUpsert",
+				"includeUpsert sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     deletable:false,",
 				"     insertable:true,",
@@ -146,7 +154,23 @@
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
-				"     errorHandlingOption: 'stopOnFirstError') ~> insertFactKPIPyramid"
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          OrganisationID = cleanColumns@OrganisationID,",
+				"          ScenarioID = cleanColumns@ScenarioID,",
+				"          MonthYearID = cleanColumns@MonthYearID,",
+				"          MonthYear = cleanColumns@MonthYear,",
+				"          CostCenter = cleanColumns@CostCenter,",
+				"          PeopleType = cleanColumns@PeopleType,",
+				"          LevelSeniority = cleanColumns@LevelSeniority,",
+				"          EndOfMonth_FTE = cleanColumns@EndOfMonth_FTE,",
+				"          SrvcSales_bef_bonimali = cleanColumns@SrvcSales_bef_bonimali,",
+				"          BillableDays = cleanColumns@BillableDays,",
+				"          DailyRate = cleanColumns@DailyRate,",
+				"          AnnualDirectCosts = cleanColumns@AnnualDirectCosts,",
+				"          AnnualProductionDays = cleanColumns@AnnualProductionDays,",
+				"          DailyCost = cleanColumns@DailyCost",
+				"     )) ~> insertFactKPIPyramid"
 			]
 		}
 	}
