@@ -66,6 +66,9 @@
 				},
 				{
 					"name": "includeUpsert"
+				},
+				{
+					"name": "insertUpdate"
 				}
 			],
 			"scriptLines": [
@@ -190,10 +193,15 @@
 				"joinFactKPI derive(InsertOrUpdate = iif(isNull(getFactKpi@OrganisationID) && isNull(getFactKpi@ScenarioID) && isNull(getFactKpi@MonthYearID) && isNull(getFactKpi@CostCenter)  && isNull(getFactKpi@PeopleType) \r",
 				" && isNull(getFactKpi@LevelSeniority) \r",
 				", 'I',\r",
-				"'P'\r",
+				"iif(equals(cleanColumns@EndOfMonth_FTE,getFactKpi@EndOfMonth_FTE) && equals(cleanColumns@SrvcSales_bef_bonimali,getFactKpi@SrvcSales_bef_bonimali) && \r",
+				" equals(cleanColumns@BillableDays,getFactKpi@BillableDays) && equals(cleanColumns@DailyRate,getFactKpi@DailyRate) &&\r",
+				" equals(cleanColumns@AnnualDirectCosts,getFactKpi@AnnualDirectCosts) &&  equals(cleanColumns@AnnualProductionDays,getFactKpi@AnnualProductionDays) &&\r",
+				"  equals(cleanColumns@DailyCost,getFactKpi@DailyCost) , 'P','U')\r",
 				")) ~> insertOrUpdate",
 				"insertOrUpdate filter(in(['I','U'],InsertOrUpdate)) ~> includeUpsert",
-				"includeUpsert sink(allowSchemaDrift: true,",
+				"includeUpsert alterRow(insertIf(InsertOrUpdate == 'I'),",
+				"     updateIf(InsertOrUpdate == 'U')) ~> insertUpdate",
+				"insertUpdate sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     deletable:false,",
 				"     insertable:true,",
