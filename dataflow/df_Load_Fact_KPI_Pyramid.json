@@ -29,7 +29,15 @@
 					"name": "getDimOrganisation"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_ocean_dwh",
+						"type": "DatasetReference"
+					},
+					"name": "insertFactKPIPyramid"
+				}
+			],
 			"transformations": [
 				{
 					"name": "addYearMonthID"
@@ -127,7 +135,18 @@
 				"          DailyCost",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> cleanColumns"
+				"     skipDuplicateMapOutputs: true) ~> cleanColumns",
+				"cleanColumns sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     recreate:true,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> insertFactKPIPyramid"
 			]
 		}
 	}
