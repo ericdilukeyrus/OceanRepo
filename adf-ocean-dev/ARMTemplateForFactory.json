@@ -1655,7 +1655,7 @@
 						}
 					},
 					{
-						"name": "Load Staging Tables",
+						"name": "Load Financials Staging Tables",
 						"type": "ExecutePipeline",
 						"dependsOn": [
 							{
@@ -1680,7 +1680,13 @@
 						"type": "ExecutePipeline",
 						"dependsOn": [
 							{
-								"activity": "Load Staging Tables",
+								"activity": "Load Financials Staging Tables",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Load KPI Pyramid Staging Tables",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -1730,6 +1736,54 @@
 							"waitOnCompletion": true,
 							"parameters": {}
 						}
+					},
+					{
+						"name": "Load KPI Pyramid Staging Tables",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "ForEach Active MBR Scope",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "pl_04_load_stg_kpi_pyramid",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Load Fact KPI Pyramid",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load Financials Staging Tables",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Load KPI Pyramid Staging Tables",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "pl_05_load_fact_kpipyramid",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
 					}
 				],
 				"policy": {
@@ -1745,6 +1799,8 @@
 				"[concat(variables('factoryId'), '/pipelines/pl_04_load_fact_financials')]",
 				"[concat(variables('factoryId'), '/pipelines/pl_00_initialization')]",
 				"[concat(variables('factoryId'), '/pipelines/pl_01_get_files_sharepoint')]",
+				"[concat(variables('factoryId'), '/pipelines/pl_04_load_stg_kpi_pyramid')]",
+				"[concat(variables('factoryId'), '/pipelines/pl_05_load_fact_kpipyramid')]",
 				"[concat(variables('factoryId'), '/pipelines/pl_01_read_all_MBR_files')]"
 			]
 		},
@@ -2523,7 +2579,7 @@
 							"source": {
 								"type": "AzureSqlSource",
 								"sqlReaderQuery": {
-									"value": "select a.Prop_1 as MBR_Scope, b.Prop_1 as MBR_Month,  CONCAT('P&L FI_', bu_sequence ) AS SheetName, bu_sequence AS BU_Code, bu_name as BU_Name,\nCONCAT('R_P&L_FI_', a.Prop_1, '_',bu_sequence) AS RawTableName,  CONCAT('U_P&L_FI_', a.Prop_1, '_', bu_sequence) AS UnpvtTableName, currency_code as Currency_Code\nfrom ods.R_MBR_Currency_@{pipeline().parameters.pMBRScope},\n(select Prop_1 from ods.R_MBR_Parameters_@{pipeline().parameters.pMBRScope}\nwhere Prop_0 = 'MBR SCOPE') a,\n(select Prop_1 from ods.R_MBR_Parameters_@{pipeline().parameters.pMBRScope}\nwhere Prop_0 = 'MONTH') b\nwhere bu_select is not null",
+									"value": "select a.Prop_1 as MBR_Scope, b.Prop_1 as MBR_Month,  CONCAT('P&L FI_', bu_sequence ) AS SheetName, bu_sequence AS BU_Code, bu_name as BU_Name,\nCONCAT('R_P&L_FI_', a.Prop_1, '_',bu_sequence) AS RawTableName,  CONCAT('U_P&L_FI_', a.Prop_1, '_', bu_sequence) AS UnpvtTableName, currency_code as Currency_Code,\nCONCAT('R_KPI_Pyramid_', a.Prop_1) AS KPIPyramidTableName\nfrom ods.R_MBR_Currency_@{pipeline().parameters.pMBRScope},\n(select Prop_1 from ods.R_MBR_Parameters_@{pipeline().parameters.pMBRScope}\nwhere Prop_0 = 'MBR SCOPE') a,\n(select Prop_1 from ods.R_MBR_Parameters_@{pipeline().parameters.pMBRScope}\nwhere Prop_0 = 'MONTH') b\nwhere bu_select is not null",
 									"type": "Expression"
 								},
 								"queryTimeout": "02:00:00",
@@ -2628,8 +2684,7 @@
 														"type": "Expression"
 													}
 												}
-											},
-											"linkedServiceParameters": {}
+											}
 										},
 										"staging": {},
 										"compute": {
@@ -2737,7 +2792,7 @@
 											{
 												"type": "Query",
 												"text": {
-													"value": "INSERT INTO [@{pipeline().globalParameters.gODSSchemaName}].[@{pipeline().globalParameters.gSourcesConfigTableName}]\n           ([MBR_FileName]\n           ,[MBR_Scope]\n           ,[MBR_Month]\n           ,[MBR_SheetName]\n           ,[MBR_BU_Code]\n           ,[MBR_BU_Name]\n           ,[MBR_RawTableName]\n           ,[MBR_UnpvtTableName]\n           ,[MBR_Currency_Code])\n     VALUES\n           ('@{pipeline().parameters.pFileName}'\n           ,'@{item().MBR_Scope}'\n           ,'@{item().MBR_Month}'\n           ,'@{item().SheetName}'\n           ,'@{item().BU_Code}'\n           ,'@{item().BU_Name}'\n           ,'@{item().RawTableName}'\n           ,'@{item().UnpvtTableName}'\n           ,'@{item().Currency_Code}')\n\n",
+													"value": "INSERT INTO [@{pipeline().globalParameters.gODSSchemaName}].[@{pipeline().globalParameters.gSourcesConfigTableName}]\n           ([MBR_FileName]\n           ,[MBR_Scope]\n           ,[MBR_Month]\n           ,[MBR_SheetName]\n           ,[MBR_BU_Code]\n           ,[MBR_BU_Name]\n           ,[MBR_RawTableName]\n           ,[MBR_UnpvtTableName]\n           ,[MBR_Currency_Code]\n           ,[MBR_KPIPyramid_TableName])\n     VALUES\n           ('@{pipeline().parameters.pFileName}'\n           ,'@{item().MBR_Scope}'\n           ,'@{item().MBR_Month}'\n           ,'@{item().SheetName}'\n           ,'@{item().BU_Code}'\n           ,'@{item().BU_Name}'\n           ,'@{item().RawTableName}'\n           ,'@{item().UnpvtTableName}'\n           ,'@{item().Currency_Code}'\n           ,'@{item().KPIPyramidTableName}')\n\n",
 													"type": "Expression"
 												}
 											}
@@ -2779,6 +2834,212 @@
 							"referenceName": "ocean_db",
 							"type": "LinkedServiceReference"
 						}
+					},
+					{
+						"name": "Copy KPI Pyramid to ODS",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Get MBR Parameters",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "ExcelSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false,
+								"tableOption": "autoCreate",
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 1
+										},
+										"sink": {
+											"name": "BU",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 2
+										},
+										"sink": {
+											"name": "Version",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 3
+										},
+										"sink": {
+											"name": "Period",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 4
+										},
+										"sink": {
+											"name": "CostCenter",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 5
+										},
+										"sink": {
+											"name": "PeopleType",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 6
+										},
+										"sink": {
+											"name": "LevelSeniority",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 7
+										},
+										"sink": {
+											"name": "EndOfMonth_FTE",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 8
+										},
+										"sink": {
+											"name": "SrvcSales_bef_bonimali",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 9
+										},
+										"sink": {
+											"name": "BillableDays",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 10
+										},
+										"sink": {
+											"name": "DailyRate",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 11
+										},
+										"sink": {
+											"name": "AnnualDirectCosts",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 12
+										},
+										"sink": {
+											"name": "AnnualProductionDays",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 13
+										},
+										"sink": {
+											"name": "DailyCost",
+											"physicalType": "String"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "ds_mbr_kpi_pyramid",
+								"type": "DatasetReference",
+								"parameters": {
+									"pFileName": {
+										"value": "@pipeline().parameters.pFileName",
+										"type": "Expression"
+									},
+									"pFolderName": {
+										"value": "@pipeline().parameters.pFolderName",
+										"type": "Expression"
+									}
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ds_ocean_ods",
+								"type": "DatasetReference",
+								"parameters": {
+									"vTableName": {
+										"value": "@concat('R_KPI_Pyramid_',pipeline().parameters.pMBRScope)",
+										"type": "Expression"
+									}
+								}
+							}
+						]
 					}
 				],
 				"policy": {
@@ -2812,6 +3073,7 @@
 				"[concat(variables('factoryId'), '/datasets/ds_ocean_ods')]",
 				"[concat(variables('factoryId'), '/datasets/ds_mbr_currency')]",
 				"[concat(variables('factoryId'), '/linkedServices/ocean_db')]",
+				"[concat(variables('factoryId'), '/datasets/ds_mbr_kpi_pyramid')]",
 				"[concat(variables('factoryId'), '/dataflows/df_copy_all_mbr')]",
 				"[concat(variables('factoryId'), '/dataflows/df_unpvt_mbr_data')]"
 			]
@@ -3076,8 +3338,7 @@
 														"type": "Expression"
 													}
 												}
-											},
-											"linkedServiceParameters": {}
+											}
 										},
 										"staging": {},
 										"compute": {
@@ -3104,7 +3365,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"pipeline": {
-								"referenceName": "pl_05_summary_log",
+								"referenceName": "pl_06_summary_log",
 								"type": "PipelineReference"
 							},
 							"waitOnCompletion": false,
@@ -3124,12 +3385,273 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ds_ocean_ods')]",
-				"[concat(variables('factoryId'), '/pipelines/pl_05_summary_log')]",
+				"[concat(variables('factoryId'), '/pipelines/pl_06_summary_log')]",
 				"[concat(variables('factoryId'), '/dataflows/df_Load_Fact_Financials')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/pl_05_summary_log')]",
+			"name": "[concat(parameters('factoryName'), '/pl_05_load_fact_kpipyramid')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Get All Staging Data",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "select  distinct concat('KPI_Pyramid_', MBR_Scope) AS StgKpiTableName  from  [@{pipeline().globalParameters.gODSSchemaName}].[@{pipeline().globalParameters.gSourcesConfigTableName}]",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "ds_ocean_ods",
+								"type": "DatasetReference",
+								"parameters": {
+									"vTableName": {
+										"value": "@pipeline().globalParameters.gSourcesConfigTableName",
+										"type": "Expression"
+									}
+								}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEach Staging Table",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Get All Staging Data",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Get All Staging Data').output.value",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Load Fact KPI Pyramid",
+									"type": "ExecuteDataFlow",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataflow": {
+											"referenceName": "df_Load_Fact_KPI_Pyramid",
+											"type": "DataFlowReference",
+											"parameters": {},
+											"datasetParameters": {
+												"getMBRKPIPyramidStaging": {
+													"vTableName": {
+														"value": "@item().StgKpiTableName",
+														"type": "Expression"
+													}
+												},
+												"getDimScenario": {
+													"vTableName": {
+														"value": "@pipeline().globalParameters.gDimScenarioTableName",
+														"type": "Expression"
+													}
+												},
+												"getDimOrganisation": {
+													"vTableName": {
+														"value": "@pipeline().globalParameters.gDimOrganisationTableName",
+														"type": "Expression"
+													}
+												},
+												"getFactKpi": {
+													"vTableName": {
+														"value": "@pipeline().globalParameters.gFactKpiPyramid",
+														"type": "Expression"
+													}
+												},
+												"insertFactKPIPyramid": {
+													"vTableName": {
+														"value": "@pipeline().globalParameters.gFactKpiPyramid",
+														"type": "Expression"
+													}
+												}
+											},
+											"linkedServiceParameters": {}
+										},
+										"staging": {},
+										"compute": {
+											"coreCount": 8,
+											"computeType": "General"
+										},
+										"traceLevel": "Fine"
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"folder": {
+					"name": "03DWH"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-17T16:37:57Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_ocean_ods')]",
+				"[concat(variables('factoryId'), '/dataflows/df_Load_Fact_KPI_Pyramid')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_04_load_stg_kpi_pyramid')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ForEach KPI Pyramid ODS Table",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Get All KPI Pyramid ODS Tables",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Get All KPI Pyramid ODS Tables').output.value",
+								"type": "Expression"
+							},
+							"isSequential": false,
+							"activities": [
+								{
+									"name": "Staging KPI Pyramid Tables",
+									"type": "ExecuteDataFlow",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataflow": {
+											"referenceName": "df_stg_kpi_pyramid",
+											"type": "DataFlowReference",
+											"parameters": {
+												"kpiPyramidTableName": {
+													"value": "'@{item().MBR_KPIPyramid_TableName}'",
+													"type": "Expression"
+												}
+											},
+											"datasetParameters": {
+												"getMBRKpiPyramid": {
+													"vTableName": {
+														"value": "@item().MBR_KPIPyramid_TableName",
+														"type": "Expression"
+													}
+												},
+												"insertMBRStagingData": {
+													"pKpiPyramidTableName": {
+														"value": "@item().StgTableName",
+														"type": "Expression"
+													}
+												}
+											}
+										},
+										"staging": {},
+										"compute": {
+											"coreCount": 8,
+											"computeType": "General"
+										},
+										"traceLevel": "Fine"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "Get All KPI Pyramid ODS Tables",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "select  distinct MBR_KPIPyramid_TableName,  concat('KPI_Pyramid_', MBR_Scope) as StgTableName from  [@{pipeline().globalParameters.gODSSchemaName}].[@{pipeline().globalParameters.gSourcesConfigTableName}]",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "ds_ocean_ods",
+								"type": "DatasetReference",
+								"parameters": {
+									"vTableName": {
+										"value": "@pipeline().globalParameters.gSourcesConfigTableName",
+										"type": "Expression"
+									}
+								}
+							},
+							"firstRowOnly": false
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"folder": {
+					"name": "02STG"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-20T11:30:45Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_ocean_ods')]",
+				"[concat(variables('factoryId'), '/dataflows/df_stg_kpi_pyramid')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_06_summary_log')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -3427,44 +3949,6 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/mbr_dimensions')]",
 				"[concat(variables('factoryId'), '/datasets/ds_ocean_ods')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ds_mbr_files_bin')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "dimensions_source",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"pMBR_Scope": {
-						"type": "string"
-					},
-					"pFileName": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "Binary",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"fileName": {
-							"value": "@dataset().pFileName",
-							"type": "Expression"
-						},
-						"folderPath": {
-							"value": "toload/@{dataset().pMBR_Scope}",
-							"type": "Expression"
-						},
-						"container": "mbr-landing-zone"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/dimensions_source')]"
 			]
 		},
 		{
@@ -4105,6 +4589,149 @@
 					{
 						"type": "String"
 					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/dimensions_source')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_mbr_files_bin')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dimensions_source",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"pMBR_Scope": {
+						"type": "string"
+					},
+					"pFileName": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "@dataset().pFileName",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "toload/@{dataset().pMBR_Scope}",
+							"type": "Expression"
+						},
+						"container": "mbr-landing-zone"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/dimensions_source')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_mbr_kpi_pyramid')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dimensions_source",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"pFileName": {
+						"type": "string"
+					},
+					"pFolderName": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Excel",
+				"typeProperties": {
+					"sheetName": "KPI Pyramid",
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "@dataset().pFileName",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().pFolderName",
+							"type": "Expression"
+						},
+						"container": "mbr-landing-zone"
+					},
+					"range": "B79:N4000"
+				},
+				"schema": [
 					{
 						"type": "String"
 					},
@@ -5159,6 +5786,9 @@
 					"referenceName": "dimensions_source",
 					"type": "LinkedServiceReference"
 				},
+				"folder": {
+					"name": "00INIT"
+				},
 				"annotations": [],
 				"type": "DelimitedText",
 				"typeProperties": {
@@ -5239,6 +5869,9 @@
 					"pMBR_Scope": {
 						"type": "string"
 					}
+				},
+				"folder": {
+					"name": "00INIT"
 				},
 				"annotations": [],
 				"type": "Xml",
@@ -5332,6 +5965,9 @@
 				"linkedServiceName": {
 					"referenceName": "dimensions_source",
 					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "00INIT"
 				},
 				"annotations": [],
 				"type": "Xml",
@@ -10603,6 +11239,38 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/stg_kpi_pyramid')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ocean_db_nonencrypted",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"pKpiPyramidTableName": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "02STG"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "stg",
+					"table": {
+						"value": "@dataset().pKpiPyramidTableName",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ocean_db_nonencrypted')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/AzureKeyVaultOceanProject')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -11139,6 +11807,237 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/df_Load_Fact_KPI_Pyramid')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "03DWH"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_ocean_stg",
+								"type": "DatasetReference"
+							},
+							"name": "getMBRKPIPyramidStaging"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_ocean_dwh",
+								"type": "DatasetReference"
+							},
+							"name": "getDimScenario"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_ocean_dwh",
+								"type": "DatasetReference"
+							},
+							"name": "getDimOrganisation"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_ocean_dwh",
+								"type": "DatasetReference"
+							},
+							"name": "getFactKpi"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_ocean_dwh",
+								"type": "DatasetReference"
+							},
+							"name": "insertFactKPIPyramid"
+						}
+					],
+					"transformations": [
+						{
+							"name": "addYearMonthID"
+						},
+						{
+							"name": "joinDimScenario"
+						},
+						{
+							"name": "joinDimOrganisation"
+						},
+						{
+							"name": "cleanColumns"
+						},
+						{
+							"name": "joinFactKPI"
+						},
+						{
+							"name": "insertOrUpdate"
+						},
+						{
+							"name": "includeUpsert"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          BU as string,",
+						"          Version as string,",
+						"          Period as date,",
+						"          CostCenter as string,",
+						"          PeopleType as string,",
+						"          LevelSeniority as string,",
+						"          EndOfMonth_FTE as float,",
+						"          SrvcSales_bef_bonimali as float,",
+						"          BillableDays as float,",
+						"          DailyRate as float,",
+						"          AnnualDirectCosts as float,",
+						"          AnnualProductionDays as float,",
+						"          DailyCost as float",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> getMBRKPIPyramidStaging",
+						"source(output(",
+						"          Scenario_Name0 as string,",
+						"          Scenario_Code0 as string,",
+						"          Comment as string,",
+						"          Scenario_Index as long",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> getDimScenario",
+						"source(output(",
+						"          {Business Unit} as string,",
+						"          {MBR Scope} as string,",
+						"          Area as string,",
+						"          Zone as string,",
+						"          {Keyrus Group} as string,",
+						"          Total as string,",
+						"          {MBR Scope_1} as string,",
+						"          Management_hierarchy_1 as string,",
+						"          Management_hierarchy_2 as string,",
+						"          Management_hierarchy_3 as string,",
+						"          Management_hierarchy_4 as string,",
+						"          Currency_Name0 as string,",
+						"          Currency_Code0 as string,",
+						"          BusinessLine_Name as string,",
+						"          Country_Name as string,",
+						"          {Financial manager} as string,",
+						"          {Managing Director} as string,",
+						"          {MBR file user(s)} as string,",
+						"          OrganisationID as long",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> getDimOrganisation",
+						"source(output(",
+						"          FactKpiID as long,",
+						"          OrganisationID as long,",
+						"          ScenarioID as long,",
+						"          MonthYearID as integer,",
+						"          MonthYear as date,",
+						"          CostCenter as string,",
+						"          PeopleType as string,",
+						"          LevelSeniority as string,",
+						"          EndOfMonth_FTE as float,",
+						"          SrvcSales_bef_bonimali as float,",
+						"          BillableDays as float,",
+						"          DailyRate as float,",
+						"          AnnualDirectCosts as float,",
+						"          AnnualProductionDays as float,",
+						"          DailyCost as float,",
+						"          CreatedOn as timestamp,",
+						"          CreatedBy as string,",
+						"          ModifiedOn as timestamp,",
+						"          ModifiedBy as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> getFactKpi",
+						"getMBRKPIPyramidStaging derive(MonthYearID = toInteger(concat(toString(year(Period)), lpad(toString(month(Period)),2,'0'), '01'))) ~> addYearMonthID",
+						"addYearMonthID, getDimScenario join(lower(trim(Version)) == lower(trim(Scenario_Name0)),",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> joinDimScenario",
+						"joinDimScenario, getDimOrganisation join(lower(trim(BU)) == lower(trim({Business Unit})),",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> joinDimOrganisation",
+						"joinDimOrganisation select(mapColumn(",
+						"          OrganisationID,",
+						"          ScenarioID = Scenario_Index,",
+						"          MonthYearID,",
+						"          MonthYear = Period,",
+						"          CostCenter,",
+						"          PeopleType,",
+						"          LevelSeniority,",
+						"          EndOfMonth_FTE,",
+						"          SrvcSales_bef_bonimali,",
+						"          BillableDays,",
+						"          DailyRate,",
+						"          AnnualDirectCosts,",
+						"          AnnualProductionDays,",
+						"          DailyCost",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> cleanColumns",
+						"cleanColumns, getFactKpi join(cleanColumns@OrganisationID == getFactKpi@OrganisationID",
+						"     && cleanColumns@ScenarioID == getFactKpi@ScenarioID",
+						"     && cleanColumns@MonthYearID == getFactKpi@MonthYearID",
+						"     && cleanColumns@CostCenter == getFactKpi@CostCenter",
+						"     && cleanColumns@PeopleType == getFactKpi@PeopleType",
+						"     && cleanColumns@LevelSeniority == getFactKpi@LevelSeniority,",
+						"     joinType:'left',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> joinFactKPI",
+						"joinFactKPI derive(InsertOrUpdate = iif(isNull(getFactKpi@OrganisationID) && isNull(getFactKpi@ScenarioID) && isNull(getFactKpi@MonthYearID) && isNull(getFactKpi@CostCenter)  && isNull(getFactKpi@PeopleType) \r",
+						" && isNull(getFactKpi@LevelSeniority) \r",
+						", 'I',\r",
+						"'P'\r",
+						")) ~> insertOrUpdate",
+						"insertOrUpdate filter(in(['I','U'],InsertOrUpdate)) ~> includeUpsert",
+						"includeUpsert sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          OrganisationID = cleanColumns@OrganisationID,",
+						"          ScenarioID = cleanColumns@ScenarioID,",
+						"          MonthYearID,",
+						"          MonthYear,",
+						"          CostCenter,",
+						"          PeopleType,",
+						"          LevelSeniority,",
+						"          EndOfMonth_FTE,",
+						"          SrvcSales_bef_bonimali,",
+						"          BillableDays,",
+						"          DailyRate,",
+						"          AnnualDirectCosts,",
+						"          AnnualProductionDays,",
+						"          DailyCost",
+						"     )) ~> insertFactKPIPyramid"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_ocean_stg')]",
+				"[concat(variables('factoryId'), '/datasets/ds_ocean_dwh')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/df_copy_all_mbr')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
@@ -11578,6 +12477,107 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ds_ocean_ods')]",
 				"[concat(variables('factoryId'), '/datasets/stg_financials')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_stg_kpi_pyramid')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "02STG"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_ocean_ods",
+								"type": "DatasetReference"
+							},
+							"name": "getMBRKpiPyramid"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "stg_kpi_pyramid",
+								"type": "DatasetReference"
+							},
+							"name": "insertMBRStagingData"
+						}
+					],
+					"transformations": [
+						{
+							"name": "castColumns"
+						},
+						{
+							"name": "removeEmptyRows"
+						},
+						{
+							"name": "nulltoZero"
+						}
+					],
+					"scriptLines": [
+						"parameters{",
+						"     kpiPyramidTableName as string",
+						"}",
+						"source(output(",
+						"          BU as string,",
+						"          Version as string,",
+						"          Period as string,",
+						"          CostCenter as string,",
+						"          PeopleType as string,",
+						"          LevelSeniority as string,",
+						"          EndOfMonth_FTE as string,",
+						"          SrvcSales_bef_bonimali as string,",
+						"          BillableDays as string,",
+						"          DailyRate as string,",
+						"          AnnualDirectCosts as string,",
+						"          AnnualProductionDays as string,",
+						"          DailyCost as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     query: (\"select * from [ods].[{$kpiPyramidTableName}]\"),",
+						"     format: 'query') ~> getMBRKpiPyramid",
+						"removeEmptyRows cast(output(",
+						"          Period as date 'yyyy-MM-dd',",
+						"          EndOfMonth_FTE as float,",
+						"          SrvcSales_bef_bonimali as float,",
+						"          BillableDays as float,",
+						"          DailyRate as float,",
+						"          AnnualDirectCosts as float,",
+						"          AnnualProductionDays as float,",
+						"          DailyCost as float",
+						"     ),",
+						"     errors: true) ~> castColumns",
+						"getMBRKpiPyramid filter(not(isNull(BU))) ~> removeEmptyRows",
+						"castColumns derive(EndOfMonth_FTE = iifNull(EndOfMonth_FTE,0),",
+						"          SrvcSales_bef_bonimali = iifNull(SrvcSales_bef_bonimali,0),",
+						"          BillableDays = iifNull(BillableDays,0),",
+						"          DailyRate = iifNull(DailyRate,0),",
+						"          AnnualDirectCosts = iifNull(AnnualDirectCosts,0),",
+						"          AnnualProductionDays = iifNull(AnnualProductionDays,0),",
+						"          DailyCost = iifNull(DailyCost,0)) ~> nulltoZero",
+						"nulltoZero sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     truncate:true,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> insertMBRStagingData"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_ocean_ods')]",
+				"[concat(variables('factoryId'), '/datasets/stg_kpi_pyramid')]"
 			]
 		},
 		{

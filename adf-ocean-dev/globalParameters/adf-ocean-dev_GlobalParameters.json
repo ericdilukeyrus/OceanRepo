@@ -38,5 +38,9 @@
 	"gFactFinancialsTableName": {
 		"type": "string",
 		"value": "FactFinancials"
+	},
+	"gFactKpiPyramid": {
+		"type": "string",
+		"value": "FactKpiPyramid1"
 	}
 }
