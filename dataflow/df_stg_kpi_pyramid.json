@@ -30,6 +30,9 @@
 				},
 				{
 					"name": "removeEmptyRows"
+				},
+				{
+					"name": "nulltoZero"
 				}
 			],
 			"scriptLines": [
@@ -68,7 +71,14 @@
 				"     ),",
 				"     errors: true) ~> castColumns",
 				"getMBRKpiPyramid filter(not(isNull(BU))) ~> removeEmptyRows",
-				"castColumns sink(allowSchemaDrift: true,",
+				"castColumns derive(EndOfMonth_FTE = iifNull(EndOfMonth_FTE,0),",
+				"          SrvcSales_bef_bonimali = iifNull(SrvcSales_bef_bonimali,0),",
+				"          BillableDays = iifNull(BillableDays,0),",
+				"          DailyRate = iifNull(DailyRate,0),",
+				"          AnnualDirectCosts = iifNull(AnnualDirectCosts,0),",
+				"          AnnualProductionDays = iifNull(AnnualProductionDays,0),",
+				"          DailyCost = iifNull(DailyCost,0)) ~> nulltoZero",
+				"nulltoZero sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     deletable:false,",
 				"     insertable:true,",
