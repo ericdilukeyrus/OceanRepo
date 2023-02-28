@@ -52,7 +52,7 @@
 										},
 										"insertMBRStagingData": {
 											"pKpiPyramidTableName": {
-												"value": "KPI_Pyramid_Canada",
+												"value": "@item().StgTableName",
 												"type": "Expression"
 											}
 										}
@@ -84,7 +84,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "select  distinct MBR_KPIPyramid_TableName from  [@{pipeline().globalParameters.gODSSchemaName}].[@{pipeline().globalParameters.gSourcesConfigTableName}]",
+							"value": "select  distinct MBR_KPIPyramid_TableName,  concat('KPI_Pyramid_', MBR_Scope) as StgTableName from  [@{pipeline().globalParameters.gODSSchemaName}].[@{pipeline().globalParameters.gSourcesConfigTableName}]",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
