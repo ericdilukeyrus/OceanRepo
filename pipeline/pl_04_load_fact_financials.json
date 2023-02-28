@@ -158,7 +158,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "pl_05_summary_log",
+						"referenceName": "pl_06_summary_log",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": false

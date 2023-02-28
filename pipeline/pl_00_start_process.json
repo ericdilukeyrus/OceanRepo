@@ -208,7 +208,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "pl_04_load_fact_kpipyramid",
+						"referenceName": "pl_05_load_fact_kpipyramid",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true
