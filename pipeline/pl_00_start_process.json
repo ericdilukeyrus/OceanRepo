@@ -187,6 +187,32 @@
 					},
 					"waitOnCompletion": true
 				}
+			},
+			{
+				"name": "Load Fact KPI Pyramid",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Load Financials Staging Tables",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Load KPI Pyramid Staging Tables",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_04_load_fact_kpipyramid",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
 			}
 		],
 		"annotations": [],
