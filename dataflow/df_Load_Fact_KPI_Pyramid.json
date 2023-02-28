@@ -204,6 +204,8 @@
 				"     skipDuplicateMapOutputs: true,",
 				"     errorHandlingOption: 'stopOnFirstError',",
 				"     mapColumn(",
+				"          OrganisationID = cleanColumns@OrganisationID,",
+				"          ScenarioID = cleanColumns@ScenarioID,",
 				"          MonthYearID,",
 				"          MonthYear,",
 				"          CostCenter,",
