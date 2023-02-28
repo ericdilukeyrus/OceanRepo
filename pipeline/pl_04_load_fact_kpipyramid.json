@@ -90,6 +90,12 @@
 												"type": "Expression"
 											}
 										},
+										"getFactKpi": {
+											"vTableName": {
+												"value": "@pipeline().globalParameters.gFactKpiPyramid",
+												"type": "Expression"
+											}
+										},
 										"insertFactKPIPyramid": {
 											"vTableName": {
 												"value": "@pipeline().globalParameters.gFactKpiPyramid",
