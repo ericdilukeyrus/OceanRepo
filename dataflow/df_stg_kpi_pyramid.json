@@ -1,0 +1,81 @@
+{
+	"name": "df_stg_kpi_pyramid",
+	"properties": {
+		"folder": {
+			"name": "02STG"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_ocean_ods",
+						"type": "DatasetReference"
+					},
+					"name": "getMBRKpiPyramid"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "stg_kpi_pyramid",
+						"type": "DatasetReference"
+					},
+					"name": "insertMBRStagingData"
+				}
+			],
+			"transformations": [
+				{
+					"name": "castColumns"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     kpiPyramidTableName as string",
+				"}",
+				"source(output(",
+				"          BU as string,",
+				"          Version as string,",
+				"          Period as string,",
+				"          CostCenter as string,",
+				"          PeopleType as string,",
+				"          LevelSeniority as string,",
+				"          EndOfMonth_FTE as string,",
+				"          SrvcSales_bef_bonimali as string,",
+				"          BillableDays as string,",
+				"          DailyRate as string,",
+				"          AnnualDirectCosts as string,",
+				"          AnnualProductionDays as string,",
+				"          DailyCost as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: (\"select * from [ods].[{$kpiPyramidTableName}]\"),",
+				"     format: 'query') ~> getMBRKpiPyramid",
+				"getMBRKpiPyramid cast(output(",
+				"          Period as date 'yyyy-MM-dd',",
+				"          EndOfMonth_FTE as float,",
+				"          SrvcSales_bef_bonimali as float,",
+				"          BillableDays as float,",
+				"          DailyRate as float,",
+				"          AnnualDirectCosts as float,",
+				"          AnnualProductionDays as float,",
+				"          DailyCost as float",
+				"     ),",
+				"     errors: true) ~> castColumns",
+				"castColumns sink(allowSchemaDrift: false,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     recreate:true,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> insertMBRStagingData"
+			]
+		}
+	}
+}

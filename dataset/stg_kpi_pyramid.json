@@ -1,0 +1,24 @@
+{
+	"name": "stg_kpi_pyramid",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ocean_db_nonencrypted",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"pKpiPyramidTableName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "stg",
+			"table": {
+				"value": "@dataset().pKpiPyramidTableName",
+				"type": "Expression"
+			}
+		}
+	}
+}

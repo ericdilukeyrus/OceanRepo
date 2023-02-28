@@ -1,0 +1,114 @@
+{
+	"name": "pl_04_load_stg_kpi_pyramid",
+	"properties": {
+		"activities": [
+			{
+				"name": "ForEach Unpvt Data Table",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Get All KPI Pyramid ODS Tables",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get All Unpvt Table').output.value",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"activities": [
+						{
+							"name": "Staging Financial Table",
+							"type": "ExecuteDataFlow",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataflow": {
+									"referenceName": "df_stg_financials",
+									"type": "DataFlowReference",
+									"parameters": {
+										"unpvtTableName": {
+											"value": "'@{item().MBR_UnpvtTableName}'",
+											"type": "Expression"
+										}
+									},
+									"datasetParameters": {
+										"getMBRUnpvtData": {
+											"vTableName": {
+												"value": "@item().MBR_UnpvtTableName",
+												"type": "Expression"
+											}
+										},
+										"insertMBRStagingData": {
+											"stgFinancialTable": {
+												"value": "@item().StgFinancialTableName",
+												"type": "Expression"
+											}
+										}
+									}
+								},
+								"compute": {
+									"coreCount": 8,
+									"computeType": "General"
+								},
+								"traceLevel": "Fine"
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Get All KPI Pyramid ODS Tables",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "select  distinct MBR_KPIPyramid_TableName from  [@{pipeline().globalParameters.gODSSchemaName}].[@{pipeline().globalParameters.gSourcesConfigTableName}]",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_ocean_ods",
+						"type": "DatasetReference",
+						"parameters": {
+							"vTableName": {
+								"value": "@pipeline().globalParameters.gSourcesConfigTableName",
+								"type": "Expression"
+							}
+						}
+					},
+					"firstRowOnly": false
+				}
+			}
+		],
+		"folder": {
+			"name": "02STG"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-02-20T11:30:45Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
