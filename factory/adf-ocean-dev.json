@@ -44,7 +44,7 @@
 			},
 			"gFactKpiPyramid": {
 				"type": "string",
-				"value": "FactKpiPyramid1"
+				"value": "FactKpiPyramid"
 			}
 		},
 		"globalConfigurations": {
