@@ -6,14 +6,7 @@
 			{
 				"name": "Copy MBR Parameters",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "Truncate ODS Param Curr Tables",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -34,7 +27,7 @@
 					"sink": {
 						"type": "AzureSqlSink",
 						"preCopyScript": {
-							"value": "truncate table ods.R_MBR_Parameters_@{pipeline().parameters.pMBRScope}",
+							"value": "DROP TABLE IF EXISTS ods.R_MBR_Parameters_@{pipeline().parameters.pMBRScope}",
 							"type": "Expression"
 						},
 						"writeBehavior": "insert",
@@ -45,6 +38,30 @@
 					"enableStaging": false,
 					"translator": {
 						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"type": "String",
+									"ordinal": 1
+								},
+								"sink": {
+									"name": "Prop_0",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"type": "String",
+									"ordinal": 2
+								},
+								"sink": {
+									"name": "Prop_1",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							}
+						],
 						"typeConversion": true,
 						"typeConversionSettings": {
 							"allowDataTruncation": true,
@@ -84,14 +101,7 @@
 			{
 				"name": "Copy MBR Currency",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "Truncate ODS Param Curr Tables",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -112,7 +122,7 @@
 					"sink": {
 						"type": "AzureSqlSink",
 						"preCopyScript": {
-							"value": "truncate table ods.R_MBR_Currency_@{pipeline().parameters.pMBRScope}",
+							"value": "DROP TABLE IF EXISTS ods.R_MBR_Currency_@{pipeline().parameters.pMBRScope}",
 							"type": "Expression"
 						},
 						"writeBehavior": "insert",
@@ -486,38 +496,6 @@
 							}
 						}
 					]
-				}
-			},
-			{
-				"name": "Truncate ODS Param Curr Tables",
-				"type": "SqlServerStoredProcedure",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"storedProcedureName": {
-						"value": "[@{pipeline().globalParameters.gODSSchemaName}].[prc_ods_truncate_paramCurr_tables]",
-						"type": "Expression"
-					},
-					"storedProcedureParameters": {
-						"mbr_scope": {
-							"value": {
-								"value": "@pipeline().parameters.pMBRScope",
-								"type": "Expression"
-							},
-							"type": "String"
-						}
-					}
-				},
-				"linkedServiceName": {
-					"referenceName": "ocean_db",
-					"type": "LinkedServiceReference"
 				}
 			},
 			{
