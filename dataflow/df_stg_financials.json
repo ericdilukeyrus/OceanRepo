@@ -28,6 +28,9 @@
 				{
 					"name": "addColumns",
 					"description": "Add Columns : \nScenario\nMonthYear"
+				},
+				{
+					"name": "toInsert"
 				}
 			],
 			"scriptLines": [
@@ -44,6 +47,7 @@
 				"          Currency_Code as string,",
 				"          MBR_Scope as string,",
 				"          MBR_Month as string,",
+				"          CostCenter_Code as string,",
 				"          Period as string,",
 				"          Value as string",
 				"     ),",
@@ -62,7 +66,19 @@
 				"toDate(concat(toString(year(toDate(MBR_Month))-1), '-',right(Period,2)))),",
 				"          Index = toInteger(Index),",
 				"          Value = toFloat(Value)) ~> addColumns",
-				"addColumns sink(allowSchemaDrift: false,",
+				"addColumns select(mapColumn(",
+				"          BusinessUnit = BU_Name,",
+				"          Scenario,",
+				"          NatureID = Index,",
+				"          Nature = K_Nature,",
+				"          CurrencyCode = Currency_Code,",
+				"          CostCenterCode = CostCenter_Code,",
+				"          MonthYear,",
+				"          Value",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> toInsert",
+				"toInsert sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          BusinessUnit as string,",
@@ -80,15 +96,7 @@
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
-				"     errorHandlingOption: 'stopOnFirstError',",
-				"     mapColumn(",
-				"          BusinessUnit = BU_Name,",
-				"          Scenario,",
-				"          NatureID = Index,",
-				"          Nature = K_Nature,",
-				"          MonthYear,",
-				"          Value",
-				"     )) ~> insertMBRStagingData"
+				"     errorHandlingOption: 'stopOnFirstError') ~> insertMBRStagingData"
 			]
 		}
 	}
