@@ -195,6 +195,10 @@
 			{
 				"name": "MBR_Month",
 				"type": "nvarchar"
+			},
+			{
+				"name": "CostCenter_Code",
+				"type": "nvarchar"
 			}
 		],
 		"typeProperties": {
