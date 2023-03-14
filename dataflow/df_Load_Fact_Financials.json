@@ -55,6 +55,13 @@
 						"type": "DatasetReference"
 					},
 					"name": "getDimKPI"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_ocean_dwh",
+						"type": "DatasetReference"
+					},
+					"name": "getDimCostCenter"
 				}
 			],
 			"sinks": [
@@ -140,6 +147,9 @@
 				},
 				{
 					"name": "joinDimKPI"
+				},
+				{
+					"name": "joinDimCostCenter"
 				}
 			],
 			"scriptLines": [
@@ -151,6 +161,8 @@
 				"          Scenario as string,",
 				"          NatureID as integer,",
 				"          Nature as string,",
+				"          CurrencyCode as string,",
+				"          CostCenterCode as string,",
 				"          MonthYear as timestamp,",
 				"          Value as double",
 				"     ),",
@@ -250,6 +262,20 @@
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     format: 'table') ~> getDimKPI",
+				"source(output(",
+				"          Cost_center_Name0 as string,",
+				"          Cost_Center_Code0 as string,",
+				"          Cost_center_Name1 as string,",
+				"          Cost_Center_Code1 as string,",
+				"          Cost_center_Name2 as string,",
+				"          Cost_Center_Code2 as string,",
+				"          Cost_center_Name3 as string,",
+				"          Cost_Center_Code3 as string",
+				"     ),",
+				"     allowSchemaDrift: false,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> getDimCostCenter",
 				"getMBRStagingData derive(MonthYearID = toInteger(concat(toString(year(MonthYear)), lpad(toString(month(MonthYear)),2,'0'), '01')),",
 				"          CreatedBy = $pPipelineRunID) ~> addYearMonthID",
 				"addYearMonthID, getDimScenario join(lower(trim(Scenario)) == lower(trim(Scenario_Name0)),",
@@ -268,10 +294,11 @@
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joinDimOrganisation",
-				"joinDimOrganisation select(mapColumn(",
+				"joinDimCostCenter select(mapColumn(",
 				"          ScenarioID = Scenario_Index,",
 				"          OrganisationID,",
 				"          NatureID,",
+				"          CostCenterID = Cost_Center_Code0,",
 				"          MonthYearID,",
 				"          MonthYear,",
 				"          Value,",
@@ -364,6 +391,11 @@
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joinDimKPI",
+				"joinDimOrganisation, getDimCostCenter join(CostCenterCode == Cost_Center_Code0,",
+				"     joinType:'left',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinDimCostCenter",
 				"insertOrUpdate sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
