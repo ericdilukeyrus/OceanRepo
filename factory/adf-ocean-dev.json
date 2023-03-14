@@ -46,7 +46,7 @@
 				"type": "string",
 				"value": "FactKpiPyramid"
 			},
-			"gDimCostCenter": {
+			"gDimCostCenterTableName": {
 				"type": "string",
 				"value": "DimCostCenter"
 			}
