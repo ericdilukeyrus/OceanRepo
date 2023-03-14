@@ -18,7 +18,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "select distinct concat('toload/',MBR_Scope) as SourcePathFolder,\nconcat('archives/',MBR_Scope) as DestiPathFolder, MBR_FileName as FileName \nfrom  [@{pipeline().globalParameters.gODSSchemaName}].[@{pipeline().globalParameters.gSourcesConfigTableName}]",
+							"value": "select distinct concat('toload/',MBR_Scope) as SourcePathFolder,\nconcat('archives/',MBR_Scope) as DestiPathFolder, MBR_FileName as FileName , concat(format( GETDATE(),'yyyyMMdd_HHmmss_'),MBR_FileName) as DestiFileName\nfrom  [@{pipeline().globalParameters.gODSSchemaName}].[@{pipeline().globalParameters.gSourcesConfigTableName}]",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -113,7 +113,7 @@
 											"type": "Expression"
 										},
 										"pFileName": {
-											"value": "@item().FileName",
+											"value": "@item().DestiFileName",
 											"type": "Expression"
 										}
 									}
