@@ -45,6 +45,10 @@
 			"gFactKpiPyramid": {
 				"type": "string",
 				"value": "FactKpiPyramid"
+			},
+			"gDimCostCenter": {
+				"type": "string",
+				"value": "DimCostCenter"
 			}
 		},
 		"globalConfigurations": {
