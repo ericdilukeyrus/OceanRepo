@@ -120,6 +120,12 @@
 												"type": "Expression"
 											}
 										},
+										"getDimCostCenter": {
+											"vTableName": {
+												"value": "@pipeline().globalParameters.gDimCostCenterTableName",
+												"type": "Expression"
+											}
+										},
 										"insertFactFinancials": {
 											"FactName": {
 												"value": "@pipeline().globalParameters.gFactFinancialsTableName",
