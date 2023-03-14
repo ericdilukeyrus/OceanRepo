@@ -446,6 +446,8 @@
 				"          ScenarioID as integer,",
 				"          KPIID as integer,",
 				"          OrganisationID as integer,",
+				"          CostCenterID as integer,",
+				"          CurrencyID as integer,",
 				"          MonthYearID as integer,",
 				"          MonthYear as date,",
 				"          Value as double,",

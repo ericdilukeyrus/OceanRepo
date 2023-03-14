@@ -37,6 +37,16 @@
 				"precision": 10
 			},
 			{
+				"name": "CostCenterID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "CurrencyID",
+				"type": "int",
+				"precision": 10
+			},
+			{
 				"name": "MonthYearID",
 				"type": "int",
 				"precision": 10
