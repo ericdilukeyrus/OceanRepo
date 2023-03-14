@@ -418,7 +418,7 @@
 							"type": "Script",
 							"dependsOn": [
 								{
-									"activity": "Unpivot MBR ODS Table",
+									"activity": "Update Fct Period",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -447,6 +447,42 @@
 									}
 								],
 								"scriptBlockExecutionTimeout": "02:00:00"
+							}
+						},
+						{
+							"name": "Update Fct Period",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "Unpivot MBR ODS Table",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[ods].[prc_ods_update_periods]",
+								"storedProcedureParameters": {
+									"table_name": {
+										"value": {
+											"value": "@item().UnpvtTableName",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "ocean_db",
+								"type": "LinkedServiceReference"
 							}
 						}
 					]
