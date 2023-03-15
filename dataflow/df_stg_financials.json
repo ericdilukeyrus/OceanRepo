@@ -74,6 +74,7 @@
 				"          CurrencyCode = Currency_Code,",
 				"          CostCenterCode = CostCenter_Code,",
 				"          MonthYear,",
+				"          MBR_Month,",
 				"          Value",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
