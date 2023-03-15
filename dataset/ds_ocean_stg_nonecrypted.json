@@ -199,6 +199,18 @@
 			{
 				"name": "CostCenter_Code",
 				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_NY_01",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_NY_02",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Actual_NY_03",
+				"type": "nvarchar"
 			}
 		],
 		"typeProperties": {
