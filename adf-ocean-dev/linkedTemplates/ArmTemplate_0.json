@@ -255,6 +255,16 @@
 						"precision": 10
 					},
 					{
+						"name": "CostCenterID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CurrencyID",
+						"type": "int",
+						"precision": 10
+					},
+					{
 						"name": "MonthYearID",
 						"type": "int",
 						"precision": 10
@@ -335,6 +345,16 @@
 					},
 					{
 						"name": "OrganisationID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CostCenterID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CurrencyID",
 						"type": "int",
 						"precision": 10
 					},
@@ -888,6 +908,44 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/dimensions_source')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_mbr_excel_files')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_files_to_load",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"pFolder": {
+						"type": "string"
+					},
+					"pFileName": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "@dataset().pFileName",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().pFolder",
+							"type": "Expression"
+						},
+						"container": "mbr-landing-zone"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_files_to_load')]"
 			]
 		},
 		{
@@ -1672,38 +1730,6 @@
 				"schema": [],
 				"typeProperties": {
 					"schema": "dwh",
-					"table": {
-						"value": "@dataset().vTableName",
-						"type": "Expression"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ocean_db')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ds_ocean_ods')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "ocean_db",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"vTableName": {
-						"type": "string"
-					}
-				},
-				"folder": {
-					"name": "01ODS"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": "ods",
 					"table": {
 						"value": "@dataset().vTableName",
 						"type": "Expression"

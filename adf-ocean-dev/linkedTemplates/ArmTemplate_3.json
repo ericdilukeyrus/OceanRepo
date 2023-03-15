@@ -13,6 +13,495 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/df_Load_Fact_Financials')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "03DWH"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_ocean_stg",
+								"type": "DatasetReference"
+							},
+							"name": "getMBRStagingData"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_ocean_dwh",
+								"type": "DatasetReference"
+							},
+							"name": "getDimScenario"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_ocean_dwh",
+								"type": "DatasetReference"
+							},
+							"name": "getDimNature"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_ocean_dwh",
+								"type": "DatasetReference"
+							},
+							"name": "getDimOrganisation"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_fact_financials",
+								"type": "DatasetReference"
+							},
+							"name": "getFactFinancials"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_ocean_dwh",
+								"type": "DatasetReference"
+							},
+							"name": "getFactDrivers"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_ocean_dwh",
+								"type": "DatasetReference"
+							},
+							"name": "getDimKPI"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_ocean_dwh",
+								"type": "DatasetReference"
+							},
+							"name": "getDimCostCenter"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_fact_financials",
+								"type": "DatasetReference"
+							},
+							"name": "insertFactFinancials"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_fact_drivers",
+								"type": "DatasetReference"
+							},
+							"name": "insertFactDrivers"
+						}
+					],
+					"transformations": [
+						{
+							"name": "addYearMonthID",
+							"description": "Add MonthYearID"
+						},
+						{
+							"name": "joinDimScenario",
+							"description": "Inner join with 'getDimScenario'"
+						},
+						{
+							"name": "getOrganizationID"
+						},
+						{
+							"name": "joinDimOrganisation",
+							"description": "Inner join on 'joinDimNature' and 'getOrganizationID'"
+						},
+						{
+							"name": "cleanColumns"
+						},
+						{
+							"name": "joinFactFinancials"
+						},
+						{
+							"name": "factFinancialsClean"
+						},
+						{
+							"name": "insertOrUpdateColumns"
+						},
+						{
+							"name": "insertOrUpdate"
+						},
+						{
+							"name": "includesUpsert"
+						},
+						{
+							"name": "cleanColumnsToUpsert"
+						},
+						{
+							"name": "convertToInteger",
+							"description": "Convert Surrogate Key to Integer"
+						},
+						{
+							"name": "FINorKPI"
+						},
+						{
+							"name": "joinDimNature"
+						},
+						{
+							"name": "factDriversClean"
+						},
+						{
+							"name": "joinFactKPI"
+						},
+						{
+							"name": "upsertColumn"
+						},
+						{
+							"name": "includesUpsertKPI"
+						},
+						{
+							"name": "cleanColumnsToUpsertKPI"
+						},
+						{
+							"name": "insertOrUpdateKPI"
+						},
+						{
+							"name": "joinDimKPI"
+						},
+						{
+							"name": "joinDimCostCenter"
+						}
+					],
+					"scriptLines": [
+						"parameters{",
+						"     pPipelineRunID as string",
+						"}",
+						"source(output(",
+						"          BusinessUnit as string,",
+						"          Scenario as string,",
+						"          NatureID as integer,",
+						"          Nature as string,",
+						"          CurrencyCode as string,",
+						"          CostCenterCode as string,",
+						"          MonthYear as timestamp,",
+						"          Value as double",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> getMBRStagingData",
+						"source(output(",
+						"          Scenario_Name0 as string,",
+						"          Scenario_Code0 as string,",
+						"          Comment as string,",
+						"          Scenario_Index as long",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> getDimScenario",
+						"source(output(",
+						"          NatureGroupID as long,",
+						"          NatureGroup as string,",
+						"          NatureSubGroupID as long,",
+						"          NatureSubGroup as string,",
+						"          Nature as string,",
+						"          NatureID as long",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> getDimNature",
+						"source(output(",
+						"          {Business Unit} as string,",
+						"          {MBR Scope} as string,",
+						"          Area as string,",
+						"          Zone as string,",
+						"          {Keyrus Group} as string,",
+						"          Total as string,",
+						"          {MBR Scope_1} as string,",
+						"          Management_hierarchy_1 as string,",
+						"          Management_hierarchy_2 as string,",
+						"          Management_hierarchy_3 as string,",
+						"          Management_hierarchy_4 as string,",
+						"          Currency_Name0 as string,",
+						"          Currency_Code0 as string,",
+						"          BusinessLine_Name as string,",
+						"          Country_Name as string,",
+						"          {Financial manager} as string,",
+						"          {Managing Director} as string,",
+						"          {MBR file user(s)} as string,",
+						"          OrganisationID as long",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> getDimOrganisation",
+						"source(output(",
+						"          FactFinID as long,",
+						"          ScenarioID as integer,",
+						"          NatureID as integer,",
+						"          OrganisationID as integer,",
+						"          CostCenterID as integer,",
+						"          CurrencyID as integer,",
+						"          MonthYearID as integer,",
+						"          MonthYear as date,",
+						"          Value as double,",
+						"          CreatedOn as timestamp,",
+						"          CreatedBy as string,",
+						"          ModifiedOn as timestamp,",
+						"          ModifiedBy as string",
+						"     ),",
+						"     allowSchemaDrift: false,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> getFactFinancials",
+						"source(output(",
+						"          FactDriversID as long,",
+						"          ScenarioID as integer,",
+						"          KPIID as integer,",
+						"          OrganisationID as integer,",
+						"          MonthYearID as integer,",
+						"          MonthYear as date,",
+						"          Value as double,",
+						"          CreatedOn as timestamp,",
+						"          CreatedBy as string,",
+						"          ModifiedOn as timestamp,",
+						"          ModifiedBy as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> getFactDrivers",
+						"source(output(",
+						"          Index as long,",
+						"          PeopleType as string,",
+						"          PeopleTypeID as long,",
+						"          KPI as string,",
+						"          IsKPI as long",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> getDimKPI",
+						"source(output(",
+						"          CostCenterID as integer,",
+						"          Cost_center_Name0 as string,",
+						"          Cost_Center_Code0 as string,",
+						"          Cost_center_Name1 as string,",
+						"          Cost_Center_Code1 as string,",
+						"          Cost_center_Name2 as string,",
+						"          Cost_Center_Code2 as string,",
+						"          Cost_center_Name3 as string,",
+						"          Cost_Center_Code3 as string",
+						"     ),",
+						"     allowSchemaDrift: false,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> getDimCostCenter",
+						"getMBRStagingData derive(MonthYearID = toInteger(concat(toString(year(MonthYear)), lpad(toString(month(MonthYear)),2,'0'), '01')),",
+						"          CreatedBy = $pPipelineRunID) ~> addYearMonthID",
+						"addYearMonthID, getDimScenario join(lower(trim(Scenario)) == lower(trim(Scenario_Name0)),",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> joinDimScenario",
+						"getDimOrganisation select(mapColumn(",
+						"          {Business Unit},",
+						"          OrganisationID",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> getOrganizationID",
+						"joinDimScenario, getOrganizationID join(lower(trim(BusinessUnit)) == lower(trim({Business Unit})),",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> joinDimOrganisation",
+						"joinDimCostCenter select(mapColumn(",
+						"          ScenarioID = Scenario_Index,",
+						"          OrganisationID,",
+						"          NatureID,",
+						"          CostCenterID,",
+						"          MonthYearID,",
+						"          MonthYear,",
+						"          Value,",
+						"          CreatedBy",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> cleanColumns",
+						"joinDimNature, factFinancialsClean join(FINorKPI@FIN@ScenarioID == factFinancialsClean@ScenarioID",
+						"     && getDimNature@NatureID == factFinancialsClean@NatureID",
+						"     && FINorKPI@FIN@OrganisationID == factFinancialsClean@OrganisationID",
+						"     && FINorKPI@FIN@MonthYearID == factFinancialsClean@MonthYearID,",
+						"     joinType:'left',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> joinFactFinancials",
+						"getFactFinancials select(mapColumn(",
+						"          ScenarioID,",
+						"          NatureID,",
+						"          OrganisationID,",
+						"          MonthYearID,",
+						"          Value",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> factFinancialsClean",
+						"joinFactFinancials derive(InsertOrUpdate = iif(isNull(factFinancialsClean@ScenarioID) && isNull(factFinancialsClean@NatureID) && isNull(factFinancialsClean@OrganisationID) && isNull(factFinancialsClean@MonthYearID) \r",
+						", 'I',\r",
+						"iif(FINorKPI@FIN@Value == factFinancialsClean@Value, 'P','U')\r",
+						"),",
+						"          CostCenterID = iifNull(CostCenterID, -1, CostCenterID),",
+						"          CurrencyID = -1) ~> insertOrUpdateColumns",
+						"cleanColumnsToUpsert alterRow(insertIf(InsertOrUpdate=='I'),",
+						"     updateIf(InsertOrUpdate=='U')) ~> insertOrUpdate",
+						"insertOrUpdateColumns filter(in(['I','U'],InsertOrUpdate)) ~> includesUpsert",
+						"includesUpsert select(mapColumn(",
+						"          ScenarioID = FINorKPI@FIN@ScenarioID,",
+						"          OrganisationID = FINorKPI@FIN@OrganisationID,",
+						"          NatureID = getDimNature@NatureID,",
+						"          MonthYearID = FINorKPI@FIN@MonthYearID,",
+						"          MonthYear,",
+						"          CostCenterID,",
+						"          CurrencyID,",
+						"          Value = FINorKPI@FIN@Value,",
+						"          InsertOrUpdate,",
+						"          CreatedBy",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> cleanColumnsToUpsert",
+						"cleanColumns derive(ScenarioID = toInteger(ScenarioID),",
+						"          OrganisationID = toInteger(OrganisationID),",
+						"          FactIndicator = iif(NatureID >= 372, 'KPI', 'FIN')) ~> convertToInteger",
+						"convertToInteger split(FactIndicator == 'FIN',",
+						"     disjoint: false) ~> FINorKPI@(FIN, KPI)",
+						"FINorKPI@FIN, getDimNature join(FINorKPI@FIN@NatureID == getDimNature@NatureID,",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> joinDimNature",
+						"getFactDrivers select(mapColumn(",
+						"          ScenarioID,",
+						"          KPIID,",
+						"          OrganisationID,",
+						"          MonthYearID,",
+						"          Value",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> factDriversClean",
+						"joinDimKPI, factDriversClean join(FINorKPI@KPI@ScenarioID == factDriversClean@ScenarioID",
+						"     && FINorKPI@KPI@OrganisationID == factDriversClean@OrganisationID",
+						"     && Index == KPIID",
+						"     && FINorKPI@KPI@MonthYearID == factDriversClean@MonthYearID,",
+						"     joinType:'left',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> joinFactKPI",
+						"joinFactKPI derive(InsertOrUpdate = iif(isNull(factDriversClean@ScenarioID) && isNull(KPIID) && isNull(factDriversClean@OrganisationID) && isNull(factDriversClean@MonthYearID) , \r",
+						"'I',iif(FINorKPI@KPI@Value == factDriversClean@Value, 'P','U')),",
+						"          CostCenterID = iifNull(CostCenterID, -1, CostCenterID),",
+						"          CurrencyID = -1) ~> upsertColumn",
+						"upsertColumn filter(in(['I','U'],InsertOrUpdate)) ~> includesUpsertKPI",
+						"includesUpsertKPI select(mapColumn(",
+						"          ScenarioID = FINorKPI@KPI@ScenarioID,",
+						"          KPIID = Index,",
+						"          OrganisationID = FINorKPI@KPI@OrganisationID,",
+						"          MonthYearID = FINorKPI@KPI@MonthYearID,",
+						"          MonthYear,",
+						"          CostCenterID,",
+						"          CurrencyID,",
+						"          Value = FINorKPI@KPI@Value,",
+						"          InsertOrUpdate,",
+						"          CreatedBy",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> cleanColumnsToUpsertKPI",
+						"cleanColumnsToUpsertKPI alterRow(insertIf(InsertOrUpdate=='I'),",
+						"     updateIf(InsertOrUpdate=='U')) ~> insertOrUpdateKPI",
+						"FINorKPI@KPI, getDimKPI join(NatureID == Index,",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> joinDimKPI",
+						"joinDimOrganisation, getDimCostCenter join(lower(trim(CostCenterCode)) == lower(trim(Cost_Center_Code0)),",
+						"     joinType:'left',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> joinDimCostCenter",
+						"insertOrUpdate sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          FactFinID as long,",
+						"          ScenarioID as integer,",
+						"          NatureID as integer,",
+						"          OrganisationID as integer,",
+						"          CostCenterID as integer,",
+						"          CurrencyID as integer,",
+						"          MonthYearID as integer,",
+						"          MonthYear as date,",
+						"          Value as double,",
+						"          CreatedOn as timestamp,",
+						"          CreatedBy as string,",
+						"          ModifiedOn as timestamp,",
+						"          ModifiedBy as string",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:true,",
+						"     upsertable:false,",
+						"     keys:['ScenarioID','NatureID','OrganisationID','MonthYearID'],",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          ScenarioID,",
+						"          NatureID,",
+						"          OrganisationID,",
+						"          CostCenterID,",
+						"          CurrencyID,",
+						"          MonthYearID,",
+						"          MonthYear,",
+						"          Value,",
+						"          CreatedBy",
+						"     )) ~> insertFactFinancials",
+						"insertOrUpdateKPI sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          FactDriversID as long,",
+						"          ScenarioID as integer,",
+						"          KPIID as integer,",
+						"          OrganisationID as integer,",
+						"          CostCenterID as integer,",
+						"          CurrencyID as integer,",
+						"          MonthYearID as integer,",
+						"          MonthYear as date,",
+						"          Value as double,",
+						"          CreatedOn as timestamp,",
+						"          CreatedBy as string,",
+						"          ModifiedOn as timestamp,",
+						"          ModifiedBy as string",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          ScenarioID,",
+						"          KPIID,",
+						"          OrganisationID,",
+						"          CostCenterID,",
+						"          CurrencyID,",
+						"          MonthYearID,",
+						"          MonthYear,",
+						"          Value,",
+						"          CreatedBy",
+						"     )) ~> insertFactDrivers"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/df_Load_Fact_KPI_Pyramid')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
@@ -215,8 +704,8 @@
 						"  equals(cleanColumns@DailyCost,getFactKpi@DailyCost) , 'P','U')\r",
 						")) ~> insertOrUpdate",
 						"insertOrUpdate filter(in(['I','U'],InsertOrUpdate)) ~> includeUpsert",
-						"includeUpsert alterRow(insertIf(InsertOrUpdate == 'I'),",
-						"     updateIf(InsertOrUpdate == 'U')) ~> insertUpdate",
+						"includeUpsert alterRow(insertIf(InsertOrUpdate=='I'),",
+						"     updateIf(InsertOrUpdate=='U')) ~> insertUpdate",
 						"insertUpdate sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     deletable:false,",
@@ -350,7 +839,8 @@
 						"          BU_Name = $pBU_Name,",
 						"          Currency_Code = $pCurrency_Code,",
 						"          MBR_Scope = $pMBR_Scope,",
-						"          MBR_Month = $pMBR_Month) ~> addMBRMetadata",
+						"          MBR_Month = $pMBR_Month,",
+						"          CostCenter_Code = left({_col1_},7)) ~> addMBRMetadata",
 						"addMBRMetadata select(mapColumn(",
 						"          {_col0_},",
 						"          {_col1_},",
@@ -396,11 +886,12 @@
 						"          BU_Name,",
 						"          Currency_Code,",
 						"          MBR_Scope,",
-						"          MBR_Month",
+						"          MBR_Month,",
+						"          CostCenter_Code",
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true) ~> removeEmptyColumns",
-						"removeEmptyColumns sink(allowSchemaDrift: false,",
+						"removeEmptyColumns sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     input(",
 						"          Index as string,",
@@ -447,7 +938,8 @@
 						"          BU_Name as string,",
 						"          Currency_Code as string,",
 						"          MBR_Scope as string,",
-						"          MBR_Month as string",
+						"          MBR_Month as string,",
+						"          CostCenter_Code as string",
 						"     ),",
 						"     deletable:false,",
 						"     insertable:true,",
@@ -503,7 +995,8 @@
 						"          BU_Name,",
 						"          Currency_Code,",
 						"          MBR_Scope,",
-						"          MBR_Month",
+						"          MBR_Month,",
+						"          CostCenter_Code",
 						"     )) ~> insertRawMBRData"
 					]
 				}
@@ -619,6 +1112,9 @@
 						{
 							"name": "addColumns",
 							"description": "Add Columns : \nScenario\nMonthYear"
+						},
+						{
+							"name": "toInsert"
 						}
 					],
 					"scriptLines": [
@@ -635,6 +1131,7 @@
 						"          Currency_Code as string,",
 						"          MBR_Scope as string,",
 						"          MBR_Month as string,",
+						"          CostCenter_Code as string,",
 						"          Period as string,",
 						"          Value as string",
 						"     ),",
@@ -643,13 +1140,30 @@
 						"     isolationLevel: 'READ_UNCOMMITTED',",
 						"     query: (\"select * from [ods].[{$unpvtTableName}]\"),",
 						"     format: 'query') ~> getMBRUnpvtData",
-						"getMBRUnpvtData derive(Scenario = case( like(Period, 'Actual%'),'Actual','Budget'),",
+						"getMBRUnpvtData derive(Scenario = case( \r",
+						"    like(Period, 'Actual%'),\r",
+						"    'Actual',\r",
+						"    case( like(Period, 'Budget%'),'Budget','Forecast')\r",
+						"    ),",
 						"          MonthYear = case(like(Period,'%CY%'),\r",
 						"toDate(concat(toString(year(toDate(MBR_Month))), '-',right(Period,2))),\r",
 						"toDate(concat(toString(year(toDate(MBR_Month))-1), '-',right(Period,2)))),",
 						"          Index = toInteger(Index),",
 						"          Value = toFloat(Value)) ~> addColumns",
-						"addColumns sink(allowSchemaDrift: false,",
+						"addColumns select(mapColumn(",
+						"          BusinessUnit = BU_Name,",
+						"          Scenario,",
+						"          NatureID = Index,",
+						"          Nature = K_Nature,",
+						"          CurrencyCode = Currency_Code,",
+						"          CostCenterCode = CostCenter_Code,",
+						"          MonthYear,",
+						"          MBR_Month,",
+						"          Value",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> toInsert",
+						"toInsert sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     input(",
 						"          BusinessUnit as string,",
@@ -667,15 +1181,7 @@
 						"     format: 'table',",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError',",
-						"     mapColumn(",
-						"          BusinessUnit = BU_Name,",
-						"          Scenario,",
-						"          NatureID = Index,",
-						"          Nature = K_Nature,",
-						"          MonthYear,",
-						"          Value",
-						"     )) ~> insertMBRStagingData"
+						"     errorHandlingOption: 'stopOnFirstError') ~> insertMBRStagingData"
 					]
 				}
 			},
@@ -769,7 +1275,7 @@
 						"     insertable:true,",
 						"     updateable:false,",
 						"     upsertable:false,",
-						"     truncate:true,",
+						"     recreate:true,",
 						"     format: 'table',",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true,",
@@ -865,7 +1371,8 @@
 						"          BU_Name as string,",
 						"          Currency_Code as string,",
 						"          MBR_Scope as string,",
-						"          MBR_Month as string",
+						"          MBR_Month as string,",
+						"          CostCenter_Code as string",
 						"     ),",
 						"     allowSchemaDrift: true,",
 						"     validateSchema: false,",
@@ -883,7 +1390,8 @@
 						"          BU_Name,",
 						"          Currency_Code,",
 						"          MBR_Scope,",
-						"          MBR_Month),",
+						"          MBR_Month,",
+						"          CostCenter_Code),",
 						"     lateral: false,",
 						"     ignoreNullPivots: true) ~> UnpivotMBRData",
 						"UnpivotMBRData sink(allowSchemaDrift: true,",
@@ -896,161 +1404,9 @@
 						"     format: 'table',",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError',",
-						"     mapColumn(",
-						"          Index,",
-						"          Anaplant_Index,",
-						"          PBI_Index,",
-						"          K_Nature,",
-						"          BU_Code,",
-						"          BU_Name,",
-						"          Currency_Code,",
-						"          MBR_Scope,",
-						"          MBR_Month,",
-						"          Period,",
-						"          Value",
-						"     )) ~> InsertUnpvtMBRData"
+						"     errorHandlingOption: 'stopOnFirstError') ~> InsertUnpvtMBRData"
 					]
 				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pl_04_archive_files')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Get All Files",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "select distinct concat('toload/',MBR_Scope) as SourcePathFolder,\nconcat('archives/',MBR_Scope) as DestiPathFolder, MBR_FileName as FileName \nfrom  [@{pipeline().globalParameters.gODSSchemaName}].[@{pipeline().globalParameters.gSourcesConfigTableName}]",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "ds_ocean_ods",
-								"type": "DatasetReference",
-								"parameters": {
-									"vTableName": {
-										"value": "@pipeline().globalParameters.gSourcesConfigTableName",
-										"type": "Expression"
-									}
-								}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "ForEach MBR Files",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Get All Files",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Get All Files').output.value",
-								"type": "Expression"
-							},
-							"activities": [
-								{
-									"name": "Move File to Archives",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "BinarySource",
-											"storeSettings": {
-												"type": "AzureBlobStorageReadSettings",
-												"recursive": true,
-												"deleteFilesAfterCompletion": true
-											},
-											"formatSettings": {
-												"type": "BinaryReadSettings"
-											}
-										},
-										"sink": {
-											"type": "BinarySink",
-											"storeSettings": {
-												"type": "AzureBlobStorageWriteSettings"
-											}
-										},
-										"enableStaging": false
-									},
-									"inputs": [
-										{
-											"referenceName": "ds_mbr_excel_files",
-											"type": "DatasetReference",
-											"parameters": {
-												"pFolder": {
-													"value": "@item().SourcePathFolder",
-													"type": "Expression"
-												},
-												"pFileName": {
-													"value": "@item().FileName",
-													"type": "Expression"
-												}
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "ds_mbr_excel_files",
-											"type": "DatasetReference",
-											"parameters": {
-												"pFolder": {
-													"value": "@item().DestiPathFolder",
-													"type": "Expression"
-												},
-												"pFileName": {
-													"value": "@item().FileName",
-													"type": "Expression"
-												}
-											}
-										}
-									]
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"folder": {
-					"name": "03DWH"
-				},
-				"annotations": []
 			},
 			"dependsOn": []
 		},
@@ -1298,6 +1654,320 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/pl_01_load_fact_financials')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Get All Staging Data",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "select  MBR_UnpvtTableName, CONCAT('P&L_FI_', MBR_Scope, '_', MBR_BU_Code) AS StgFinancialTableName  from  [@{pipeline().globalParameters.gODSSchemaName}].[@{pipeline().globalParameters.gSourcesConfigTableName}]",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "ds_ocean_ods",
+								"type": "DatasetReference",
+								"parameters": {
+									"vTableName": {
+										"value": "@pipeline().globalParameters.gSourcesConfigTableName",
+										"type": "Expression"
+									}
+								}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEach Staging Table",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Get All Staging Data",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Get All Staging Data').output.value",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Load Fact Financials",
+									"type": "ExecuteDataFlow",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataflow": {
+											"referenceName": "df_Load_Fact_Financials",
+											"type": "DataFlowReference",
+											"parameters": {
+												"pPipelineRunID": {
+													"value": "'@{pipeline().RunId}'",
+													"type": "Expression"
+												}
+											},
+											"datasetParameters": {
+												"getMBRStagingData": {
+													"vTableName": {
+														"value": "@item().StgFinancialTableName",
+														"type": "Expression"
+													}
+												},
+												"getDimScenario": {
+													"vTableName": {
+														"value": "@pipeline().globalParameters.gDimScenarioTableName",
+														"type": "Expression"
+													}
+												},
+												"getDimNature": {
+													"vTableName": {
+														"value": "@pipeline().globalParameters.gDimNatureTableName",
+														"type": "Expression"
+													}
+												},
+												"getDimOrganisation": {
+													"vTableName": {
+														"value": "@pipeline().globalParameters.gDimOrganisationTableName",
+														"type": "Expression"
+													}
+												},
+												"getFactFinancials": {
+													"FactName": {
+														"value": "@pipeline().globalParameters.gFactFinancialsTableName",
+														"type": "Expression"
+													}
+												},
+												"getFactDrivers": {
+													"vTableName": {
+														"value": "@pipeline().globalParameters.gFactDriversTableName",
+														"type": "Expression"
+													}
+												},
+												"getDimKPI": {
+													"vTableName": {
+														"value": "@pipeline().globalParameters.gDimKPITableName",
+														"type": "Expression"
+													}
+												},
+												"getDimCostCenter": {
+													"vTableName": {
+														"value": "@pipeline().globalParameters.gDimCostCenterTableName",
+														"type": "Expression"
+													}
+												},
+												"insertFactFinancials": {
+													"FactName": {
+														"value": "@pipeline().globalParameters.gFactFinancialsTableName",
+														"type": "Expression"
+													}
+												},
+												"insertFactDrivers": {
+													"FactName": {
+														"value": "@pipeline().globalParameters.gFactDriversTableName",
+														"type": "Expression"
+													}
+												}
+											}
+										},
+										"staging": {},
+										"compute": {
+											"coreCount": 8,
+											"computeType": "General"
+										},
+										"traceLevel": "Fine"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "Summary Log Data",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "ForEach Staging Table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "pl_03_summary_log",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": false,
+							"parameters": {}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"folder": {
+					"name": "03DWH"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-17T16:37:57Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/df_Load_Fact_Financials')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_01_load_stg_financials')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ForEach Unpvt Data Table",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Get All Unpvt Table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Get All Unpvt Table').output.value",
+								"type": "Expression"
+							},
+							"isSequential": false,
+							"activities": [
+								{
+									"name": "Staging Financial Table",
+									"type": "ExecuteDataFlow",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataflow": {
+											"referenceName": "df_stg_financials",
+											"type": "DataFlowReference",
+											"parameters": {
+												"unpvtTableName": {
+													"value": "'@{item().MBR_UnpvtTableName}'",
+													"type": "Expression"
+												}
+											},
+											"datasetParameters": {
+												"getMBRUnpvtData": {
+													"vTableName": {
+														"value": "@item().MBR_UnpvtTableName",
+														"type": "Expression"
+													}
+												},
+												"insertMBRStagingData": {
+													"stgFinancialTable": {
+														"value": "@item().StgFinancialTableName",
+														"type": "Expression"
+													}
+												}
+											}
+										},
+										"staging": {},
+										"compute": {
+											"coreCount": 8,
+											"computeType": "General"
+										},
+										"traceLevel": "Fine"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "Get All Unpvt Table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "select  MBR_UnpvtTableName, CONCAT('P&L_FI_', MBR_Scope, '_', MBR_BU_Code) AS StgFinancialTableName  from  [@{pipeline().globalParameters.gODSSchemaName}].[@{pipeline().globalParameters.gSourcesConfigTableName}]",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "ds_ocean_ods",
+								"type": "DatasetReference",
+								"parameters": {
+									"vTableName": {
+										"value": "@pipeline().globalParameters.gSourcesConfigTableName",
+										"type": "Expression"
+									}
+								}
+							},
+							"firstRowOnly": false
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"folder": {
+					"name": "02STG"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-20T11:30:45Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/df_stg_financials')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/pl_02_ingest_mbr_data_ods')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -1307,14 +1977,7 @@
 					{
 						"name": "Copy MBR Parameters",
 						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "Truncate ODS Param Curr Tables",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -1335,7 +1998,7 @@
 							"sink": {
 								"type": "AzureSqlSink",
 								"preCopyScript": {
-									"value": "truncate table ods.R_MBR_Parameters_@{pipeline().parameters.pMBRScope}",
+									"value": "DROP TABLE IF EXISTS ods.R_MBR_Parameters_@{pipeline().parameters.pMBRScope}",
 									"type": "Expression"
 								},
 								"writeBehavior": "insert",
@@ -1346,6 +2009,30 @@
 							"enableStaging": false,
 							"translator": {
 								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 1
+										},
+										"sink": {
+											"name": "Prop_0",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"type": "String",
+											"ordinal": 2
+										},
+										"sink": {
+											"name": "Prop_1",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									}
+								],
 								"typeConversion": true,
 								"typeConversionSettings": {
 									"allowDataTruncation": true,
@@ -1385,14 +2072,7 @@
 					{
 						"name": "Copy MBR Currency",
 						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "Truncate ODS Param Curr Tables",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -1413,7 +2093,7 @@
 							"sink": {
 								"type": "AzureSqlSink",
 								"preCopyScript": {
-									"value": "truncate table ods.R_MBR_Currency_@{pipeline().parameters.pMBRScope}",
+									"value": "DROP TABLE IF EXISTS ods.R_MBR_Currency_@{pipeline().parameters.pMBRScope}",
 									"type": "Expression"
 								},
 								"writeBehavior": "insert",
@@ -1721,7 +2401,7 @@
 									"type": "Script",
 									"dependsOn": [
 										{
-											"activity": "Unpivot MBR ODS Table",
+											"activity": "Update Fct Period",
 											"dependencyConditions": [
 												"Succeeded"
 											]
@@ -1751,40 +2431,44 @@
 										],
 										"scriptBlockExecutionTimeout": "02:00:00"
 									}
+								},
+								{
+									"name": "Update Fct Period",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "Unpivot MBR ODS Table",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[ods].[prc_ods_update_periods]",
+										"storedProcedureParameters": {
+											"table_name": {
+												"value": {
+													"value": "@item().UnpvtTableName",
+													"type": "Expression"
+												},
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "ocean_db",
+										"type": "LinkedServiceReference"
+									}
 								}
 							]
-						}
-					},
-					{
-						"name": "Truncate ODS Param Curr Tables",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": {
-								"value": "[[@{pipeline().globalParameters.gODSSchemaName}].[prc_ods_truncate_paramCurr_tables]",
-								"type": "Expression"
-							},
-							"storedProcedureParameters": {
-								"mbr_scope": {
-									"value": {
-										"value": "@pipeline().parameters.pMBRScope",
-										"type": "Expression"
-									},
-									"type": "String"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "ocean_db",
-							"type": "LinkedServiceReference"
 						}
 					},
 					{
@@ -2026,312 +2710,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/pl_01_load_stg_financials')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "ForEach Unpvt Data Table",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Get All Unpvt Table",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Get All Unpvt Table').output.value",
-								"type": "Expression"
-							},
-							"isSequential": false,
-							"activities": [
-								{
-									"name": "Staging Financial Table",
-									"type": "ExecuteDataFlow",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"dataflow": {
-											"referenceName": "df_stg_financials",
-											"type": "DataFlowReference",
-											"parameters": {
-												"unpvtTableName": {
-													"value": "'@{item().MBR_UnpvtTableName}'",
-													"type": "Expression"
-												}
-											},
-											"datasetParameters": {
-												"getMBRUnpvtData": {
-													"vTableName": {
-														"value": "@item().MBR_UnpvtTableName",
-														"type": "Expression"
-													}
-												},
-												"insertMBRStagingData": {
-													"stgFinancialTable": {
-														"value": "@item().StgFinancialTableName",
-														"type": "Expression"
-													}
-												}
-											}
-										},
-										"staging": {},
-										"compute": {
-											"coreCount": 8,
-											"computeType": "General"
-										},
-										"traceLevel": "Fine"
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "Get All Unpvt Table",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "select  MBR_UnpvtTableName, CONCAT('P&L_FI_', MBR_Scope, '_', MBR_BU_Code) AS StgFinancialTableName  from  [@{pipeline().globalParameters.gODSSchemaName}].[@{pipeline().globalParameters.gSourcesConfigTableName}]",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "ds_ocean_ods",
-								"type": "DatasetReference",
-								"parameters": {
-									"vTableName": {
-										"value": "@pipeline().globalParameters.gSourcesConfigTableName",
-										"type": "Expression"
-									}
-								}
-							},
-							"firstRowOnly": false
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"folder": {
-					"name": "02STG"
-				},
-				"annotations": [],
-				"lastPublishTime": "2023-02-20T11:30:45Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/df_stg_financials')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pl_01_load_fact_financials')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Get All Staging Data",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "select  MBR_UnpvtTableName, CONCAT('P&L_FI_', MBR_Scope, '_', MBR_BU_Code) AS StgFinancialTableName  from  [@{pipeline().globalParameters.gODSSchemaName}].[@{pipeline().globalParameters.gSourcesConfigTableName}]",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "ds_ocean_ods",
-								"type": "DatasetReference",
-								"parameters": {
-									"vTableName": {
-										"value": "@pipeline().globalParameters.gSourcesConfigTableName",
-										"type": "Expression"
-									}
-								}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "ForEach Staging Table",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Get All Staging Data",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Get All Staging Data').output.value",
-								"type": "Expression"
-							},
-							"activities": [
-								{
-									"name": "Load Fact Financials",
-									"type": "ExecuteDataFlow",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"dataflow": {
-											"referenceName": "df_Load_Fact_Financials",
-											"type": "DataFlowReference",
-											"parameters": {
-												"pPipelineRunID": {
-													"value": "'@{pipeline().RunId}'",
-													"type": "Expression"
-												}
-											},
-											"datasetParameters": {
-												"getMBRStagingData": {
-													"vTableName": {
-														"value": "@item().StgFinancialTableName",
-														"type": "Expression"
-													}
-												},
-												"getDimScenario": {
-													"vTableName": {
-														"value": "@pipeline().globalParameters.gDimScenarioTableName",
-														"type": "Expression"
-													}
-												},
-												"getDimNature": {
-													"vTableName": {
-														"value": "@pipeline().globalParameters.gDimNatureTableName",
-														"type": "Expression"
-													}
-												},
-												"getDimOrganisation": {
-													"vTableName": {
-														"value": "@pipeline().globalParameters.gDimOrganisationTableName",
-														"type": "Expression"
-													}
-												},
-												"getFactFinancials": {
-													"FactName": {
-														"value": "@pipeline().globalParameters.gFactFinancialsTableName",
-														"type": "Expression"
-													}
-												},
-												"getFactDrivers": {
-													"vTableName": {
-														"value": "@pipeline().globalParameters.gFactDriversTableName",
-														"type": "Expression"
-													}
-												},
-												"getDimKPI": {
-													"vTableName": {
-														"value": "@pipeline().globalParameters.gDimKPITableName",
-														"type": "Expression"
-													}
-												},
-												"insertFactFinancials": {
-													"FactName": {
-														"value": "@pipeline().globalParameters.gFactFinancialsTableName",
-														"type": "Expression"
-													}
-												},
-												"insertFactDrivers": {
-													"FactName": {
-														"value": "@pipeline().globalParameters.gFactDriversTableName",
-														"type": "Expression"
-													}
-												}
-											}
-										},
-										"staging": {},
-										"compute": {
-											"coreCount": 8,
-											"computeType": "General"
-										},
-										"traceLevel": "Fine"
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "Summary Log Data",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "ForEach Staging Table",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "pl_03_summary_log",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": false,
-							"parameters": {}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"folder": {
-					"name": "03DWH"
-				},
-				"annotations": [],
-				"lastPublishTime": "2023-02-17T16:37:57Z"
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/pl_02_load_fact_kpipyramid')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -2438,8 +2816,7 @@
 														"type": "Expression"
 													}
 												}
-											},
-											"linkedServiceParameters": {}
+											}
 										},
 										"staging": {},
 										"compute": {
@@ -2971,7 +3348,6 @@
 				"[concat(variables('factoryId'), '/pipelines/pl_01_get_files_sharepoint')]",
 				"[concat(variables('factoryId'), '/pipelines/pl_02_load_stg_kpi_pyramid')]",
 				"[concat(variables('factoryId'), '/pipelines/pl_02_load_fact_kpipyramid')]",
-				"[concat(variables('factoryId'), '/pipelines/pl_04_archive_files')]",
 				"[concat(variables('factoryId'), '/pipelines/pl_01_read_all_MBR_files')]"
 			]
 		}
