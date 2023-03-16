@@ -33,7 +33,7 @@
 						"writeBehavior": "insert",
 						"sqlWriterUseTableLock": false,
 						"tableOption": "autoCreate",
-						"disableMetricsCollection": false
+						"disableMetricsCollection": true
 					},
 					"enableStaging": false,
 					"translator": {
@@ -128,7 +128,7 @@
 						"writeBehavior": "insert",
 						"sqlWriterUseTableLock": false,
 						"tableOption": "autoCreate",
-						"disableMetricsCollection": false
+						"disableMetricsCollection": true
 					},
 					"enableStaging": false,
 					"translator": {
@@ -347,11 +347,12 @@
 										}
 									}
 								},
-								"compute": {
-									"coreCount": 8,
-									"computeType": "General"
+								"integrationRuntime": {
+									"referenceName": "integrationRuntime",
+									"type": "IntegrationRuntimeReference"
 								},
-								"traceLevel": "Fine"
+								"traceLevel": "Fine",
+								"runConcurrently": true
 							}
 						}
 					]
@@ -416,11 +417,12 @@
 										}
 									}
 								},
-								"compute": {
-									"coreCount": 8,
-									"computeType": "General"
+								"integrationRuntime": {
+									"referenceName": "integrationRuntime",
+									"type": "IntegrationRuntimeReference"
 								},
-								"traceLevel": "Fine"
+								"traceLevel": "Fine",
+								"runConcurrently": true
 							}
 						},
 						{
@@ -531,7 +533,7 @@
 						"writeBehavior": "insert",
 						"sqlWriterUseTableLock": false,
 						"tableOption": "autoCreate",
-						"disableMetricsCollection": false
+						"disableMetricsCollection": true
 					},
 					"enableStaging": false,
 					"translator": {
