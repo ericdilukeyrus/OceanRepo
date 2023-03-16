@@ -167,11 +167,12 @@
 										}
 									}
 								},
-								"compute": {
-									"coreCount": 8,
-									"computeType": "General"
+								"integrationRuntime": {
+									"referenceName": "integrationRuntime",
+									"type": "IntegrationRuntimeReference"
 								},
-								"traceLevel": "Fine"
+								"traceLevel": "Fine",
+								"runConcurrently": true
 							}
 						},
 						{
@@ -217,6 +218,10 @@
 				"userProperties": [],
 				"typeProperties": {
 					"url": "https://accounts.accesscontrol.windows.net/168e48b2-81f0-4aac-bc77-d58d07d205e2/tokens/OAuth/2",
+					"connectVia": {
+						"referenceName": "integrationRuntime",
+						"type": "IntegrationRuntimeReference"
+					},
 					"method": "POST",
 					"headers": {
 						"Content-Type": "application/x-www-form-urlencoded"
