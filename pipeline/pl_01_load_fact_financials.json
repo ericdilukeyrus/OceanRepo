@@ -126,6 +126,12 @@
 												"type": "Expression"
 											}
 										},
+										"getDimCurrency": {
+											"vTableName": {
+												"value": "@pipeline().globalParameters.gDimCurrency",
+												"type": "Expression"
+											}
+										},
 										"insertFactFinancials": {
 											"FactName": {
 												"value": "@pipeline().globalParameters.gFactFinancialsTableName",
