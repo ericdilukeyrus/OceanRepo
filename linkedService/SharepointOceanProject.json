@@ -8,6 +8,10 @@
 			"url": "https://keyrusgroup.sharepoint.com",
 			"enableServerCertificateValidation": false,
 			"authenticationType": "Anonymous"
+		},
+		"connectVia": {
+			"referenceName": "integrationRuntime",
+			"type": "IntegrationRuntimeReference"
 		}
 	}
 }
