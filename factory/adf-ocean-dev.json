@@ -49,6 +49,10 @@
 			"gDimCostCenterTableName": {
 				"type": "string",
 				"value": "DimCostCenter"
+			},
+			"gDimCurrency": {
+				"type": "string",
+				"value": "DimCurrency"
 			}
 		},
 		"globalConfigurations": {
