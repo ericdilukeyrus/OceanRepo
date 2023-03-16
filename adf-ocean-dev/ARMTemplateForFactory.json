@@ -2215,6 +2215,12 @@
 														"type": "Expression"
 													}
 												},
+												"getDimCurrency": {
+													"vTableName": {
+														"value": "@pipeline().globalParameters.gDimCurrency",
+														"type": "Expression"
+													}
+												},
 												"insertFactFinancials": {
 													"FactName": {
 														"value": "@pipeline().globalParameters.gFactFinancialsTableName",
@@ -2227,7 +2233,8 @@
 														"type": "Expression"
 													}
 												}
-											}
+											},
+											"linkedServiceParameters": {}
 										},
 										"staging": {},
 										"integrationRuntime": {
@@ -4240,6 +4247,10 @@
 						"precision": 10
 					},
 					{
+						"name": "MBRMonth",
+						"type": "nvarchar"
+					},
+					{
 						"name": "MonthYearID",
 						"type": "int",
 						"precision": 10
@@ -4332,6 +4343,10 @@
 						"name": "CurrencyID",
 						"type": "int",
 						"precision": 10
+					},
+					{
+						"name": "MBRMonth",
+						"type": "nvarchar"
 					},
 					{
 						"name": "MonthYearID",
@@ -11746,6 +11761,13 @@
 								"type": "DatasetReference"
 							},
 							"name": "getDimCostCenter"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_ocean_dwh",
+								"type": "DatasetReference"
+							},
+							"name": "getDimCurrency"
 						}
 					],
 					"sinks": [
@@ -11834,6 +11856,12 @@
 						},
 						{
 							"name": "joinDimCostCenter"
+						},
+						{
+							"name": "currAddYearMonth"
+						},
+						{
+							"name": "joinDimCurrency"
 						}
 					],
 					"scriptLines": [
@@ -11848,6 +11876,7 @@
 						"          CurrencyCode as string,",
 						"          CostCenterCode as string,",
 						"          MonthYear as timestamp,",
+						"          MBR_Month as string,",
 						"          Value as double",
 						"     ),",
 						"     allowSchemaDrift: true,",
@@ -11908,6 +11937,7 @@
 						"          OrganisationID as integer,",
 						"          CostCenterID as integer,",
 						"          CurrencyID as integer,",
+						"          MBRMonth as string,",
 						"          MonthYearID as integer,",
 						"          MonthYear as date,",
 						"          Value as double,",
@@ -11925,6 +11955,9 @@
 						"          ScenarioID as integer,",
 						"          KPIID as integer,",
 						"          OrganisationID as integer,",
+						"          CostCenterID as integer,",
+						"          CurrencyID as integer,",
+						"          MBRMonth as string,",
 						"          MonthYearID as integer,",
 						"          MonthYear as date,",
 						"          Value as double,",
@@ -11963,6 +11996,19 @@
 						"     validateSchema: false,",
 						"     isolationLevel: 'READ_UNCOMMITTED',",
 						"     format: 'table') ~> getDimCostCenter",
+						"source(output(",
+						"          CurrencyID as long,",
+						"          InputCurrency as string,",
+						"          CurrencyPair as string,",
+						"          MonthYear as timestamp,",
+						"          Actual_LY as double,",
+						"          Budget_CY as double,",
+						"          Actual_CY as double",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> getDimCurrency",
 						"getMBRStagingData derive(MonthYearID = toInteger(concat(toString(year(MonthYear)), lpad(toString(month(MonthYear)),2,'0'), '01')),",
 						"          CreatedBy = $pPipelineRunID) ~> addYearMonthID",
 						"addYearMonthID, getDimScenario join(lower(trim(Scenario)) == lower(trim(Scenario_Name0)),",
@@ -11981,13 +12027,15 @@
 						"     matchType:'exact',",
 						"     ignoreSpaces: false,",
 						"     broadcast: 'auto')~> joinDimOrganisation",
-						"joinDimCostCenter select(mapColumn(",
+						"joinDimCurrency select(mapColumn(",
 						"          ScenarioID = Scenario_Index,",
 						"          OrganisationID,",
 						"          NatureID,",
 						"          CostCenterID,",
-						"          MonthYearID,",
-						"          MonthYear,",
+						"          CurrencyID,",
+						"          MBRMonth = MBR_Month,",
+						"          MonthYearID = addYearMonthID@MonthYearID,",
+						"          MonthYear = getMBRStagingData@MonthYear,",
 						"          Value,",
 						"          CreatedBy",
 						"     ),",
@@ -11996,7 +12044,10 @@
 						"joinDimNature, factFinancialsClean join(FINorKPI@FIN@ScenarioID == factFinancialsClean@ScenarioID",
 						"     && getDimNature@NatureID == factFinancialsClean@NatureID",
 						"     && FINorKPI@FIN@OrganisationID == factFinancialsClean@OrganisationID",
-						"     && FINorKPI@FIN@MonthYearID == factFinancialsClean@MonthYearID,",
+						"     && FINorKPI@FIN@MonthYearID == factFinancialsClean@MonthYearID",
+						"     && FINorKPI@FIN@CostCenterID == factFinancialsClean@CostCenterID",
+						"     && FINorKPI@FIN@CurrencyID == factFinancialsClean@CurrencyID",
+						"     && FINorKPI@FIN@MBRMonth == factFinancialsClean@MBRMonth,",
 						"     joinType:'left',",
 						"     matchType:'exact',",
 						"     ignoreSpaces: false,",
@@ -12005,17 +12056,25 @@
 						"          ScenarioID,",
 						"          NatureID,",
 						"          OrganisationID,",
+						"          CostCenterID,",
+						"          CurrencyID,",
 						"          MonthYearID,",
-						"          Value",
+						"          Value,",
+						"          MBRMonth",
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true) ~> factFinancialsClean",
-						"joinFactFinancials derive(InsertOrUpdate = iif(isNull(factFinancialsClean@ScenarioID) && isNull(factFinancialsClean@NatureID) && isNull(factFinancialsClean@OrganisationID) && isNull(factFinancialsClean@MonthYearID) \r",
+						"joinFactFinancials derive(InsertOrUpdate = iif(\r",
+						"    isNull(factFinancialsClean@ScenarioID) && \r",
+						"    isNull(factFinancialsClean@NatureID) && \r",
+						"    isNull(factFinancialsClean@OrganisationID) && \r",
+						"    isNull(factFinancialsClean@MonthYearID) &&\r",
+						"    isNull(factFinancialsClean@MBRMonth) &&\r",
+						"    isNull(factFinancialsClean@CurrencyID) \r",
 						", 'I',\r",
 						"iif(FINorKPI@FIN@Value == factFinancialsClean@Value, 'P','U')\r",
 						"),",
-						"          CostCenterID = iifNull(CostCenterID, -1, CostCenterID),",
-						"          CurrencyID = -1) ~> insertOrUpdateColumns",
+						"          CostCenterID = iifNull(FINorKPI@FIN@CostCenterID, -1, FINorKPI@FIN@CostCenterID)) ~> insertOrUpdateColumns",
 						"cleanColumnsToUpsert alterRow(insertIf(InsertOrUpdate=='I'),",
 						"     updateIf(InsertOrUpdate=='U')) ~> insertOrUpdate",
 						"insertOrUpdateColumns filter(in(['I','U'],InsertOrUpdate)) ~> includesUpsert",
@@ -12023,10 +12082,11 @@
 						"          ScenarioID = FINorKPI@FIN@ScenarioID,",
 						"          OrganisationID = FINorKPI@FIN@OrganisationID,",
 						"          NatureID = getDimNature@NatureID,",
+						"          MBRMonth = FINorKPI@FIN@MBRMonth,",
 						"          MonthYearID = FINorKPI@FIN@MonthYearID,",
 						"          MonthYear,",
 						"          CostCenterID,",
-						"          CurrencyID,",
+						"          CurrencyID = FINorKPI@FIN@CurrencyID,",
 						"          Value = FINorKPI@FIN@Value,",
 						"          InsertOrUpdate,",
 						"          CreatedBy",
@@ -12047,32 +12107,46 @@
 						"          ScenarioID,",
 						"          KPIID,",
 						"          OrganisationID,",
+						"          CostCenterID,",
+						"          CurrencyID,",
 						"          MonthYearID,",
-						"          Value",
+						"          Value,",
+						"          MBRMonth",
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true) ~> factDriversClean",
 						"joinDimKPI, factDriversClean join(FINorKPI@KPI@ScenarioID == factDriversClean@ScenarioID",
 						"     && FINorKPI@KPI@OrganisationID == factDriversClean@OrganisationID",
 						"     && Index == KPIID",
-						"     && FINorKPI@KPI@MonthYearID == factDriversClean@MonthYearID,",
+						"     && FINorKPI@KPI@MonthYearID == factDriversClean@MonthYearID",
+						"     && FINorKPI@KPI@CurrencyID == factDriversClean@CurrencyID",
+						"     && FINorKPI@KPI@CostCenterID == factDriversClean@CostCenterID",
+						"     && FINorKPI@KPI@MBRMonth == factDriversClean@MBRMonth,",
 						"     joinType:'left',",
 						"     matchType:'exact',",
 						"     ignoreSpaces: false,",
 						"     broadcast: 'auto')~> joinFactKPI",
-						"joinFactKPI derive(InsertOrUpdate = iif(isNull(factDriversClean@ScenarioID) && isNull(KPIID) && isNull(factDriversClean@OrganisationID) && isNull(factDriversClean@MonthYearID) , \r",
+						"joinFactKPI derive(InsertOrUpdate = iif(\r",
+						"    isNull(factDriversClean@ScenarioID) && \r",
+						"    isNull(KPIID) && \r",
+						"    isNull(factDriversClean@OrganisationID) && \r",
+						"    isNull(factDriversClean@MonthYearID) &&\r",
+						"    isNull(factDriversClean@CurrencyID) &&\r",
+						"    isNull(factDriversClean@CostCenterID) &&\r",
+						"    isNull(factDriversClean@MBRMonth)\r",
+						"    , \r",
 						"'I',iif(FINorKPI@KPI@Value == factDriversClean@Value, 'P','U')),",
-						"          CostCenterID = iifNull(CostCenterID, -1, CostCenterID),",
-						"          CurrencyID = -1) ~> upsertColumn",
+						"          CostCenterID = iifNull(FINorKPI@KPI@CostCenterID, -1, FINorKPI@KPI@CostCenterID)) ~> upsertColumn",
 						"upsertColumn filter(in(['I','U'],InsertOrUpdate)) ~> includesUpsertKPI",
 						"includesUpsertKPI select(mapColumn(",
 						"          ScenarioID = FINorKPI@KPI@ScenarioID,",
 						"          KPIID = Index,",
 						"          OrganisationID = FINorKPI@KPI@OrganisationID,",
+						"          MBRMonth = FINorKPI@KPI@MBRMonth,",
 						"          MonthYearID = FINorKPI@KPI@MonthYearID,",
 						"          MonthYear,",
 						"          CostCenterID,",
-						"          CurrencyID,",
+						"          CurrencyID = FINorKPI@KPI@CurrencyID,",
 						"          Value = FINorKPI@KPI@Value,",
 						"          InsertOrUpdate,",
 						"          CreatedBy",
@@ -12091,6 +12165,13 @@
 						"     matchType:'exact',",
 						"     ignoreSpaces: false,",
 						"     broadcast: 'auto')~> joinDimCostCenter",
+						"getDimCurrency derive(MonthYearID = toInteger(concat(toString(year(MonthYear)), lpad(toString(month(MonthYear)),2,'0'), '01'))) ~> currAddYearMonth",
+						"joinDimCostCenter, currAddYearMonth join(lower(trim(CurrencyCode)) == lower(trim(InputCurrency))",
+						"     && addYearMonthID@MonthYearID == currAddYearMonth@MonthYearID,",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> joinDimCurrency",
 						"insertOrUpdate sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     input(",
@@ -12100,6 +12181,7 @@
 						"          OrganisationID as integer,",
 						"          CostCenterID as integer,",
 						"          CurrencyID as integer,",
+						"          MBRMonth as string,",
 						"          MonthYearID as integer,",
 						"          MonthYear as date,",
 						"          Value as double,",
@@ -12122,6 +12204,7 @@
 						"          OrganisationID,",
 						"          CostCenterID,",
 						"          CurrencyID,",
+						"          MBRMonth,",
 						"          MonthYearID,",
 						"          MonthYear,",
 						"          Value,",
@@ -12136,6 +12219,7 @@
 						"          OrganisationID as integer,",
 						"          CostCenterID as integer,",
 						"          CurrencyID as integer,",
+						"          MBRMonth as string,",
 						"          MonthYearID as integer,",
 						"          MonthYear as date,",
 						"          Value as double,",
@@ -12158,6 +12242,7 @@
 						"          OrganisationID,",
 						"          CostCenterID,",
 						"          CurrencyID,",
+						"          MBRMonth,",
 						"          MonthYearID,",
 						"          MonthYear,",
 						"          Value,",

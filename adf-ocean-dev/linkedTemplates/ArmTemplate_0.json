@@ -321,6 +321,10 @@
 						"precision": 10
 					},
 					{
+						"name": "MBRMonth",
+						"type": "nvarchar"
+					},
+					{
 						"name": "MonthYearID",
 						"type": "int",
 						"precision": 10
@@ -413,6 +417,10 @@
 						"name": "CurrencyID",
 						"type": "int",
 						"precision": 10
+					},
+					{
+						"name": "MBRMonth",
+						"type": "nvarchar"
 					},
 					{
 						"name": "MonthYearID",
