@@ -2004,11 +2004,12 @@
 											}
 										},
 										"staging": {},
-										"compute": {
-											"coreCount": 8,
-											"computeType": "General"
+										"integrationRuntime": {
+											"referenceName": "integrationRuntime",
+											"type": "IntegrationRuntimeReference"
 										},
-										"traceLevel": "Fine"
+										"traceLevel": "Fine",
+										"runConcurrently": true
 									}
 								},
 								{
@@ -2054,6 +2055,10 @@
 						"userProperties": [],
 						"typeProperties": {
 							"url": "https://accounts.accesscontrol.windows.net/168e48b2-81f0-4aac-bc77-d58d07d205e2/tokens/OAuth/2",
+							"connectVia": {
+								"referenceName": "integrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
 							"method": "POST",
 							"headers": {
 								"Content-Type": "application/x-www-form-urlencoded"
@@ -2073,6 +2078,7 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ds_ocean_cfg')]",
+				"[concat(variables('factoryId'), '/integrationRuntimes/integrationRuntime')]",
 				"[concat(variables('factoryId'), '/datasets/ds_sharepoint_ocean_project')]",
 				"[concat(variables('factoryId'), '/datasets/mbr_landing_zone')]",
 				"[concat(variables('factoryId'), '/dataflows/df_shrp_listoffiles')]",
@@ -2224,9 +2230,9 @@
 											}
 										},
 										"staging": {},
-										"compute": {
-											"coreCount": 8,
-											"computeType": "General"
+										"integrationRuntime": {
+											"referenceName": "integrationRuntime",
+											"type": "IntegrationRuntimeReference"
 										},
 										"traceLevel": "Fine"
 									}
@@ -2269,7 +2275,8 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ds_ocean_ods')]",
 				"[concat(variables('factoryId'), '/pipelines/pl_03_summary_log')]",
-				"[concat(variables('factoryId'), '/dataflows/df_Load_Fact_Financials')]"
+				"[concat(variables('factoryId'), '/dataflows/df_Load_Fact_Financials')]",
+				"[concat(variables('factoryId'), '/integrationRuntimes/integrationRuntime')]"
 			]
 		},
 		{
@@ -2335,9 +2342,9 @@
 											}
 										},
 										"staging": {},
-										"compute": {
-											"coreCount": 8,
-											"computeType": "General"
+										"integrationRuntime": {
+											"referenceName": "integrationRuntime",
+											"type": "IntegrationRuntimeReference"
 										},
 										"traceLevel": "Fine"
 									}
@@ -2393,7 +2400,8 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ds_ocean_ods')]",
-				"[concat(variables('factoryId'), '/dataflows/df_stg_financials')]"
+				"[concat(variables('factoryId'), '/dataflows/df_stg_financials')]",
+				"[concat(variables('factoryId'), '/integrationRuntimes/integrationRuntime')]"
 			]
 		},
 		{
@@ -2662,6 +2670,10 @@
 						"userProperties": [],
 						"typeProperties": {
 							"url": "https://accounts.accesscontrol.windows.net/168e48b2-81f0-4aac-bc77-d58d07d205e2/tokens/OAuth/2",
+							"connectVia": {
+								"referenceName": "integrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
 							"method": "POST",
 							"headers": {
 								"Content-Type": "application/x-www-form-urlencoded"
@@ -2686,6 +2698,7 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ds_sharepoint_json')]",
+				"[concat(variables('factoryId'), '/integrationRuntimes/integrationRuntime')]",
 				"[concat(variables('factoryId'), '/datasets/ds_sharepoint_ocean_project_copy1')]",
 				"[concat(variables('factoryId'), '/datasets/ds_mbr_files_bin')]"
 			]
@@ -2727,7 +2740,7 @@
 								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false,
 								"tableOption": "autoCreate",
-								"disableMetricsCollection": false
+								"disableMetricsCollection": true
 							},
 							"enableStaging": false,
 							"translator": {
@@ -2822,7 +2835,7 @@
 								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false,
 								"tableOption": "autoCreate",
-								"disableMetricsCollection": false
+								"disableMetricsCollection": true
 							},
 							"enableStaging": false,
 							"translator": {
@@ -3042,11 +3055,12 @@
 											}
 										},
 										"staging": {},
-										"compute": {
-											"coreCount": 8,
-											"computeType": "General"
+										"integrationRuntime": {
+											"referenceName": "integrationRuntime",
+											"type": "IntegrationRuntimeReference"
 										},
-										"traceLevel": "Fine"
+										"traceLevel": "Fine",
+										"runConcurrently": true
 									}
 								}
 							]
@@ -3112,11 +3126,12 @@
 											}
 										},
 										"staging": {},
-										"compute": {
-											"coreCount": 8,
-											"computeType": "General"
+										"integrationRuntime": {
+											"referenceName": "integrationRuntime",
+											"type": "IntegrationRuntimeReference"
 										},
-										"traceLevel": "Fine"
+										"traceLevel": "Fine",
+										"runConcurrently": true
 									}
 								},
 								{
@@ -3227,7 +3242,7 @@
 								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false,
 								"tableOption": "autoCreate",
-								"disableMetricsCollection": false
+								"disableMetricsCollection": true
 							},
 							"enableStaging": false,
 							"translator": {
@@ -3433,6 +3448,7 @@
 				"[concat(variables('factoryId'), '/datasets/ds_mbr_currency')]",
 				"[concat(variables('factoryId'), '/datasets/ds_mbr_kpi_pyramid')]",
 				"[concat(variables('factoryId'), '/dataflows/df_copy_all_mbr')]",
+				"[concat(variables('factoryId'), '/integrationRuntimes/integrationRuntime')]",
 				"[concat(variables('factoryId'), '/dataflows/df_unpvt_mbr_data')]",
 				"[concat(variables('factoryId'), '/linkedServices/ocean_db')]"
 			]
@@ -3547,9 +3563,9 @@
 											}
 										},
 										"staging": {},
-										"compute": {
-											"coreCount": 8,
-											"computeType": "General"
+										"integrationRuntime": {
+											"referenceName": "integrationRuntime",
+											"type": "IntegrationRuntimeReference"
 										},
 										"traceLevel": "Fine"
 									}
@@ -3570,7 +3586,8 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ds_ocean_ods')]",
-				"[concat(variables('factoryId'), '/dataflows/df_Load_Fact_KPI_Pyramid')]"
+				"[concat(variables('factoryId'), '/dataflows/df_Load_Fact_KPI_Pyramid')]",
+				"[concat(variables('factoryId'), '/integrationRuntimes/integrationRuntime')]"
 			]
 		},
 		{
@@ -3636,9 +3653,9 @@
 											}
 										},
 										"staging": {},
-										"compute": {
-											"coreCount": 8,
-											"computeType": "General"
+										"integrationRuntime": {
+											"referenceName": "integrationRuntime",
+											"type": "IntegrationRuntimeReference"
 										},
 										"traceLevel": "Fine"
 									}
@@ -3694,7 +3711,8 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ds_ocean_ods')]",
-				"[concat(variables('factoryId'), '/dataflows/df_stg_kpi_pyramid')]"
+				"[concat(variables('factoryId'), '/dataflows/df_stg_kpi_pyramid')]",
+				"[concat(variables('factoryId'), '/integrationRuntimes/integrationRuntime')]"
 			]
 		},
 		{
