@@ -42,11 +42,6 @@
 				"precision": 10
 			},
 			{
-				"name": "CurrencyID",
-				"type": "int",
-				"precision": 10
-			},
-			{
 				"name": "MBRMonth",
 				"type": "nvarchar"
 			},
@@ -60,7 +55,16 @@
 				"type": "date"
 			},
 			{
+				"name": "CurrencyCode",
+				"type": "nvarchar"
+			},
+			{
 				"name": "Value",
+				"type": "float",
+				"precision": 15
+			},
+			{
+				"name": "ValueEuro",
 				"type": "float",
 				"precision": 15
 			},
