@@ -52,7 +52,7 @@
 					"name": "cleanColumns"
 				},
 				{
-					"name": "addPeriodYYYYMM"
+					"name": "addPeriodYYYYMM01"
 				}
 			],
 			"scriptLines": [
@@ -120,10 +120,10 @@
 				"     lateral: false,",
 				"     ignoreNullPivots: false) ~> upvtCurrency",
 				"upvtCurrency derive(Period = concat(Period,'_',toString(MonthYear, 'MM')),",
-				"          PeriodYYYYMM = toInteger(concat(toString(year(MonthYear)),right(concat('0',toString(month(MonthYear))),2)))) ~> calcPeriod",
-				"addPeriodYYYYMM, calcPeriod join(lower(trim(Currency_Code)) == lower(trim(InputCurrency))",
+				"          PeriodYYYYMM01 = toInteger(concat(toString(year(MonthYear)),right(concat('0',toString(month(MonthYear))),2),'01'))) ~> calcPeriod",
+				"addPeriodYYYYMM01, calcPeriod join(lower(trim(Currency_Code)) == lower(trim(InputCurrency))",
 				"     && getMBRUnpvtData@Period == calcPeriod@Period",
-				"     && addPeriodYYYYMM@PeriodYYYYMM == calcPeriod@PeriodYYYYMM,",
+				"     && addPeriodYYYYMM01@PeriodYYYYMM01 == calcPeriod@PeriodYYYYMM01,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
@@ -137,14 +137,14 @@
 				"          CurrencyCode = Currency_Code,",
 				"          CostCenterCode = CostCenter_Code,",
 				"          MonthYear = addColumns@MonthYear,",
-				"          MonthYearID = addPeriodYYYYMM@PeriodYYYYMM,",
+				"          MonthYearID = addPeriodYYYYMM01@PeriodYYYYMM01,",
 				"          MBR_Month,",
 				"          Value = addColumns@Value,",
 				"          ValueEuro",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> cleanColumns",
-				"addColumns derive(PeriodYYYYMM = toInteger(concat(toString(year(MonthYear)),right(concat('0',toString(month(MonthYear))),2)))) ~> addPeriodYYYYMM",
+				"addColumns derive(PeriodYYYYMM01 = toInteger(concat(toString(year(MonthYear)),right(concat('0',toString(month(MonthYear))),2), '01'))) ~> addPeriodYYYYMM01",
 				"cleanColumns sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
