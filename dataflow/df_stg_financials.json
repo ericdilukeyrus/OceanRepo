@@ -43,16 +43,16 @@
 					"name": "calcPeriod"
 				},
 				{
-					"name": "join1"
+					"name": "joinDimCurrency"
 				},
 				{
-					"name": "derivedColumn1"
+					"name": "convertToEuro"
 				},
 				{
-					"name": "select1"
+					"name": "cleanColumns"
 				},
 				{
-					"name": "derivedColumn2"
+					"name": "addPeriodYYYYMM"
 				}
 			],
 			"scriptLines": [
@@ -120,16 +120,16 @@
 				"     lateral: false,",
 				"     ignoreNullPivots: false) ~> upvtCurrency",
 				"upvtCurrency derive(Period = concat(Period,'_',toString(MonthYear, 'MM')),",
-				"          PeriodYYYYMM = concat(toString(year(MonthYear)),right(concat('0',toString(month(MonthYear))),2))) ~> calcPeriod",
-				"derivedColumn2, calcPeriod join(Currency_Code == InputCurrency",
+				"          PeriodYYYYMM = toInteger(concat(toString(year(MonthYear)),right(concat('0',toString(month(MonthYear))),2)))) ~> calcPeriod",
+				"addPeriodYYYYMM, calcPeriod join(lower(trim(Currency_Code)) == lower(trim(InputCurrency))",
 				"     && getMBRUnpvtData@Period == calcPeriod@Period",
-				"     && derivedColumn2@PeriodYYYYMM == calcPeriod@PeriodYYYYMM,",
+				"     && addPeriodYYYYMM@PeriodYYYYMM == calcPeriod@PeriodYYYYMM,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> join1",
-				"join1 derive(ValueEuro = addColumns@Value* upvtCurrency@Value) ~> derivedColumn1",
-				"derivedColumn1 select(mapColumn(",
+				"     broadcast: 'auto')~> joinDimCurrency",
+				"joinDimCurrency derive(ValueEuro = addColumns@Value* upvtCurrency@Value) ~> convertToEuro",
+				"convertToEuro select(mapColumn(",
 				"          BusinessUnit = BU_Name,",
 				"          Scenario,",
 				"          NatureID = Index,",
@@ -137,14 +137,15 @@
 				"          CurrencyCode = Currency_Code,",
 				"          CostCenterCode = CostCenter_Code,",
 				"          MonthYear = addColumns@MonthYear,",
+				"          MonthYearID = addPeriodYYYYMM@PeriodYYYYMM,",
 				"          MBR_Month,",
 				"          Value = addColumns@Value,",
 				"          ValueEuro",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> select1",
-				"addColumns derive(PeriodYYYYMM = concat(toString(year(MonthYear)),right(concat('0',toString(month(MonthYear))),2))) ~> derivedColumn2",
-				"select1 sink(allowSchemaDrift: true,",
+				"     skipDuplicateMapOutputs: true) ~> cleanColumns",
+				"addColumns derive(PeriodYYYYMM = toInteger(concat(toString(year(MonthYear)),right(concat('0',toString(month(MonthYear))),2)))) ~> addPeriodYYYYMM",
+				"cleanColumns sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          BusinessUnit as string,",
