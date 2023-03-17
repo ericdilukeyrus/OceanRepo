@@ -1,0 +1,17 @@
+{
+	"name": "dataflow1",
+	"properties": {
+		"folder": {
+			"name": "02STG"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [],
+			"sinks": [],
+			"transformations": [],
+			"scriptLines": [
+				""
+			]
+		}
+	}
+}

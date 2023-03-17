@@ -13,6 +13,13 @@
 						"type": "DatasetReference"
 					},
 					"name": "getMBRUnpvtData"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_ocean_dwh",
+						"type": "DatasetReference"
+					},
+					"name": "getDImCurrency"
 				}
 			],
 			"sinks": [
@@ -30,7 +37,19 @@
 					"description": "Add Columns : \nScenario\nMonthYear"
 				},
 				{
-					"name": "toInsert"
+					"name": "upvtCurrency"
+				},
+				{
+					"name": "calcPeriod"
+				},
+				{
+					"name": "join1"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "select1"
 				}
 			],
 			"scriptLines": [
@@ -56,6 +75,19 @@
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     query: (\"select * from [ods].[{$unpvtTableName}]\"),",
 				"     format: 'query') ~> getMBRUnpvtData",
+				"source(output(",
+				"          CurrencyID as long,",
+				"          InputCurrency as string,",
+				"          CurrencyPair as string,",
+				"          MonthYear as timestamp,",
+				"          Actual_LY as double,",
+				"          Budget_CY as double,",
+				"          Actual_CY as double",
+				"     ),",
+				"     allowSchemaDrift: false,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> getDImCurrency",
 				"getMBRUnpvtData derive(Scenario = case( \r",
 				"    like(Period, 'Actual%'),\r",
 				"    'Actual',\r",
@@ -71,21 +103,41 @@
 				")\r",
 				"),",
 				"          Index = toInteger(Index),",
-				"          Value = toFloat(Value)) ~> addColumns",
-				"addColumns select(mapColumn(",
+				"          Value = toFloat(Value),",
+				"          PeriodCurr = replace(replace(Period,' Forecast_CY',' Budget_CY'),' Forecast_NY','Budget_CY')) ~> addColumns",
+				"getDImCurrency unpivot(output(",
+				"          Period as string,",
+				"          Value as double",
+				"     ),",
+				"     ungroupBy(CurrencyID,",
+				"          InputCurrency,",
+				"          CurrencyPair,",
+				"          MonthYear),",
+				"     lateral: false,",
+				"     ignoreNullPivots: false) ~> upvtCurrency",
+				"upvtCurrency derive(Period = concat(Period,'_',toString(MonthYear, 'MM'))) ~> calcPeriod",
+				"addColumns, calcPeriod join(Currency_Code == InputCurrency",
+				"     && PeriodCurr == calcPeriod@Period,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"join1 derive(ValueEuro = addColumns@Value* upvtCurrency@Value) ~> derivedColumn1",
+				"derivedColumn1 select(mapColumn(",
 				"          BusinessUnit = BU_Name,",
 				"          Scenario,",
 				"          NatureID = Index,",
 				"          Nature = K_Nature,",
 				"          CurrencyCode = Currency_Code,",
 				"          CostCenterCode = CostCenter_Code,",
-				"          MonthYear,",
+				"          MonthYear = addColumns@MonthYear,",
 				"          MBR_Month,",
-				"          Value",
+				"          Value = addColumns@Value,",
+				"          ValueEuro",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> toInsert",
-				"toInsert sink(allowSchemaDrift: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          BusinessUnit as string,",
