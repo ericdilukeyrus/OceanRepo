@@ -50,6 +50,9 @@
 				},
 				{
 					"name": "select1"
+				},
+				{
+					"name": "derivedColumn2"
 				}
 			],
 			"scriptLines": [
@@ -116,9 +119,11 @@
 				"          MonthYear),",
 				"     lateral: false,",
 				"     ignoreNullPivots: false) ~> upvtCurrency",
-				"upvtCurrency derive(Period = concat(Period,'_',toString(MonthYear, 'MM'))) ~> calcPeriod",
-				"addColumns, calcPeriod join(Currency_Code == InputCurrency",
-				"     && getMBRUnpvtData@Period == calcPeriod@Period,",
+				"upvtCurrency derive(Period = concat(Period,'_',toString(MonthYear, 'MM')),",
+				"          PeriodYYYYMM = concat(toString(year(MonthYear)),right(concat('0',toString(month(MonthYear))),2))) ~> calcPeriod",
+				"derivedColumn2, calcPeriod join(Currency_Code == InputCurrency",
+				"     && getMBRUnpvtData@Period == calcPeriod@Period",
+				"     && derivedColumn2@PeriodYYYYMM == calcPeriod@PeriodYYYYMM,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
@@ -138,6 +143,7 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select1",
+				"addColumns derive(PeriodYYYYMM = concat(toString(year(MonthYear)),right(concat('0',toString(month(MonthYear))),2))) ~> derivedColumn2",
 				"select1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
