@@ -104,7 +104,7 @@
 				"),",
 				"          Index = toInteger(Index),",
 				"          Value = toFloat(Value),",
-				"          PeriodCurr = replace(replace(Period,' Forecast_CY',' Budget_CY'),' Forecast_NY','Budget_CY')) ~> addColumns",
+				"          PeriodCurr = replace(replace(Period,'Forecast_CY','Budget_CY'),'Forecast_NY','Budget_CY')) ~> addColumns",
 				"getDImCurrency unpivot(output(",
 				"          Period as string,",
 				"          Value as double",
