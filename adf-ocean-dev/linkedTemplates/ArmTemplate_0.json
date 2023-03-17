@@ -301,22 +301,17 @@
 						"precision": 10
 					},
 					{
-						"name": "KPIID",
-						"type": "int",
-						"precision": 10
-					},
-					{
 						"name": "OrganisationID",
 						"type": "int",
 						"precision": 10
 					},
 					{
-						"name": "CostCenterID",
+						"name": "KPIID",
 						"type": "int",
 						"precision": 10
 					},
 					{
-						"name": "CurrencyID",
+						"name": "CostCenterID",
 						"type": "int",
 						"precision": 10
 					},
@@ -334,7 +329,16 @@
 						"type": "date"
 					},
 					{
+						"name": "CurrencyCode",
+						"type": "nvarchar"
+					},
+					{
 						"name": "Value",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "ValueEuro",
 						"type": "float",
 						"precision": 15
 					},
@@ -414,11 +418,6 @@
 						"precision": 10
 					},
 					{
-						"name": "CurrencyID",
-						"type": "int",
-						"precision": 10
-					},
-					{
 						"name": "MBRMonth",
 						"type": "nvarchar"
 					},
@@ -432,7 +431,16 @@
 						"type": "date"
 					},
 					{
+						"name": "CurrencyCode",
+						"type": "nvarchar"
+					},
+					{
 						"name": "Value",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "ValueEuro",
 						"type": "float",
 						"precision": 15
 					},
