@@ -53,6 +53,10 @@
 			"gDimCurrency": {
 				"type": "string",
 				"value": "DimCurrency"
+			},
+			"gDimPeopleType": {
+				"type": "string",
+				"value": "DimPeopleType"
 			}
 		},
 		"globalConfigurations": {
