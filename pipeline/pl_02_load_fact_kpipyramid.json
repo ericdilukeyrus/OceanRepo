@@ -18,7 +18,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "select  distinct concat('KPI_Pyramid_', MBR_Scope) AS StgKpiTableName  from  [@{pipeline().globalParameters.gODSSchemaName}].[@{pipeline().globalParameters.gSourcesConfigTableName}]",
+							"value": "select  distinct concat('KPI_Pyramid_', MBR_Scope) AS StgKpiTableName, MBR_Month  from  [@{pipeline().globalParameters.gODSSchemaName}].[@{pipeline().globalParameters.gSourcesConfigTableName}]",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -71,6 +71,12 @@
 								"dataflow": {
 									"referenceName": "df_Load_Fact_KPI_Pyramid",
 									"type": "DataFlowReference",
+									"parameters": {
+										"pMBR_Month": {
+											"value": "'@{item().MBR_Month}'",
+											"type": "Expression"
+										}
+									},
 									"datasetParameters": {
 										"getMBRKPIPyramidStaging": {
 											"vTableName": {

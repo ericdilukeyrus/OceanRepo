@@ -34,6 +34,27 @@
 						"type": "DatasetReference"
 					},
 					"name": "getFactKpi"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_ocean_dwh",
+						"type": "DatasetReference"
+					},
+					"name": "getDimPeopleType"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_ocean_dwh",
+						"type": "DatasetReference"
+					},
+					"name": "getDimSeniorityLevel"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_ocean_dwh",
+						"type": "DatasetReference"
+					},
+					"name": "getDimCostCenter"
 				}
 			],
 			"sinks": [
@@ -69,9 +90,21 @@
 				},
 				{
 					"name": "insertUpdate"
+				},
+				{
+					"name": "joinDimCostCenter"
+				},
+				{
+					"name": "joinDimPeopleType"
+				},
+				{
+					"name": "joinDimSeniorityLevel"
 				}
 			],
 			"scriptLines": [
+				"parameters{",
+				"     pMBR_Month as string",
+				"}",
 				"source(output(",
 				"          BU as string,",
 				"          Version as string,",
@@ -151,6 +184,39 @@
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     format: 'table') ~> getFactKpi",
+				"source(output(",
+				"          PeopleTypeID as long,",
+				"          PeopleType as string",
+				"     ),",
+				"     allowSchemaDrift: false,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> getDimPeopleType",
+				"source(output(",
+				"          SeniorityLevelID as long,",
+				"          SeniorityLevelCode as string,",
+				"          SeniorityLevelIndex as integer,",
+				"          SeniorityLevelName as string",
+				"     ),",
+				"     allowSchemaDrift: false,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> getDimSeniorityLevel",
+				"source(output(",
+				"          CostCenterID as integer,",
+				"          Cost_center_Name0 as string,",
+				"          Cost_Center_Code0 as string,",
+				"          Cost_center_Name1 as string,",
+				"          Cost_Center_Code1 as string,",
+				"          Cost_center_Name2 as string,",
+				"          Cost_Center_Code2 as string,",
+				"          Cost_center_Name3 as string,",
+				"          Cost_Center_Code3 as string",
+				"     ),",
+				"     allowSchemaDrift: false,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> getDimCostCenter",
 				"getMBRKPIPyramidStaging derive(MonthYearID = toInteger(concat(toString(year(Period)), lpad(toString(month(Period)),2,'0'), '01'))) ~> addYearMonthID",
 				"addYearMonthID, getDimScenario join(lower(trim(Version)) == lower(trim(Scenario_Name0)),",
 				"     joinType:'inner',",
@@ -162,14 +228,14 @@
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joinDimOrganisation",
-				"joinDimOrganisation select(mapColumn(",
+				"joinDimSeniorityLevel select(mapColumn(",
 				"          OrganisationID,",
 				"          ScenarioID = Scenario_Index,",
+				"          CostCenterID,",
+				"          PeopleTypeID,",
+				"          SeniorityLevelID,",
 				"          MonthYearID,",
 				"          MonthYear = Period,",
-				"          CostCenter,",
-				"          PeopleType,",
-				"          LevelSeniority,",
 				"          EndOfMonth_FTE,",
 				"          SrvcSales_bef_bonimali,",
 				"          BillableDays,",
@@ -199,8 +265,23 @@
 				"  equals(cleanColumns@DailyCost,getFactKpi@DailyCost) , 'P','U')\r",
 				")) ~> insertOrUpdate",
 				"insertOrUpdate filter(in(['I','U'],InsertOrUpdate)) ~> includeUpsert",
-				"includeUpsert alterRow(insertIf(InsertOrUpdate == 'I'),",
-				"     updateIf(InsertOrUpdate == 'U')) ~> insertUpdate",
+				"includeUpsert alterRow(insertIf(InsertOrUpdate=='I'),",
+				"     updateIf(InsertOrUpdate=='U')) ~> insertUpdate",
+				"joinDimOrganisation, getDimCostCenter join(lower(trim(CostCenter)) == lower(trim(Cost_center_Name0)),",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinDimCostCenter",
+				"joinDimCostCenter, getDimPeopleType join(lower(trim(getMBRKPIPyramidStaging@PeopleType)) == lower(trim(getDimPeopleType@PeopleType)),",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinDimPeopleType",
+				"joinDimPeopleType, getDimSeniorityLevel join(lower(trim(LevelSeniority)) == lower(trim(SeniorityLevelCode)),",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinDimSeniorityLevel",
 				"insertUpdate sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     deletable:false,",
