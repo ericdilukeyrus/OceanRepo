@@ -102,6 +102,24 @@
 												"type": "Expression"
 											}
 										},
+										"getDimPeopleType": {
+											"vTableName": {
+												"value": "@pipeline().globalParameters.gDimPeopleType",
+												"type": "Expression"
+											}
+										},
+										"getDimSeniorityLevel": {
+											"vTableName": {
+												"value": "@pipeline().globalParameters.gDimSeniorityLevel",
+												"type": "Expression"
+											}
+										},
+										"getDimCostCenter": {
+											"vTableName": {
+												"value": "@pipeline().globalParameters.gDimCostCenterTableName",
+												"type": "Expression"
+											}
+										},
 										"insertFactKPIPyramid": {
 											"vTableName": {
 												"value": "@pipeline().globalParameters.gFactKpiPyramid",
