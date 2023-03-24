@@ -50,5 +50,13 @@
 	"gDimCurrency": {
 		"type": "string",
 		"value": "DimCurrency"
+	},
+	"gDimPeopleType": {
+		"type": "string",
+		"value": "DimPeopleType"
+	},
+	"gDimSeniorityLevel": {
+		"type": "string",
+		"value": "DimSeniorityLevel"
 	}
 }

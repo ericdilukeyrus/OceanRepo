@@ -2351,8 +2351,7 @@
 														"type": "Expression"
 													}
 												}
-											},
-											"linkedServiceParameters": {}
+											}
 										},
 										"staging": {},
 										"integrationRuntime": {
@@ -3488,7 +3487,7 @@
 							"source": {
 								"type": "AzureSqlSource",
 								"sqlReaderQuery": {
-									"value": "select  distinct concat('KPI_Pyramid_', MBR_Scope) AS StgKpiTableName  from  [@{pipeline().globalParameters.gODSSchemaName}].[@{pipeline().globalParameters.gSourcesConfigTableName}]",
+									"value": "select  distinct concat('KPI_Pyramid_', MBR_Scope) AS StgKpiTableName, MBR_Month  from  [@{pipeline().globalParameters.gODSSchemaName}].[@{pipeline().globalParameters.gSourcesConfigTableName}]",
 									"type": "Expression"
 								},
 								"queryTimeout": "02:00:00",
@@ -3541,7 +3540,12 @@
 										"dataflow": {
 											"referenceName": "df_Load_Fact_KPI_Pyramid",
 											"type": "DataFlowReference",
-											"parameters": {},
+											"parameters": {
+												"pMBR_Month": {
+													"value": "'@{item().MBR_Month}'",
+													"type": "Expression"
+												}
+											},
 											"datasetParameters": {
 												"getMBRKPIPyramidStaging": {
 													"vTableName": {
@@ -3564,6 +3568,24 @@
 												"getFactKpi": {
 													"vTableName": {
 														"value": "@pipeline().globalParameters.gFactKpiPyramid",
+														"type": "Expression"
+													}
+												},
+												"getDimPeopleType": {
+													"vTableName": {
+														"value": "@pipeline().globalParameters.gDimPeopleType",
+														"type": "Expression"
+													}
+												},
+												"getDimSeniorityLevel": {
+													"vTableName": {
+														"value": "@pipeline().globalParameters.gDimSeniorityLevel",
+														"type": "Expression"
+													}
+												},
+												"getDimCostCenter": {
+													"vTableName": {
+														"value": "@pipeline().globalParameters.gDimCostCenterTableName",
 														"type": "Expression"
 													}
 												},
@@ -12333,6 +12355,27 @@
 								"type": "DatasetReference"
 							},
 							"name": "getFactKpi"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_ocean_dwh",
+								"type": "DatasetReference"
+							},
+							"name": "getDimPeopleType"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_ocean_dwh",
+								"type": "DatasetReference"
+							},
+							"name": "getDimSeniorityLevel"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_ocean_dwh",
+								"type": "DatasetReference"
+							},
+							"name": "getDimCostCenter"
 						}
 					],
 					"sinks": [
@@ -12368,9 +12411,21 @@
 						},
 						{
 							"name": "insertUpdate"
+						},
+						{
+							"name": "joinDimCostCenter"
+						},
+						{
+							"name": "joinDimPeopleType"
+						},
+						{
+							"name": "joinDimSeniorityLevel"
 						}
 					],
 					"scriptLines": [
+						"parameters{",
+						"     pMBR_Month as string",
+						"}",
 						"source(output(",
 						"          BU as string,",
 						"          Version as string,",
@@ -12429,11 +12484,12 @@
 						"          FactKpiID as long,",
 						"          OrganisationID as long,",
 						"          ScenarioID as long,",
+						"          CostCenterID as long,",
+						"          PeopleTypeID as long,",
+						"          SeniorityLevelID as long,",
+						"          MBR_Month as string,",
 						"          MonthYearID as integer,",
 						"          MonthYear as date,",
-						"          CostCenter as string,",
-						"          PeopleType as string,",
-						"          LevelSeniority as string,",
 						"          EndOfMonth_FTE as float,",
 						"          SrvcSales_bef_bonimali as float,",
 						"          BillableDays as float,",
@@ -12450,7 +12506,41 @@
 						"     validateSchema: false,",
 						"     isolationLevel: 'READ_UNCOMMITTED',",
 						"     format: 'table') ~> getFactKpi",
-						"getMBRKPIPyramidStaging derive(MonthYearID = toInteger(concat(toString(year(Period)), lpad(toString(month(Period)),2,'0'), '01'))) ~> addYearMonthID",
+						"source(output(",
+						"          PeopleTypeID as long,",
+						"          PeopleType as string",
+						"     ),",
+						"     allowSchemaDrift: false,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> getDimPeopleType",
+						"source(output(",
+						"          SeniorityLevelID as long,",
+						"          SeniorityLevelCode as string,",
+						"          SeniorityLevelIndex as integer,",
+						"          SeniorityLevelName as string",
+						"     ),",
+						"     allowSchemaDrift: false,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> getDimSeniorityLevel",
+						"source(output(",
+						"          CostCenterID as integer,",
+						"          Cost_center_Name0 as string,",
+						"          Cost_Center_Code0 as string,",
+						"          Cost_center_Name1 as string,",
+						"          Cost_Center_Code1 as string,",
+						"          Cost_center_Name2 as string,",
+						"          Cost_Center_Code2 as string,",
+						"          Cost_center_Name3 as string,",
+						"          Cost_Center_Code3 as string",
+						"     ),",
+						"     allowSchemaDrift: false,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> getDimCostCenter",
+						"getMBRKPIPyramidStaging derive(MonthYearID = toInteger(concat(toString(year(Period)), lpad(toString(month(Period)),2,'0'), '01')),",
+						"          MBR_Month = $pMBR_Month) ~> addYearMonthID",
 						"addYearMonthID, getDimScenario join(lower(trim(Version)) == lower(trim(Scenario_Name0)),",
 						"     joinType:'inner',",
 						"     matchType:'exact',",
@@ -12461,14 +12551,15 @@
 						"     matchType:'exact',",
 						"     ignoreSpaces: false,",
 						"     broadcast: 'auto')~> joinDimOrganisation",
-						"joinDimOrganisation select(mapColumn(",
+						"joinDimSeniorityLevel select(mapColumn(",
 						"          OrganisationID,",
 						"          ScenarioID = Scenario_Index,",
+						"          CostCenterID,",
+						"          PeopleTypeID,",
+						"          SeniorityLevelID,",
+						"          MBR_Month,",
 						"          MonthYearID,",
 						"          MonthYear = Period,",
-						"          CostCenter,",
-						"          PeopleType,",
-						"          LevelSeniority,",
 						"          EndOfMonth_FTE,",
 						"          SrvcSales_bef_bonimali,",
 						"          BillableDays,",
@@ -12482,24 +12573,50 @@
 						"cleanColumns, getFactKpi join(cleanColumns@OrganisationID == getFactKpi@OrganisationID",
 						"     && cleanColumns@ScenarioID == getFactKpi@ScenarioID",
 						"     && cleanColumns@MonthYearID == getFactKpi@MonthYearID",
-						"     && cleanColumns@CostCenter == getFactKpi@CostCenter",
-						"     && cleanColumns@PeopleType == getFactKpi@PeopleType",
-						"     && cleanColumns@LevelSeniority == getFactKpi@LevelSeniority,",
+						"     && cleanColumns@CostCenterID == getFactKpi@CostCenterID",
+						"     && cleanColumns@PeopleTypeID == getFactKpi@PeopleTypeID",
+						"     && cleanColumns@SeniorityLevelID == getFactKpi@SeniorityLevelID",
+						"     && cleanColumns@MBR_Month == getFactKpi@MBR_Month,",
 						"     joinType:'left',",
 						"     matchType:'exact',",
 						"     ignoreSpaces: false,",
 						"     broadcast: 'auto')~> joinFactKPI",
-						"joinFactKPI derive(InsertOrUpdate = iif(isNull(getFactKpi@OrganisationID) && isNull(getFactKpi@ScenarioID) && isNull(getFactKpi@MonthYearID) && isNull(getFactKpi@CostCenter)  && isNull(getFactKpi@PeopleType) \r",
-						" && isNull(getFactKpi@LevelSeniority) \r",
+						"joinFactKPI derive(InsertOrUpdate = iif(\r",
+						"  isNull(getFactKpi@OrganisationID) && \r",
+						"  isNull(getFactKpi@ScenarioID) && \r",
+						"  isNull(getFactKpi@MonthYearID) && \r",
+						"  isNull(getFactKpi@CostCenterID) && \r",
+						"  isNull(getFactKpi@PeopleTypeID) && \r",
+						"  isNull(getFactKpi@SeniorityLevelID) &&\r",
+						"  isNull(getFactKpi@MBR_Month)\r",
 						", 'I',\r",
-						"iif(equals(cleanColumns@EndOfMonth_FTE,getFactKpi@EndOfMonth_FTE) && equals(cleanColumns@SrvcSales_bef_bonimali,getFactKpi@SrvcSales_bef_bonimali) && \r",
-						" equals(cleanColumns@BillableDays,getFactKpi@BillableDays) && equals(cleanColumns@DailyRate,getFactKpi@DailyRate) &&\r",
-						" equals(cleanColumns@AnnualDirectCosts,getFactKpi@AnnualDirectCosts) &&  equals(cleanColumns@AnnualProductionDays,getFactKpi@AnnualProductionDays) &&\r",
-						"  equals(cleanColumns@DailyCost,getFactKpi@DailyCost) , 'P','U')\r",
+						"iif(\r",
+						"    equals(cleanColumns@EndOfMonth_FTE,getFactKpi@EndOfMonth_FTE) && \r",
+						"    equals(cleanColumns@SrvcSales_bef_bonimali,getFactKpi@SrvcSales_bef_bonimali) && \r",
+						"    equals(cleanColumns@BillableDays,getFactKpi@BillableDays) && \r",
+						"    equals(cleanColumns@DailyRate,getFactKpi@DailyRate) &&\r",
+						"    equals(cleanColumns@AnnualDirectCosts,getFactKpi@AnnualDirectCosts) &&  \r",
+						"    equals(cleanColumns@AnnualProductionDays,getFactKpi@AnnualProductionDays) &&\r",
+						"    equals(cleanColumns@DailyCost,getFactKpi@DailyCost) , 'P','U')\r",
 						")) ~> insertOrUpdate",
 						"insertOrUpdate filter(in(['I','U'],InsertOrUpdate)) ~> includeUpsert",
 						"includeUpsert alterRow(insertIf(InsertOrUpdate=='I'),",
 						"     updateIf(InsertOrUpdate=='U')) ~> insertUpdate",
+						"joinDimOrganisation, getDimCostCenter join(lower(trim(CostCenter)) == lower(trim(Cost_center_Name0)),",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> joinDimCostCenter",
+						"joinDimCostCenter, getDimPeopleType join(lower(trim(getMBRKPIPyramidStaging@PeopleType)) == lower(trim(getDimPeopleType@PeopleType)),",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> joinDimPeopleType",
+						"joinDimPeopleType, getDimSeniorityLevel join(lower(trim(LevelSeniority)) == lower(trim(SeniorityLevelCode)),",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> joinDimSeniorityLevel",
 						"insertUpdate sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     deletable:false,",
@@ -12513,18 +12630,18 @@
 						"     mapColumn(",
 						"          OrganisationID = cleanColumns@OrganisationID,",
 						"          ScenarioID = cleanColumns@ScenarioID,",
-						"          MonthYearID,",
-						"          MonthYear,",
-						"          CostCenter,",
-						"          PeopleType,",
-						"          LevelSeniority,",
-						"          EndOfMonth_FTE,",
-						"          SrvcSales_bef_bonimali,",
-						"          BillableDays,",
-						"          DailyRate,",
-						"          AnnualDirectCosts,",
-						"          AnnualProductionDays,",
-						"          DailyCost",
+						"          CostCenterID = cleanColumns@CostCenterID,",
+						"          PeopleTypeID = cleanColumns@PeopleTypeID,",
+						"          SeniorityLevelID = cleanColumns@SeniorityLevelID,",
+						"          MBR_Month = cleanColumns@MBR_Month,",
+						"          MonthYearID = cleanColumns@MonthYearID,",
+						"          MonthYear = cleanColumns@MonthYear,",
+						"          EndOfMonth_FTE = cleanColumns@EndOfMonth_FTE,",
+						"          SrvcSales_bef_bonimali = cleanColumns@SrvcSales_bef_bonimali,",
+						"          BillableDays = cleanColumns@BillableDays,",
+						"          DailyRate = cleanColumns@DailyRate,",
+						"          AnnualDirectCosts = cleanColumns@AnnualDirectCosts,",
+						"          AnnualProductionDays = cleanColumns@AnnualProductionDays",
 						"     )) ~> insertFactKPIPyramid"
 					]
 				}
