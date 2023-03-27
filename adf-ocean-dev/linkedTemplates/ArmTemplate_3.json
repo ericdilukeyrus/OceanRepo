@@ -1030,7 +1030,8 @@
 						"          BillableDays = cleanColumns@BillableDays,",
 						"          DailyRate = cleanColumns@DailyRate,",
 						"          AnnualDirectCosts = cleanColumns@AnnualDirectCosts,",
-						"          AnnualProductionDays = cleanColumns@AnnualProductionDays",
+						"          AnnualProductionDays = cleanColumns@AnnualProductionDays,",
+						"          DailyCost = cleanColumns@DailyCost",
 						"     )) ~> insertFactKPIPyramid"
 					]
 				}
