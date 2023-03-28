@@ -1,0 +1,305 @@
+{
+	"name": "ds_snowf_raw_mbr_pnl_data",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_snowflake_ocean_ods",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "01ODS"
+		},
+		"annotations": [],
+		"type": "SnowflakeTable",
+		"schema": [
+			{
+				"name": "Index",
+				"type": "NUMBER",
+				"precision": 38,
+				"scale": 0
+			},
+			{
+				"name": "Anaplant_Index",
+				"type": "VARCHAR",
+				"scale": 0
+			},
+			{
+				"name": "PBI_Index",
+				"type": "VARCHAR",
+				"scale": 0
+			},
+			{
+				"name": "K_Nature",
+				"type": "VARCHAR",
+				"scale": 0
+			},
+			{
+				"name": "Actual_LY_01",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Actual_LY_02",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Actual_LY_03",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Actual_LY_04",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Actual_LY_05",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Actual_LY_06",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Actual_LY_07",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Actual_LY_08",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Actual_LY_09",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Actual_LY_10",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Actual_LY_11",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Actual_LY_12",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Budget_CY_01",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Budget_CY_02",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Budget_CY_03",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Budget_CY_04",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Budget_CY_05",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Budget_CY_06",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Budget_CY_07",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Budget_CY_08",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Budget_CY_09",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Budget_CY_10",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Budget_CY_11",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Budget_CY_12",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Actual_CY_01",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Actual_CY_02",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Actual_CY_03",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Actual_CY_04",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Actual_CY_05",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Actual_CY_06",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Actual_CY_07",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Actual_CY_08",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Actual_CY_09",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Actual_CY_10",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Actual_CY_11",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Actual_CY_12",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Actual_NY_01",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Actual_NY_02",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "Actual_NY_03",
+				"type": "FLOAT",
+				"precision": 15,
+				"scale": 0
+			},
+			{
+				"name": "BU_Code",
+				"type": "VARCHAR",
+				"scale": 0
+			},
+			{
+				"name": "BU_Name",
+				"type": "VARCHAR",
+				"scale": 0
+			},
+			{
+				"name": "Currency_Code",
+				"type": "VARCHAR",
+				"scale": 0
+			},
+			{
+				"name": "MBR_Scope",
+				"type": "VARCHAR",
+				"scale": 0
+			},
+			{
+				"name": "MBR_Month",
+				"type": "VARCHAR",
+				"scale": 0
+			},
+			{
+				"name": "CostCenter_Code",
+				"type": "VARCHAR",
+				"scale": 0
+			}
+		],
+		"typeProperties": {
+			"schema": "ODS",
+			"table": "R_P_L_FI_CANADA_BU01"
+		}
+	}
+}
