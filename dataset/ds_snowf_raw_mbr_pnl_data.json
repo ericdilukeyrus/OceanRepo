@@ -5,6 +5,11 @@
 			"referenceName": "ls_snowflake_ocean_ods",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"pRawTableName": {
+				"type": "string"
+			}
+		},
 		"folder": {
 			"name": "01ODS"
 		},
@@ -299,7 +304,10 @@
 		],
 		"typeProperties": {
 			"schema": "ODS",
-			"table": "R_P_L_FI_CANADA_BU01"
+			"table": {
+				"value": "@dataset().pRawTableName",
+				"type": "Expression"
+			}
 		}
 	}
 }
