@@ -27,6 +27,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'ocean_db_nonencrypted'"
 		},
+		"ls_snowflake_ocean_ods_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'ls_snowflake_ocean_ods'"
+		},
 		"AzureKeyVaultOceanProject_properties_typeProperties_baseUrl": {
 			"type": "string",
 			"defaultValue": "https://ocean-project.vault.azure.net/"
@@ -3063,8 +3067,15 @@
 														"value": "@item().RawTableName",
 														"type": "Expression"
 													}
+												},
+												"insertRawMBRDataSnowf": {
+													"pRawTableName": {
+														"value": "@item().RawTableName",
+														"type": "Expression"
+													}
 												}
-											}
+											},
+											"linkedServiceParameters": {}
 										},
 										"staging": {},
 										"integrationRuntime": {
@@ -12679,6 +12690,13 @@
 								"type": "DatasetReference"
 							},
 							"name": "insertRawMBRData"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_snowf_raw_mbr_pnl_data",
+								"type": "DatasetReference"
+							},
+							"name": "insertRawMBRDataSnowf"
 						}
 					],
 					"transformations": [
@@ -12925,13 +12943,127 @@
 						"          MBR_Scope,",
 						"          MBR_Month,",
 						"          CostCenter_Code",
-						"     )) ~> insertRawMBRData"
+						"     )) ~> insertRawMBRData",
+						"removeEmptyColumns sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          Index as decimal(38,0),",
+						"          Anaplant_Index as string,",
+						"          PBI_Index as string,",
+						"          K_Nature as string,",
+						"          Actual_LY_01 as double,",
+						"          Actual_LY_02 as double,",
+						"          Actual_LY_03 as double,",
+						"          Actual_LY_04 as double,",
+						"          Actual_LY_05 as double,",
+						"          Actual_LY_06 as double,",
+						"          Actual_LY_07 as double,",
+						"          Actual_LY_08 as double,",
+						"          Actual_LY_09 as double,",
+						"          Actual_LY_10 as double,",
+						"          Actual_LY_11 as double,",
+						"          Actual_LY_12 as double,",
+						"          Budget_CY_01 as double,",
+						"          Budget_CY_02 as double,",
+						"          Budget_CY_03 as double,",
+						"          Budget_CY_04 as double,",
+						"          Budget_CY_05 as double,",
+						"          Budget_CY_06 as double,",
+						"          Budget_CY_07 as double,",
+						"          Budget_CY_08 as double,",
+						"          Budget_CY_09 as double,",
+						"          Budget_CY_10 as double,",
+						"          Budget_CY_11 as double,",
+						"          Budget_CY_12 as double,",
+						"          Actual_CY_01 as double,",
+						"          Actual_CY_02 as double,",
+						"          Actual_CY_03 as double,",
+						"          Actual_CY_04 as double,",
+						"          Actual_CY_05 as double,",
+						"          Actual_CY_06 as double,",
+						"          Actual_CY_07 as double,",
+						"          Actual_CY_08 as double,",
+						"          Actual_CY_09 as double,",
+						"          Actual_CY_10 as double,",
+						"          Actual_CY_11 as double,",
+						"          Actual_CY_12 as double,",
+						"          Actual_NY_01 as double,",
+						"          Actual_NY_02 as double,",
+						"          Actual_NY_03 as double,",
+						"          BU_Code as string,",
+						"          BU_Name as string,",
+						"          Currency_Code as string,",
+						"          MBR_Scope as string,",
+						"          MBR_Month as string,",
+						"          CostCenter_Code as string",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     recreate:true,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     stageInsert: true,",
+						"     mapColumn(",
+						"          Index = {_col0_},",
+						"          Anaplant_Index = {_col1_},",
+						"          PBI_Index = {_col2_},",
+						"          K_Nature = {_col4_},",
+						"          Actual_LY_01 = {_col5_},",
+						"          Actual_LY_02 = {_col6_},",
+						"          Actual_LY_03 = {_col7_},",
+						"          Actual_LY_04 = {_col8_},",
+						"          Actual_LY_05 = {_col9_},",
+						"          Actual_LY_06 = {_col10_},",
+						"          Actual_LY_07 = {_col11_},",
+						"          Actual_LY_08 = {_col12_},",
+						"          Actual_LY_09 = {_col13_},",
+						"          Actual_LY_10 = {_col14_},",
+						"          Actual_LY_11 = {_col15_},",
+						"          Actual_LY_12 = {_col16_},",
+						"          Budget_CY_01 = {_col19_},",
+						"          Budget_CY_02 = {_col20_},",
+						"          Budget_CY_03 = {_col21_},",
+						"          Budget_CY_04 = {_col22_},",
+						"          Budget_CY_05 = {_col23_},",
+						"          Budget_CY_06 = {_col24_},",
+						"          Budget_CY_07 = {_col25_},",
+						"          Budget_CY_08 = {_col26_},",
+						"          Budget_CY_09 = {_col27_},",
+						"          Budget_CY_10 = {_col28_},",
+						"          Budget_CY_11 = {_col29_},",
+						"          Budget_CY_12 = {_col30_},",
+						"          Actual_CY_01 = {_col33_},",
+						"          Actual_CY_02 = {_col34_},",
+						"          Actual_CY_03 = {_col35_},",
+						"          Actual_CY_04 = {_col36_},",
+						"          Actual_CY_05 = {_col37_},",
+						"          Actual_CY_06 = {_col38_},",
+						"          Actual_CY_07 = {_col39_},",
+						"          Actual_CY_08 = {_col40_},",
+						"          Actual_CY_09 = {_col41_},",
+						"          Actual_CY_10 = {_col42_},",
+						"          Actual_CY_11 = {_col43_},",
+						"          Actual_CY_12 = {_col44_},",
+						"          Actual_NY_01 = {_col46_},",
+						"          Actual_NY_02 = {_col47_},",
+						"          Actual_NY_03 = {_col48_},",
+						"          BU_Code,",
+						"          BU_Name,",
+						"          Currency_Code,",
+						"          MBR_Scope,",
+						"          MBR_Month,",
+						"          CostCenter_Code",
+						"     )) ~> insertRawMBRDataSnowf"
 					]
 				}
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ds_raw_mbr_pnl_data')]",
-				"[concat(variables('factoryId'), '/datasets/ds_ocean_stg_nonecrypted')]"
+				"[concat(variables('factoryId'), '/datasets/ds_ocean_stg_nonecrypted')]",
+				"[concat(variables('factoryId'), '/datasets/ds_snowf_raw_mbr_pnl_data')]"
 			]
 		},
 		{
@@ -13421,6 +13553,339 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ds_ocean_ods')]",
 				"[concat(variables('factoryId'), '/datasets/ds_unpvtdata_table')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_snowflake_ocean_ods')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Connection to Snowflake ODS schema",
+				"annotations": [],
+				"type": "Snowflake",
+				"typeProperties": {
+					"authenticationType": "Basic",
+					"connectionString": "[parameters('ls_snowflake_ocean_ods_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_snowf_raw_mbr_pnl_data')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_snowflake_ocean_ods",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"pRawTableName": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "01ODS"
+				},
+				"annotations": [],
+				"type": "SnowflakeTable",
+				"schema": [
+					{
+						"name": "Index",
+						"type": "NUMBER",
+						"precision": 38,
+						"scale": 0
+					},
+					{
+						"name": "Anaplant_Index",
+						"type": "VARCHAR",
+						"scale": 0
+					},
+					{
+						"name": "PBI_Index",
+						"type": "VARCHAR",
+						"scale": 0
+					},
+					{
+						"name": "K_Nature",
+						"type": "VARCHAR",
+						"scale": 0
+					},
+					{
+						"name": "Actual_LY_01",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_LY_02",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_LY_03",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_LY_04",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_LY_05",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_LY_06",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_LY_07",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_LY_08",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_LY_09",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_LY_10",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_LY_11",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_LY_12",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Budget_CY_01",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Budget_CY_02",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Budget_CY_03",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Budget_CY_04",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Budget_CY_05",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Budget_CY_06",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Budget_CY_07",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Budget_CY_08",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Budget_CY_09",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Budget_CY_10",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Budget_CY_11",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Budget_CY_12",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_CY_01",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_CY_02",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_CY_03",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_CY_04",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_CY_05",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_CY_06",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_CY_07",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_CY_08",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_CY_09",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_CY_10",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_CY_11",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_CY_12",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_NY_01",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_NY_02",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_NY_03",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "BU_Code",
+						"type": "VARCHAR",
+						"scale": 0
+					},
+					{
+						"name": "BU_Name",
+						"type": "VARCHAR",
+						"scale": 0
+					},
+					{
+						"name": "Currency_Code",
+						"type": "VARCHAR",
+						"scale": 0
+					},
+					{
+						"name": "MBR_Scope",
+						"type": "VARCHAR",
+						"scale": 0
+					},
+					{
+						"name": "MBR_Month",
+						"type": "VARCHAR",
+						"scale": 0
+					},
+					{
+						"name": "CostCenter_Code",
+						"type": "VARCHAR",
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "ODS",
+					"table": {
+						"value": "@dataset().pRawTableName",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_snowflake_ocean_ods')]"
 			]
 		}
 	]
