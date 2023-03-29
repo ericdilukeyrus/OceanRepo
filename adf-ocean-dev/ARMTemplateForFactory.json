@@ -3000,6 +3000,7 @@
 								"type": "Expression"
 							},
 							"isSequential": false,
+							"batchCount": 3,
 							"activities": [
 								{
 									"name": "Copy MBR Files to ODS",
