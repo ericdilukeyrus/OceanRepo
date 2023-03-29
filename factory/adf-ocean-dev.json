@@ -61,6 +61,10 @@
 			"gDimSeniorityLevel": {
 				"type": "string",
 				"value": "DimSeniorityLevel"
+			},
+			"gSnowflakeOnly": {
+				"type": "int",
+				"value": 1
 			}
 		},
 		"globalConfigurations": {
