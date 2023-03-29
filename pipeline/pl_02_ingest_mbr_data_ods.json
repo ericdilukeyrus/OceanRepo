@@ -344,6 +344,12 @@
 												"value": "@item().RawTableName",
 												"type": "Expression"
 											}
+										},
+										"insertRawMBRDataSnowf": {
+											"pRawTableName": {
+												"value": "@item().RawTableName",
+												"type": "Expression"
+											}
 										}
 									}
 								},
