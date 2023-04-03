@@ -66,9 +66,9 @@
 				"type": "int",
 				"value": 1
 			},
-			"gDimCurrencyConversionTableName": {
+			"gFactCurrencyConversionTableName": {
 				"type": "string",
-				"value": "DimConversionRate"
+				"value": "FactConversionRate"
 			}
 		},
 		"globalConfigurations": {
