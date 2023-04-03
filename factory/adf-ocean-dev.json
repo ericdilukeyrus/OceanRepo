@@ -65,6 +65,10 @@
 			"gSnowflakeOnly": {
 				"type": "int",
 				"value": 1
+			},
+			"gDimCurrencyConversionTableName": {
+				"type": "string",
+				"value": "DimConversionRate"
 			}
 		},
 		"globalConfigurations": {
