@@ -19,7 +19,7 @@
 						"referenceName": "ds_ocean_dwh",
 						"type": "DatasetReference"
 					},
-					"name": "getDimConversionRate"
+					"name": "getFactConversionRate"
 				}
 			],
 			"sinks": [
@@ -133,7 +133,7 @@
 				"     allowSchemaDrift: false,",
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
-				"     format: 'table') ~> getDimConversionRate",
+				"     format: 'table') ~> getFactConversionRate",
 				"getMBRUnpvtData derive(Scenario = case( \r",
 				"    like(Period, 'Actual%'),\r",
 				"    'Actual',\r",
@@ -173,7 +173,7 @@
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> cleanColumns",
 				"addColumns derive(PeriodYYYYMM01 = toInteger(concat(toString(year(MonthYear)),right(concat('0',toString(month(MonthYear))),2), '01'))) ~> addPeriodYYYYMM01",
-				"getDimConversionRate select(mapColumn(",
+				"getFactConversionRate select(mapColumn(",
 				"          InputCurrency,",
 				"          OutputCurrency,",
 				"          MonthYearID,",
