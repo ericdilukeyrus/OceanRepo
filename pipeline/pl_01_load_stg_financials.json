@@ -50,6 +50,12 @@
 												"type": "Expression"
 											}
 										},
+										"getDimConversionRate": {
+											"vTableName": {
+												"value": "@pipeline().globalParameters.gDimCurrencyConversionTableName",
+												"type": "Expression"
+											}
+										},
 										"insertMBRStagingData": {
 											"stgFinancialTable": {
 												"value": "@item().StgFinancialTableName",
