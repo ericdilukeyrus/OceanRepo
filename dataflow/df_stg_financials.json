@@ -19,7 +19,7 @@
 						"referenceName": "ds_ocean_dwh",
 						"type": "DatasetReference"
 					},
-					"name": "getDImCurrency"
+					"name": "getDimConversionRate"
 				}
 			],
 			"sinks": [
@@ -37,15 +37,6 @@
 					"description": "Add Columns : \nScenario\nMonthYear"
 				},
 				{
-					"name": "upvtCurrency"
-				},
-				{
-					"name": "calcPeriod"
-				},
-				{
-					"name": "joinDimCurrency"
-				},
-				{
 					"name": "convertToEuro"
 				},
 				{
@@ -53,6 +44,54 @@
 				},
 				{
 					"name": "addPeriodYYYYMM01"
+				},
+				{
+					"name": "filterColumns"
+				},
+				{
+					"name": "unpvtConversionRate"
+				},
+				{
+					"name": "spliCurrency"
+				},
+				{
+					"name": "addPeriodCode"
+				},
+				{
+					"name": "fCAD"
+				},
+				{
+					"name": "fUSD"
+				},
+				{
+					"name": "fEUR"
+				},
+				{
+					"name": "fBRL"
+				},
+				{
+					"name": "EUR"
+				},
+				{
+					"name": "CAD"
+				},
+				{
+					"name": "USD"
+				},
+				{
+					"name": "BRL"
+				},
+				{
+					"name": "joinEUR"
+				},
+				{
+					"name": "joinUSD"
+				},
+				{
+					"name": "joinCAD"
+				},
+				{
+					"name": "joinBRL"
 				}
 			],
 			"scriptLines": [
@@ -81,8 +120,10 @@
 				"source(output(",
 				"          CurrencyID as long,",
 				"          InputCurrency as string,",
+				"          OutputCurrency as string,",
 				"          CurrencyPair as string,",
 				"          MonthYear as timestamp,",
+				"          MonthYearID as integer,",
 				"          Actual_LY as double,",
 				"          Budget_CY as double,",
 				"          Actual_CY as double,",
@@ -92,7 +133,7 @@
 				"     allowSchemaDrift: false,",
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
-				"     format: 'table') ~> getDImCurrency",
+				"     format: 'table') ~> getDimConversionRate",
 				"getMBRUnpvtData derive(Scenario = case( \r",
 				"    like(Period, 'Actual%'),\r",
 				"    'Actual',\r",
@@ -109,26 +150,10 @@
 				"),",
 				"          Index = toInteger(Index),",
 				"          Value = toFloat(Value)) ~> addColumns",
-				"getDImCurrency unpivot(output(",
-				"          Period as string,",
-				"          Value as double",
-				"     ),",
-				"     ungroupBy(CurrencyID,",
-				"          InputCurrency,",
-				"          CurrencyPair,",
-				"          MonthYear),",
-				"     lateral: false,",
-				"     ignoreNullPivots: false) ~> upvtCurrency",
-				"upvtCurrency derive(Period = concat(Period,'_',toString(MonthYear, 'MM')),",
-				"          PeriodYYYYMM01 = toInteger(concat(toString(year(MonthYear)),right(concat('0',toString(month(MonthYear))),2),'01'))) ~> calcPeriod",
-				"addPeriodYYYYMM01, calcPeriod join(lower(trim(Currency_Code)) == lower(trim(InputCurrency))",
-				"     && getMBRUnpvtData@Period == calcPeriod@Period",
-				"     && addPeriodYYYYMM01@PeriodYYYYMM01 == calcPeriod@PeriodYYYYMM01,",
-				"     joinType:'inner',",
-				"     matchType:'exact',",
-				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> joinDimCurrency",
-				"joinDimCurrency derive(ValueEuro = addColumns@Value* upvtCurrency@Value) ~> convertToEuro",
+				"joinBRL derive(ValueEuro = Value * EURValue,",
+				"          ValueUSD = Value * USDValue,",
+				"          ValueCAD = Value * CADValue,",
+				"          ValueBRL = Value * BRLValue) ~> convertToEuro",
 				"convertToEuro select(mapColumn(",
 				"          BusinessUnit = BU_Name,",
 				"          Scenario,",
@@ -136,15 +161,118 @@
 				"          Nature = K_Nature,",
 				"          CurrencyCode = Currency_Code,",
 				"          CostCenterCode = CostCenter_Code,",
-				"          MonthYear = addColumns@MonthYear,",
-				"          MonthYearID = addPeriodYYYYMM01@PeriodYYYYMM01,",
+				"          MonthYear,",
+				"          MonthYearID = PeriodYYYYMM01,",
 				"          MBR_Month,",
-				"          Value = addColumns@Value,",
-				"          ValueEuro",
+				"          Value,",
+				"          ValueEuro,",
+				"          ValueUSD,",
+				"          ValueCAD,",
+				"          ValueBRL",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> cleanColumns",
 				"addColumns derive(PeriodYYYYMM01 = toInteger(concat(toString(year(MonthYear)),right(concat('0',toString(month(MonthYear))),2), '01'))) ~> addPeriodYYYYMM01",
+				"getDimConversionRate select(mapColumn(",
+				"          InputCurrency,",
+				"          OutputCurrency,",
+				"          MonthYearID,",
+				"          MonthYear,",
+				"          Actual_LY,",
+				"          Budget_CY,",
+				"          Actual_CY,",
+				"          Forecast_CY,",
+				"          Forecast_NY",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> filterColumns",
+				"filterColumns unpivot(output(",
+				"          Period as string,",
+				"          Value as double",
+				"     ),",
+				"     ungroupBy(InputCurrency,",
+				"          OutputCurrency,",
+				"          MonthYearID,",
+				"          MonthYear),",
+				"     lateral: false,",
+				"     ignoreNullPivots: false) ~> unpvtConversionRate",
+				"addPeriodCode split(OutputCurrency =='EUR',",
+				"     OutputCurrency == 'USD',",
+				"     OutputCurrency =='CAD',",
+				"     disjoint: true) ~> spliCurrency@(sEUR, sUSD, sCAD, sBRL)",
+				"unpvtConversionRate derive(Period = concat(Period,'_', right(concat('0',toString(month(MonthYear))),2))) ~> addPeriodCode",
+				"spliCurrency@sCAD filter(equals(OutputCurrency, \"CAD\")) ~> fCAD",
+				"spliCurrency@sUSD filter(equals(OutputCurrency, 'USD')) ~> fUSD",
+				"spliCurrency@sEUR filter(equals(OutputCurrency, 'EUR')) ~> fEUR",
+				"spliCurrency@sBRL filter(equals(OutputCurrency, 'BRL')) ~> fBRL",
+				"fEUR select(mapColumn(",
+				"          EURInputCurrency = InputCurrency,",
+				"          EUROutputCurrency = OutputCurrency,",
+				"          EURMonthYearID = MonthYearID,",
+				"          EURMonthYear = MonthYear,",
+				"          EURPeriod = Period,",
+				"          EURValue = Value",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> EUR",
+				"fCAD select(mapColumn(",
+				"          CADInputCurrency = InputCurrency,",
+				"          CADOutputCurrency = OutputCurrency,",
+				"          CADMonthYearID = MonthYearID,",
+				"          CADMonthYear = MonthYear,",
+				"          CADPeriod = Period,",
+				"          CADValue = Value",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> CAD",
+				"fUSD select(mapColumn(",
+				"          USDInputCurrency = InputCurrency,",
+				"          USDOutputCurrency = OutputCurrency,",
+				"          USDMonthYearID = MonthYearID,",
+				"          USDMonthYear = MonthYear,",
+				"          USDPeriod = Period,",
+				"          USDValue = Value",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> USD",
+				"fBRL select(mapColumn(",
+				"          BRLInputCurrency = InputCurrency,",
+				"          BRLOutputCurrency = OutputCurrency,",
+				"          BRLMonthYearID = MonthYearID,",
+				"          BRLMonthYear = MonthYear,",
+				"          BRLPeriod = Period,",
+				"          BRLValue = Value",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> BRL",
+				"addPeriodYYYYMM01, EUR join(Currency_Code == EURInputCurrency",
+				"     && Period == EURPeriod",
+				"     && PeriodYYYYMM01 == EURMonthYearID,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinEUR",
+				"joinEUR, USD join(Currency_Code == USDInputCurrency",
+				"     && Period == USDPeriod",
+				"     && PeriodYYYYMM01 == USDMonthYearID,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinUSD",
+				"joinUSD, CAD join(Currency_Code == CADInputCurrency",
+				"     && Period == CADPeriod",
+				"     && PeriodYYYYMM01 == CADMonthYearID,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinCAD",
+				"joinCAD, BRL join(Currency_Code == BRLInputCurrency",
+				"     && Period == BRLPeriod",
+				"     && PeriodYYYYMM01 == BRLMonthYearID,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinBRL",
 				"cleanColumns sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
