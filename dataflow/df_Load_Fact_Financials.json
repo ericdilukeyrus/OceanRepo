@@ -62,13 +62,6 @@
 						"type": "DatasetReference"
 					},
 					"name": "getDimCostCenter"
-				},
-				{
-					"dataset": {
-						"referenceName": "ds_ocean_dwh",
-						"type": "DatasetReference"
-					},
-					"name": "getDimCurrency"
 				}
 			],
 			"sinks": [
@@ -157,9 +150,6 @@
 				},
 				{
 					"name": "joinDimCostCenter"
-				},
-				{
-					"name": "currAddYearMonth"
 				}
 			],
 			"scriptLines": [
@@ -307,21 +297,6 @@
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     format: 'table') ~> getDimCostCenter",
-				"source(output(",
-				"          CurrencyID as long,",
-				"          InputCurrency as string,",
-				"          CurrencyPair as string,",
-				"          MonthYear as timestamp,",
-				"          Actual_LY as double,",
-				"          Budget_CY as double,",
-				"          Actual_CY as double,",
-				"          Forecast_CY as double,",
-				"          Forecast_NY as double",
-				"     ),",
-				"     allowSchemaDrift: true,",
-				"     validateSchema: false,",
-				"     isolationLevel: 'READ_UNCOMMITTED',",
-				"     format: 'table') ~> getDimCurrency",
 				"getMBRStagingData derive(CreatedBy = $pPipelineRunID) ~> addColumns",
 				"addColumns, getDimScenario join(lower(trim(Scenario)) == lower(trim(Scenario_Name0)),",
 				"     joinType:'inner',",
@@ -489,7 +464,6 @@
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joinDimCostCenter",
-				"getDimCurrency derive(MonthYearID = toInteger(concat(toString(year(MonthYear)), lpad(toString(month(MonthYear)),2,'0'), '01'))) ~> currAddYearMonth",
 				"insertOrUpdate sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",

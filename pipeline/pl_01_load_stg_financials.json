@@ -51,6 +51,12 @@
 												"type": "Expression"
 											}
 										},
+										"getFactConversionRate": {
+											"vTableName": {
+												"value": "@pipeline().globalParameters.gFactCurrencyConversionTableName",
+												"type": "Expression"
+											}
+										},
 										"insertMBRStagingData": {
 											"stgFinancialTable": {
 												"value": "@item().StgFinancialTableName",
