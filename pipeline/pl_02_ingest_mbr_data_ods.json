@@ -277,7 +277,7 @@
 						"type": "Expression"
 					},
 					"isSequential": false,
-					"batchCount": 3,
+					"batchCount": 10,
 					"activities": [
 						{
 							"name": "Copy MBR Files to ODS",
@@ -341,12 +341,6 @@
 											}
 										},
 										"insertRawMBRData": {
-											"pRawTableName": {
-												"value": "@item().RawTableName",
-												"type": "Expression"
-											}
-										},
-										"insertRawMBRDataSnowf": {
 											"pRawTableName": {
 												"value": "@item().RawTableName",
 												"type": "Expression"

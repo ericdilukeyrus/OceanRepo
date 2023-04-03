@@ -20,6 +20,7 @@
 						"type": "Expression"
 					},
 					"isSequential": false,
+					"batchCount": 10,
 					"activities": [
 						{
 							"name": "Staging Financial Table",
@@ -47,12 +48,6 @@
 										"getMBRUnpvtData": {
 											"vTableName": {
 												"value": "@item().MBR_UnpvtTableName",
-												"type": "Expression"
-											}
-										},
-										"getDimConversionRate": {
-											"vTableName": {
-												"value": "@pipeline().globalParameters.gDimCurrencyConversionTableName",
 												"type": "Expression"
 											}
 										},
