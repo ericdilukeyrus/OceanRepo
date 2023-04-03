@@ -19,6 +19,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'ls_sharepoint_xml'"
 		},
+		"ls_snowflake_ocean_ods_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'ls_snowflake_ocean_ods'"
+		},
 		"ocean_db_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'ocean_db'"
@@ -26,10 +30,6 @@
 		"ocean_db_nonencrypted_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'ocean_db_nonencrypted'"
-		},
-		"ls_snowflake_ocean_ods_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'ls_snowflake_ocean_ods'"
 		},
 		"AzureKeyVaultOceanProject_properties_typeProperties_baseUrl": {
 			"type": "string",
@@ -2343,9 +2343,9 @@
 														"type": "Expression"
 													}
 												},
-												"getDImCurrency": {
+												"getDimConversionRate": {
 													"vTableName": {
-														"value": "@pipeline().globalParameters.gDimCurrency",
+														"value": "@pipeline().globalParameters.gDimCurrencyConversionTableName",
 														"type": "Expression"
 													}
 												},
@@ -2355,7 +2355,8 @@
 														"type": "Expression"
 													}
 												}
-											}
+											},
+											"linkedServiceParameters": {}
 										},
 										"staging": {},
 										"integrationRuntime": {
@@ -3069,8 +3070,7 @@
 														"type": "Expression"
 													}
 												}
-											},
-											"linkedServiceParameters": {}
+											}
 										},
 										"staging": {},
 										"integrationRuntime": {
@@ -4298,7 +4298,22 @@
 						"precision": 15
 					},
 					{
-						"name": "ValueEuro",
+						"name": "ValueEUR",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "ValueUSD",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "ValueCAD",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "ValueBRL",
 						"type": "float",
 						"precision": 15
 					},
@@ -4325,7 +4340,7 @@
 				],
 				"typeProperties": {
 					"schema": "dwh",
-					"table": "FactDrivers"
+					"table": "FactDrivers_T"
 				}
 			},
 			"dependsOn": [
@@ -4400,7 +4415,22 @@
 						"precision": 15
 					},
 					{
-						"name": "ValueEuro",
+						"name": "ValueEUR",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "ValueUSD",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "ValueCAD",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "ValueBRL",
 						"type": "float",
 						"precision": 15
 					},
@@ -4427,7 +4457,7 @@
 				],
 				"typeProperties": {
 					"schema": "dwh",
-					"table": "FactFinancials"
+					"table": "FactFinancials_T"
 				}
 			},
 			"dependsOn": [
@@ -6319,6 +6349,324 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/dimensions_source')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_snowf_raw_mbr_pnl_data')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_snowflake_ocean_ods",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"pRawTableName": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "01ODS"
+				},
+				"annotations": [],
+				"type": "SnowflakeTable",
+				"schema": [
+					{
+						"name": "Index",
+						"type": "NUMBER",
+						"precision": 38,
+						"scale": 0
+					},
+					{
+						"name": "Anaplant_Index",
+						"type": "VARCHAR",
+						"scale": 0
+					},
+					{
+						"name": "PBI_Index",
+						"type": "VARCHAR",
+						"scale": 0
+					},
+					{
+						"name": "K_Nature",
+						"type": "VARCHAR",
+						"scale": 0
+					},
+					{
+						"name": "Actual_LY_01",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_LY_02",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_LY_03",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_LY_04",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_LY_05",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_LY_06",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_LY_07",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_LY_08",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_LY_09",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_LY_10",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_LY_11",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_LY_12",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Budget_CY_01",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Budget_CY_02",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Budget_CY_03",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Budget_CY_04",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Budget_CY_05",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Budget_CY_06",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Budget_CY_07",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Budget_CY_08",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Budget_CY_09",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Budget_CY_10",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Budget_CY_11",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Budget_CY_12",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_CY_01",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_CY_02",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_CY_03",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_CY_04",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_CY_05",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_CY_06",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_CY_07",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_CY_08",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_CY_09",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_CY_10",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_CY_11",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_CY_12",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_NY_01",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_NY_02",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "Actual_NY_03",
+						"type": "FLOAT",
+						"precision": 15,
+						"scale": 0
+					},
+					{
+						"name": "BU_Code",
+						"type": "VARCHAR",
+						"scale": 0
+					},
+					{
+						"name": "BU_Name",
+						"type": "VARCHAR",
+						"scale": 0
+					},
+					{
+						"name": "Currency_Code",
+						"type": "VARCHAR",
+						"scale": 0
+					},
+					{
+						"name": "MBR_Scope",
+						"type": "VARCHAR",
+						"scale": 0
+					},
+					{
+						"name": "MBR_Month",
+						"type": "VARCHAR",
+						"scale": 0
+					},
+					{
+						"name": "CostCenter_Code",
+						"type": "VARCHAR",
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "ODS",
+					"table": {
+						"value": "@dataset().pRawTableName",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_snowflake_ocean_ods')]"
 			]
 		},
 		{
@@ -11700,6 +12048,21 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/ls_snowflake_ocean_ods')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Connection to Snowflake ODS schema",
+				"annotations": [],
+				"type": "Snowflake",
+				"typeProperties": {
+					"authenticationType": "Basic",
+					"connectionString": "[parameters('ls_snowflake_ocean_ods_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ocean_db')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -11938,7 +12301,10 @@
 						"          MonthYearID as integer,",
 						"          MBR_Month as string,",
 						"          Value as double,",
-						"          ValueEuro as double",
+						"          ValueEuro as double,",
+						"          ValueUSD as double,",
+						"          ValueCAD as double,",
+						"          ValueBRL as double",
 						"     ),",
 						"     allowSchemaDrift: true,",
 						"     validateSchema: false,",
@@ -12002,7 +12368,10 @@
 						"          MonthYear as date,",
 						"          CurrencyCode as string,",
 						"          Value as double,",
-						"          ValueEuro as double,",
+						"          ValueEUR as double,",
+						"          ValueUSD as double,",
+						"          ValueCAD as double,",
+						"          ValueBRL as double,",
 						"          CreatedOn as timestamp,",
 						"          CreatedBy as string,",
 						"          ModifiedOn as timestamp,",
@@ -12023,7 +12392,10 @@
 						"          MonthYear as date,",
 						"          CurrencyCode as string,",
 						"          Value as double,",
-						"          ValueEuro as double,",
+						"          ValueEUR as double,",
+						"          ValueUSD as double,",
+						"          ValueCAD as double,",
+						"          ValueBRL as double,",
 						"          CreatedOn as timestamp,",
 						"          CreatedBy as string,",
 						"          ModifiedOn as timestamp,",
@@ -12102,6 +12474,9 @@
 						"          CurrencyCode,",
 						"          Value,",
 						"          ValueEuro,",
+						"          ValueUSD,",
+						"          ValueCAD,",
+						"          ValueBRL,",
 						"          CreatedBy",
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
@@ -12154,6 +12529,9 @@
 						"          CurrencyCode = FINorKPI@FIN@CurrencyCode,",
 						"          Value = FINorKPI@FIN@Value,",
 						"          ValueEuro,",
+						"          ValueUSD,",
+						"          ValueCAD,",
+						"          ValueBRL,",
 						"          CreatedBy,",
 						"          InsertOrUpdate",
 						"     ),",
@@ -12214,7 +12592,10 @@
 						"          MonthYear,",
 						"          CurrencyCode = FINorKPI@KPI@CurrencyCode,",
 						"          Value = FINorKPI@KPI@Value,",
-						"          ValueEuro,",
+						"          ValueEUR = ValueEuro,",
+						"          ValueUSD,",
+						"          ValueCAD,",
+						"          ValueBRL,",
 						"          CreatedBy,",
 						"          InsertOrUpdate",
 						"     ),",
@@ -12246,7 +12627,10 @@
 						"          MonthYear as date,",
 						"          CurrencyCode as string,",
 						"          Value as double,",
-						"          ValueEuro as double,",
+						"          ValueEUR as double,",
+						"          ValueUSD as double,",
+						"          ValueCAD as double,",
+						"          ValueBRL as double,",
 						"          CreatedOn as timestamp,",
 						"          CreatedBy as string,",
 						"          ModifiedOn as timestamp,",
@@ -12254,8 +12638,9 @@
 						"     ),",
 						"     deletable:false,",
 						"     insertable:true,",
-						"     updateable:false,",
+						"     updateable:true,",
 						"     upsertable:false,",
+						"     keys:['ScenarioID','NatureID','OrganisationID','CostCenterID','MonthYearID','CurrencyCode','MBRMonth'],",
 						"     format: 'table',",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true,",
@@ -12270,7 +12655,10 @@
 						"          MonthYear,",
 						"          CurrencyCode,",
 						"          Value,",
-						"          ValueEuro,",
+						"          ValueEUR = ValueEuro,",
+						"          ValueUSD,",
+						"          ValueCAD,",
+						"          ValueBRL,",
 						"          CreatedBy",
 						"     )) ~> insertFactFinancials",
 						"insertOrUpdateKPI sink(allowSchemaDrift: true,",
@@ -12286,7 +12674,10 @@
 						"          MonthYear as date,",
 						"          CurrencyCode as string,",
 						"          Value as double,",
-						"          ValueEuro as double,",
+						"          ValueEUR as double,",
+						"          ValueUSD as double,",
+						"          ValueCAD as double,",
+						"          ValueBRL as double,",
 						"          CreatedOn as timestamp,",
 						"          CreatedBy as string,",
 						"          ModifiedOn as timestamp,",
@@ -12294,8 +12685,9 @@
 						"     ),",
 						"     deletable:false,",
 						"     insertable:true,",
-						"     updateable:false,",
+						"     updateable:true,",
 						"     upsertable:false,",
+						"     keys:['ScenarioID','OrganisationID','KPIID','MonthYearID','CostCenterID','MBRMonth','CurrencyCode'],",
 						"     format: 'table',",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true,",
@@ -12310,7 +12702,10 @@
 						"          MonthYear,",
 						"          CurrencyCode,",
 						"          Value,",
-						"          ValueEuro,",
+						"          ValueEUR,",
+						"          ValueUSD,",
+						"          ValueCAD,",
+						"          ValueBRL,",
 						"          CreatedBy",
 						"     )) ~> insertFactDrivers"
 					]
@@ -12941,828 +13336,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/df_shrp_listoffiles')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"folder": {
-					"name": "01ODS"
-				},
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "ds_sharepoint_listofiles_xml",
-								"type": "DatasetReference"
-							},
-							"name": "getListofFiles"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "ds_sharepoint_json",
-								"type": "DatasetReference"
-							},
-							"name": "createJSONListofFiles"
-						}
-					],
-					"transformations": [
-						{
-							"name": "flattenXML"
-						},
-						{
-							"name": "addFileName"
-						}
-					],
-					"scriptLines": [
-						"parameters{",
-						"     pMBR_Scope as string",
-						"}",
-						"source(output(",
-						"          {http://www.w3.org/2005/Atom,feed} as ({http://www.w3.org/2005/Atom,entry} as ({http://www.w3.org/2005/Atom,author} as ({http://www.w3.org/2005/Atom,name} as string), {http://www.w3.org/2005/Atom,category} as ({@scheme} as string, {@term} as string), {http://www.w3.org/2005/Atom,content} as ({@type} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,properties} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,CheckInComment} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices,CheckOutType} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as short, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,ContentTag} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices,CustomizedPageStatus} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as boolean, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,ETag} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices,Exists} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as boolean, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,IrmEnabled} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as boolean, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,Length} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as integer, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,Level} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as boolean, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,LinkingUri} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices,LinkingUrl} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices,MajorVersion} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as short, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,MinorVersion} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as boolean, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,Name} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices,ServerRelativeUrl} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices,TimeCreated} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as timestamp, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,TimeLastModified} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as timestamp, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,Title} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices,UIVersion} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as short, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,UIVersionLabel} as double, {http://schemas.microsoft.com/ado/2007/08/dataservices,UniqueId} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string))), {http://www.w3.org/2005/Atom,id} as string, {http://www.w3.org/2005/Atom,link} as ({@href} as string, {@rel} as string, {@title} as string, {@type} as string)[], {http://www.w3.org/2005/Atom,title} as string, {http://www.w3.org/2005/Atom,updated} as timestamp)[], {http://www.w3.org/2005/Atom,id} as string, {http://www.w3.org/2005/Atom,title} as string, {http://www.w3.org/2005/Atom,updated} as timestamp)",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     ignoreNoFilesFound: true,",
-						"     purgeFiles: true,",
-						"     validationMode: 'none',",
-						"     namespaces: true) ~> getListofFiles",
-						"getListofFiles foldDown(unroll({http://www.w3.org/2005/Atom,feed}.{http://www.w3.org/2005/Atom,entry}),",
-						"     mapColumn(",
-						"          GetFileUrl = {http://www.w3.org/2005/Atom,feed}.{http://www.w3.org/2005/Atom,entry}.{http://www.w3.org/2005/Atom,id},",
-						"          LinkingUri = {http://www.w3.org/2005/Atom,feed}.{http://www.w3.org/2005/Atom,entry}.{http://www.w3.org/2005/Atom,content}.{http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,properties}.{http://schemas.microsoft.com/ado/2007/08/dataservices,LinkingUri},",
-						"          LinkingUrl = {http://www.w3.org/2005/Atom,feed}.{http://www.w3.org/2005/Atom,entry}.{http://www.w3.org/2005/Atom,content}.{http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,properties}.{http://schemas.microsoft.com/ado/2007/08/dataservices,ServerRelativeUrl},",
-						"          ServerRelativeUrl = {http://www.w3.org/2005/Atom,feed}.{http://www.w3.org/2005/Atom,entry}.{http://www.w3.org/2005/Atom,content}.{http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,properties}.{http://schemas.microsoft.com/ado/2007/08/dataservices,ServerRelativeUrl},",
-						"          Name = {http://www.w3.org/2005/Atom,feed}.{http://www.w3.org/2005/Atom,entry}.{http://www.w3.org/2005/Atom,content}.{http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,properties}.{http://schemas.microsoft.com/ado/2007/08/dataservices,Name}",
-						"     ),",
-						"     skipDuplicateMapInputs: false,",
-						"     skipDuplicateMapOutputs: false) ~> flattenXML",
-						"flattenXML derive(FileName = concat('toloadSharepoint/02ListFilesToCopy/ListFilesToLoad_',$pMBR_Scope,'.json'),",
-						"          GetFileUrl = concat(replace(GetFileUrl,'https://keyrusgroup.sharepoint.com',''),'/$value')) ~> addFileName",
-						"addFileName sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     input(",
-						"          LinkingUri as string,",
-						"          LinkingUrl as string,",
-						"          ServerRelativeUrl as string,",
-						"          Name as string",
-						"     ),",
-						"     rowUrlColumn:'FileName',",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> createJSONListofFiles"
-					]
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ds_sharepoint_listofiles_xml')]",
-				"[concat(variables('factoryId'), '/datasets/ds_sharepoint_json')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/df_stg_financials')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"folder": {
-					"name": "02STG"
-				},
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "ds_ocean_ods",
-								"type": "DatasetReference"
-							},
-							"name": "getMBRUnpvtData"
-						},
-						{
-							"dataset": {
-								"referenceName": "ds_ocean_dwh",
-								"type": "DatasetReference"
-							},
-							"name": "getDImCurrency"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "stg_financials",
-								"type": "DatasetReference"
-							},
-							"name": "insertMBRStagingData"
-						}
-					],
-					"transformations": [
-						{
-							"name": "addColumns",
-							"description": "Add Columns : \nScenario\nMonthYear"
-						},
-						{
-							"name": "upvtCurrency"
-						},
-						{
-							"name": "calcPeriod"
-						},
-						{
-							"name": "joinDimCurrency"
-						},
-						{
-							"name": "convertToEuro"
-						},
-						{
-							"name": "cleanColumns"
-						},
-						{
-							"name": "addPeriodYYYYMM01"
-						}
-					],
-					"scriptLines": [
-						"parameters{",
-						"     unpvtTableName as string",
-						"}",
-						"source(output(",
-						"          Index as string,",
-						"          Anaplant_Index as string,",
-						"          PBI_Index as string,",
-						"          K_Nature as string,",
-						"          BU_Code as string,",
-						"          BU_Name as string,",
-						"          Currency_Code as string,",
-						"          MBR_Scope as string,",
-						"          MBR_Month as string,",
-						"          CostCenter_Code as string,",
-						"          Period as string,",
-						"          Value as string",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     isolationLevel: 'READ_UNCOMMITTED',",
-						"     query: (\"select * from [ods].[{$unpvtTableName}]\"),",
-						"     format: 'query') ~> getMBRUnpvtData",
-						"source(output(",
-						"          CurrencyID as long,",
-						"          InputCurrency as string,",
-						"          CurrencyPair as string,",
-						"          MonthYear as timestamp,",
-						"          Actual_LY as double,",
-						"          Budget_CY as double,",
-						"          Actual_CY as double,",
-						"          Forecast_CY as double,",
-						"          Forecast_NY as double",
-						"     ),",
-						"     allowSchemaDrift: false,",
-						"     validateSchema: false,",
-						"     isolationLevel: 'READ_UNCOMMITTED',",
-						"     format: 'table') ~> getDImCurrency",
-						"getMBRUnpvtData derive(Scenario = case( \r",
-						"    like(Period, 'Actual%'),\r",
-						"    'Actual',\r",
-						"    case( like(Period, 'Budget%'),'Budget','Forecast')\r",
-						"    ),",
-						"          MonthYear = case(\r",
-						"like(Period,'%CY%'),\r",
-						"toDate(concat(toString(year(toDate(MBR_Month))), '-',right(Period,2))),\r",
-						"case(\r",
-						"like(Period,'%LY%'),\r",
-						"toDate(concat(toString(year(toDate(MBR_Month))-1), '-',right(Period,2))),\r",
-						"toDate(concat(toString(year(toDate(MBR_Month))+1), '-',right(Period,2)))\r",
-						")\r",
-						"),",
-						"          Index = toInteger(Index),",
-						"          Value = toFloat(Value)) ~> addColumns",
-						"getDImCurrency unpivot(output(",
-						"          Period as string,",
-						"          Value as double",
-						"     ),",
-						"     ungroupBy(CurrencyID,",
-						"          InputCurrency,",
-						"          CurrencyPair,",
-						"          MonthYear),",
-						"     lateral: false,",
-						"     ignoreNullPivots: false) ~> upvtCurrency",
-						"upvtCurrency derive(Period = concat(Period,'_',toString(MonthYear, 'MM')),",
-						"          PeriodYYYYMM01 = toInteger(concat(toString(year(MonthYear)),right(concat('0',toString(month(MonthYear))),2),'01'))) ~> calcPeriod",
-						"addPeriodYYYYMM01, calcPeriod join(lower(trim(Currency_Code)) == lower(trim(InputCurrency))",
-						"     && getMBRUnpvtData@Period == calcPeriod@Period",
-						"     && addPeriodYYYYMM01@PeriodYYYYMM01 == calcPeriod@PeriodYYYYMM01,",
-						"     joinType:'inner',",
-						"     matchType:'exact',",
-						"     ignoreSpaces: false,",
-						"     broadcast: 'auto')~> joinDimCurrency",
-						"joinDimCurrency derive(ValueEuro = addColumns@Value* upvtCurrency@Value) ~> convertToEuro",
-						"convertToEuro select(mapColumn(",
-						"          BusinessUnit = BU_Name,",
-						"          Scenario,",
-						"          NatureID = Index,",
-						"          Nature = K_Nature,",
-						"          CurrencyCode = Currency_Code,",
-						"          CostCenterCode = CostCenter_Code,",
-						"          MonthYear = addColumns@MonthYear,",
-						"          MonthYearID = addPeriodYYYYMM01@PeriodYYYYMM01,",
-						"          MBR_Month,",
-						"          Value = addColumns@Value,",
-						"          ValueEuro",
-						"     ),",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> cleanColumns",
-						"addColumns derive(PeriodYYYYMM01 = toInteger(concat(toString(year(MonthYear)),right(concat('0',toString(month(MonthYear))),2), '01'))) ~> addPeriodYYYYMM01",
-						"cleanColumns sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     input(",
-						"          BusinessUnit as string,",
-						"          Scenario as string,",
-						"          NatureID as integer,",
-						"          Nature as string,",
-						"          MonthYear as timestamp,",
-						"          Value as double",
-						"     ),",
-						"     deletable:false,",
-						"     insertable:true,",
-						"     updateable:false,",
-						"     upsertable:false,",
-						"     recreate:true,",
-						"     format: 'table',",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError') ~> insertMBRStagingData"
-					]
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ds_ocean_ods')]",
-				"[concat(variables('factoryId'), '/datasets/ds_ocean_dwh')]",
-				"[concat(variables('factoryId'), '/datasets/stg_financials')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/df_stg_kpi_pyramid')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"folder": {
-					"name": "02STG"
-				},
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "ds_ocean_ods",
-								"type": "DatasetReference"
-							},
-							"name": "getMBRKpiPyramid"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "stg_kpi_pyramid",
-								"type": "DatasetReference"
-							},
-							"name": "insertMBRStagingData"
-						}
-					],
-					"transformations": [
-						{
-							"name": "castColumns"
-						},
-						{
-							"name": "removeEmptyRows"
-						},
-						{
-							"name": "nulltoZero"
-						}
-					],
-					"scriptLines": [
-						"parameters{",
-						"     kpiPyramidTableName as string",
-						"}",
-						"source(output(",
-						"          BU as string,",
-						"          Version as string,",
-						"          Period as string,",
-						"          CostCenter as string,",
-						"          PeopleType as string,",
-						"          LevelSeniority as string,",
-						"          EndOfMonth_FTE as string,",
-						"          SrvcSales_bef_bonimali as string,",
-						"          BillableDays as string,",
-						"          DailyRate as string,",
-						"          AnnualDirectCosts as string,",
-						"          AnnualProductionDays as string,",
-						"          DailyCost as string",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     isolationLevel: 'READ_UNCOMMITTED',",
-						"     query: (\"select * from [ods].[{$kpiPyramidTableName}]\"),",
-						"     format: 'query') ~> getMBRKpiPyramid",
-						"removeEmptyRows cast(output(",
-						"          Period as date 'yyyy-MM-dd',",
-						"          EndOfMonth_FTE as float,",
-						"          SrvcSales_bef_bonimali as float,",
-						"          BillableDays as float,",
-						"          DailyRate as float,",
-						"          AnnualDirectCosts as float,",
-						"          AnnualProductionDays as float,",
-						"          DailyCost as float",
-						"     ),",
-						"     errors: true) ~> castColumns",
-						"getMBRKpiPyramid filter(not(isNull(BU))) ~> removeEmptyRows",
-						"castColumns derive(EndOfMonth_FTE = iifNull(EndOfMonth_FTE,0),",
-						"          SrvcSales_bef_bonimali = iifNull(SrvcSales_bef_bonimali,0),",
-						"          BillableDays = iifNull(BillableDays,0),",
-						"          DailyRate = iifNull(DailyRate,0),",
-						"          AnnualDirectCosts = iifNull(AnnualDirectCosts,0),",
-						"          AnnualProductionDays = iifNull(AnnualProductionDays,0),",
-						"          DailyCost = iifNull(DailyCost,0)) ~> nulltoZero",
-						"nulltoZero sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     deletable:false,",
-						"     insertable:true,",
-						"     updateable:false,",
-						"     upsertable:false,",
-						"     recreate:true,",
-						"     format: 'table',",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError') ~> insertMBRStagingData"
-					]
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ds_ocean_ods')]",
-				"[concat(variables('factoryId'), '/datasets/stg_kpi_pyramid')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/df_unpvt_mbr_data')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"folder": {
-					"name": "01ODS"
-				},
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "ds_ocean_ods",
-								"type": "DatasetReference"
-							},
-							"name": "getMBRData",
-							"description": "Retrieve data from the raw MBR sql table"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "ds_unpvtdata_table",
-								"type": "DatasetReference"
-							},
-							"name": "InsertUnpvtMBRData",
-							"description": "Create and insert unpivot MBR data in the corresponding table"
-						}
-					],
-					"transformations": [
-						{
-							"name": "UnpivotMBRData",
-							"description": "Unpivot MBR Data to group by Period"
-						}
-					],
-					"scriptLines": [
-						"parameters{",
-						"     RawTableName as string,",
-						"     UnpivotTableName as string",
-						"}",
-						"source(output(",
-						"          Index as string,",
-						"          Anaplant_Index as string,",
-						"          PBI_Index as string,",
-						"          K_Nature as string,",
-						"          Actual_LY_01 as string,",
-						"          Actual_LY_02 as string,",
-						"          Actual_LY_03 as string,",
-						"          Actual_LY_04 as string,",
-						"          Actual_LY_05 as string,",
-						"          Actual_LY_06 as string,",
-						"          Actual_LY_07 as string,",
-						"          Actual_LY_08 as string,",
-						"          Actual_LY_09 as string,",
-						"          Actual_LY_10 as string,",
-						"          Actual_LY_11 as string,",
-						"          Actual_LY_12 as string,",
-						"          Budget_CY_01 as string,",
-						"          Budget_CY_02 as string,",
-						"          Budget_CY_03 as string,",
-						"          Budget_CY_04 as string,",
-						"          Budget_CY_05 as string,",
-						"          Budget_CY_06 as string,",
-						"          Budget_CY_07 as string,",
-						"          Budget_CY_08 as string,",
-						"          Budget_CY_09 as string,",
-						"          Budget_CY_10 as string,",
-						"          Budget_CY_11 as string,",
-						"          Budget_CY_12 as string,",
-						"          Actual_CY_01 as string,",
-						"          Actual_CY_02 as string,",
-						"          Actual_CY_03 as string,",
-						"          Actual_CY_04 as string,",
-						"          Actual_CY_05 as string,",
-						"          Actual_CY_06 as string,",
-						"          Actual_CY_07 as string,",
-						"          Actual_CY_08 as string,",
-						"          Actual_CY_09 as string,",
-						"          Actual_CY_10 as string,",
-						"          Actual_CY_11 as string,",
-						"          Actual_CY_12 as string,",
-						"          BU_Code as string,",
-						"          BU_Name as string,",
-						"          Currency_Code as string,",
-						"          MBR_Scope as string,",
-						"          MBR_Month as string,",
-						"          CostCenter_Code as string,",
-						"          Actual_NY_01 as string,",
-						"          Actual_NY_02 as string,",
-						"          Actual_NY_03 as string",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     isolationLevel: 'READ_UNCOMMITTED',",
-						"     format: 'table') ~> getMBRData",
-						"getMBRData unpivot(output(",
-						"          Period as string,",
-						"          Value as string",
-						"     ),",
-						"     ungroupBy(Index,",
-						"          Anaplant_Index,",
-						"          PBI_Index,",
-						"          K_Nature,",
-						"          BU_Code,",
-						"          BU_Name,",
-						"          Currency_Code,",
-						"          MBR_Scope,",
-						"          MBR_Month,",
-						"          CostCenter_Code),",
-						"     lateral: false,",
-						"     ignoreNullPivots: true) ~> UnpivotMBRData",
-						"UnpivotMBRData sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     deletable:false,",
-						"     insertable:true,",
-						"     updateable:false,",
-						"     upsertable:false,",
-						"     recreate:true,",
-						"     format: 'table',",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError') ~> InsertUnpvtMBRData"
-					]
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ds_ocean_ods')]",
-				"[concat(variables('factoryId'), '/datasets/ds_unpvtdata_table')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ls_snowflake_ocean_ods')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Connection to Snowflake ODS schema",
-				"annotations": [],
-				"type": "Snowflake",
-				"typeProperties": {
-					"authenticationType": "Basic",
-					"connectionString": "[parameters('ls_snowflake_ocean_ods_connectionString')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ds_snowf_raw_mbr_pnl_data')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "ls_snowflake_ocean_ods",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"pRawTableName": {
-						"type": "string"
-					}
-				},
-				"folder": {
-					"name": "01ODS"
-				},
-				"annotations": [],
-				"type": "SnowflakeTable",
-				"schema": [
-					{
-						"name": "Index",
-						"type": "NUMBER",
-						"precision": 38,
-						"scale": 0
-					},
-					{
-						"name": "Anaplant_Index",
-						"type": "VARCHAR",
-						"scale": 0
-					},
-					{
-						"name": "PBI_Index",
-						"type": "VARCHAR",
-						"scale": 0
-					},
-					{
-						"name": "K_Nature",
-						"type": "VARCHAR",
-						"scale": 0
-					},
-					{
-						"name": "Actual_LY_01",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Actual_LY_02",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Actual_LY_03",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Actual_LY_04",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Actual_LY_05",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Actual_LY_06",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Actual_LY_07",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Actual_LY_08",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Actual_LY_09",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Actual_LY_10",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Actual_LY_11",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Actual_LY_12",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Budget_CY_01",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Budget_CY_02",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Budget_CY_03",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Budget_CY_04",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Budget_CY_05",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Budget_CY_06",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Budget_CY_07",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Budget_CY_08",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Budget_CY_09",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Budget_CY_10",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Budget_CY_11",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Budget_CY_12",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Actual_CY_01",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Actual_CY_02",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Actual_CY_03",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Actual_CY_04",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Actual_CY_05",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Actual_CY_06",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Actual_CY_07",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Actual_CY_08",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Actual_CY_09",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Actual_CY_10",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Actual_CY_11",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Actual_CY_12",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Actual_NY_01",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Actual_NY_02",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "Actual_NY_03",
-						"type": "FLOAT",
-						"precision": 15,
-						"scale": 0
-					},
-					{
-						"name": "BU_Code",
-						"type": "VARCHAR",
-						"scale": 0
-					},
-					{
-						"name": "BU_Name",
-						"type": "VARCHAR",
-						"scale": 0
-					},
-					{
-						"name": "Currency_Code",
-						"type": "VARCHAR",
-						"scale": 0
-					},
-					{
-						"name": "MBR_Scope",
-						"type": "VARCHAR",
-						"scale": 0
-					},
-					{
-						"name": "MBR_Month",
-						"type": "VARCHAR",
-						"scale": 0
-					},
-					{
-						"name": "CostCenter_Code",
-						"type": "VARCHAR",
-						"scale": 0
-					}
-				],
-				"typeProperties": {
-					"schema": "ODS",
-					"table": {
-						"value": "@dataset().pRawTableName",
-						"type": "Expression"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_snowflake_ocean_ods')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/df_copy_all_mbr_snowflake')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
@@ -14163,6 +13736,623 @@
 				"[concat(variables('factoryId'), '/datasets/ds_raw_mbr_pnl_data')]",
 				"[concat(variables('factoryId'), '/datasets/ds_ocean_stg_nonecrypted')]",
 				"[concat(variables('factoryId'), '/datasets/ds_snowf_raw_mbr_pnl_data')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_shrp_listoffiles')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "01ODS"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_sharepoint_listofiles_xml",
+								"type": "DatasetReference"
+							},
+							"name": "getListofFiles"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_sharepoint_json",
+								"type": "DatasetReference"
+							},
+							"name": "createJSONListofFiles"
+						}
+					],
+					"transformations": [
+						{
+							"name": "flattenXML"
+						},
+						{
+							"name": "addFileName"
+						}
+					],
+					"scriptLines": [
+						"parameters{",
+						"     pMBR_Scope as string",
+						"}",
+						"source(output(",
+						"          {http://www.w3.org/2005/Atom,feed} as ({http://www.w3.org/2005/Atom,entry} as ({http://www.w3.org/2005/Atom,author} as ({http://www.w3.org/2005/Atom,name} as string), {http://www.w3.org/2005/Atom,category} as ({@scheme} as string, {@term} as string), {http://www.w3.org/2005/Atom,content} as ({@type} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,properties} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,CheckInComment} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices,CheckOutType} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as short, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,ContentTag} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices,CustomizedPageStatus} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as boolean, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,ETag} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices,Exists} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as boolean, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,IrmEnabled} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as boolean, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,Length} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as integer, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,Level} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as boolean, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,LinkingUri} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices,LinkingUrl} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices,MajorVersion} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as short, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,MinorVersion} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as boolean, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,Name} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices,ServerRelativeUrl} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices,TimeCreated} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as timestamp, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,TimeLastModified} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as timestamp, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,Title} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices,UIVersion} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as short, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string), {http://schemas.microsoft.com/ado/2007/08/dataservices,UIVersionLabel} as double, {http://schemas.microsoft.com/ado/2007/08/dataservices,UniqueId} as ({http://schemas.microsoft.com/ado/2007/08/dataservices,_value_} as string, {http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,@type} as string))), {http://www.w3.org/2005/Atom,id} as string, {http://www.w3.org/2005/Atom,link} as ({@href} as string, {@rel} as string, {@title} as string, {@type} as string)[], {http://www.w3.org/2005/Atom,title} as string, {http://www.w3.org/2005/Atom,updated} as timestamp)[], {http://www.w3.org/2005/Atom,id} as string, {http://www.w3.org/2005/Atom,title} as string, {http://www.w3.org/2005/Atom,updated} as timestamp)",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: true,",
+						"     purgeFiles: true,",
+						"     validationMode: 'none',",
+						"     namespaces: true) ~> getListofFiles",
+						"getListofFiles foldDown(unroll({http://www.w3.org/2005/Atom,feed}.{http://www.w3.org/2005/Atom,entry}),",
+						"     mapColumn(",
+						"          GetFileUrl = {http://www.w3.org/2005/Atom,feed}.{http://www.w3.org/2005/Atom,entry}.{http://www.w3.org/2005/Atom,id},",
+						"          LinkingUri = {http://www.w3.org/2005/Atom,feed}.{http://www.w3.org/2005/Atom,entry}.{http://www.w3.org/2005/Atom,content}.{http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,properties}.{http://schemas.microsoft.com/ado/2007/08/dataservices,LinkingUri},",
+						"          LinkingUrl = {http://www.w3.org/2005/Atom,feed}.{http://www.w3.org/2005/Atom,entry}.{http://www.w3.org/2005/Atom,content}.{http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,properties}.{http://schemas.microsoft.com/ado/2007/08/dataservices,ServerRelativeUrl},",
+						"          ServerRelativeUrl = {http://www.w3.org/2005/Atom,feed}.{http://www.w3.org/2005/Atom,entry}.{http://www.w3.org/2005/Atom,content}.{http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,properties}.{http://schemas.microsoft.com/ado/2007/08/dataservices,ServerRelativeUrl},",
+						"          Name = {http://www.w3.org/2005/Atom,feed}.{http://www.w3.org/2005/Atom,entry}.{http://www.w3.org/2005/Atom,content}.{http://schemas.microsoft.com/ado/2007/08/dataservices/metadata,properties}.{http://schemas.microsoft.com/ado/2007/08/dataservices,Name}",
+						"     ),",
+						"     skipDuplicateMapInputs: false,",
+						"     skipDuplicateMapOutputs: false) ~> flattenXML",
+						"flattenXML derive(FileName = concat('toloadSharepoint/02ListFilesToCopy/ListFilesToLoad_',$pMBR_Scope,'.json'),",
+						"          GetFileUrl = concat(replace(GetFileUrl,'https://keyrusgroup.sharepoint.com',''),'/$value')) ~> addFileName",
+						"addFileName sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          LinkingUri as string,",
+						"          LinkingUrl as string,",
+						"          ServerRelativeUrl as string,",
+						"          Name as string",
+						"     ),",
+						"     rowUrlColumn:'FileName',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> createJSONListofFiles"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_sharepoint_listofiles_xml')]",
+				"[concat(variables('factoryId'), '/datasets/ds_sharepoint_json')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_stg_financials')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "02STG"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_ocean_ods",
+								"type": "DatasetReference"
+							},
+							"name": "getMBRUnpvtData"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_ocean_dwh",
+								"type": "DatasetReference"
+							},
+							"name": "getDimConversionRate"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "stg_financials",
+								"type": "DatasetReference"
+							},
+							"name": "insertMBRStagingData"
+						}
+					],
+					"transformations": [
+						{
+							"name": "addColumns",
+							"description": "Add Columns : \nScenario\nMonthYear"
+						},
+						{
+							"name": "convertToEuro"
+						},
+						{
+							"name": "cleanColumns"
+						},
+						{
+							"name": "addPeriodYYYYMM01"
+						},
+						{
+							"name": "filterColumns"
+						},
+						{
+							"name": "unpvtConversionRate"
+						},
+						{
+							"name": "spliCurrency"
+						},
+						{
+							"name": "addPeriodCode"
+						},
+						{
+							"name": "fCAD"
+						},
+						{
+							"name": "fUSD"
+						},
+						{
+							"name": "fEUR"
+						},
+						{
+							"name": "fBRL"
+						},
+						{
+							"name": "EUR"
+						},
+						{
+							"name": "CAD"
+						},
+						{
+							"name": "USD"
+						},
+						{
+							"name": "BRL"
+						},
+						{
+							"name": "joinEUR"
+						},
+						{
+							"name": "joinUSD"
+						},
+						{
+							"name": "joinCAD"
+						},
+						{
+							"name": "joinBRL"
+						}
+					],
+					"scriptLines": [
+						"parameters{",
+						"     unpvtTableName as string",
+						"}",
+						"source(output(",
+						"          Index as string,",
+						"          Anaplant_Index as string,",
+						"          PBI_Index as string,",
+						"          K_Nature as string,",
+						"          BU_Code as string,",
+						"          BU_Name as string,",
+						"          Currency_Code as string,",
+						"          MBR_Scope as string,",
+						"          MBR_Month as string,",
+						"          CostCenter_Code as string,",
+						"          Period as string,",
+						"          Value as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     query: (\"select * from [ods].[{$unpvtTableName}]\"),",
+						"     format: 'query') ~> getMBRUnpvtData",
+						"source(output(",
+						"          CurrencyID as long,",
+						"          InputCurrency as string,",
+						"          OutputCurrency as string,",
+						"          CurrencyPair as string,",
+						"          MonthYear as timestamp,",
+						"          MonthYearID as integer,",
+						"          Actual_LY as double,",
+						"          Budget_CY as double,",
+						"          Actual_CY as double,",
+						"          Forecast_CY as double,",
+						"          Forecast_NY as double",
+						"     ),",
+						"     allowSchemaDrift: false,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> getDimConversionRate",
+						"getMBRUnpvtData derive(Scenario = case( \r",
+						"    like(Period, 'Actual%'),\r",
+						"    'Actual',\r",
+						"    case( like(Period, 'Budget%'),'Budget','Forecast')\r",
+						"    ),",
+						"          MonthYear = case(\r",
+						"like(Period,'%CY%'),\r",
+						"toDate(concat(toString(year(toDate(MBR_Month))), '-',right(Period,2))),\r",
+						"case(\r",
+						"like(Period,'%LY%'),\r",
+						"toDate(concat(toString(year(toDate(MBR_Month))-1), '-',right(Period,2))),\r",
+						"toDate(concat(toString(year(toDate(MBR_Month))+1), '-',right(Period,2)))\r",
+						")\r",
+						"),",
+						"          Index = toInteger(Index),",
+						"          Value = toFloat(Value)) ~> addColumns",
+						"joinBRL derive(ValueEuro = Value * EURValue,",
+						"          ValueUSD = Value * USDValue,",
+						"          ValueCAD = Value * CADValue,",
+						"          ValueBRL = Value * BRLValue) ~> convertToEuro",
+						"convertToEuro select(mapColumn(",
+						"          BusinessUnit = BU_Name,",
+						"          Scenario,",
+						"          NatureID = Index,",
+						"          Nature = K_Nature,",
+						"          CurrencyCode = Currency_Code,",
+						"          CostCenterCode = CostCenter_Code,",
+						"          MonthYear,",
+						"          MonthYearID = PeriodYYYYMM01,",
+						"          MBR_Month,",
+						"          Value,",
+						"          ValueEuro,",
+						"          ValueUSD,",
+						"          ValueCAD,",
+						"          ValueBRL",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> cleanColumns",
+						"addColumns derive(PeriodYYYYMM01 = toInteger(concat(toString(year(MonthYear)),right(concat('0',toString(month(MonthYear))),2), '01'))) ~> addPeriodYYYYMM01",
+						"getDimConversionRate select(mapColumn(",
+						"          InputCurrency,",
+						"          OutputCurrency,",
+						"          MonthYearID,",
+						"          MonthYear,",
+						"          Actual_LY,",
+						"          Budget_CY,",
+						"          Actual_CY,",
+						"          Forecast_CY,",
+						"          Forecast_NY",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> filterColumns",
+						"filterColumns unpivot(output(",
+						"          Period as string,",
+						"          Value as double",
+						"     ),",
+						"     ungroupBy(InputCurrency,",
+						"          OutputCurrency,",
+						"          MonthYearID,",
+						"          MonthYear),",
+						"     lateral: false,",
+						"     ignoreNullPivots: false) ~> unpvtConversionRate",
+						"addPeriodCode split(OutputCurrency =='EUR',",
+						"     OutputCurrency == 'USD',",
+						"     OutputCurrency =='CAD',",
+						"     disjoint: true) ~> spliCurrency@(sEUR, sUSD, sCAD, sBRL)",
+						"unpvtConversionRate derive(Period = concat(Period,'_', right(concat('0',toString(month(MonthYear))),2))) ~> addPeriodCode",
+						"spliCurrency@sCAD filter(equals(OutputCurrency, \"CAD\")) ~> fCAD",
+						"spliCurrency@sUSD filter(equals(OutputCurrency, 'USD')) ~> fUSD",
+						"spliCurrency@sEUR filter(equals(OutputCurrency, 'EUR')) ~> fEUR",
+						"spliCurrency@sBRL filter(equals(OutputCurrency, 'BRL')) ~> fBRL",
+						"fEUR select(mapColumn(",
+						"          EURInputCurrency = InputCurrency,",
+						"          EUROutputCurrency = OutputCurrency,",
+						"          EURMonthYearID = MonthYearID,",
+						"          EURMonthYear = MonthYear,",
+						"          EURPeriod = Period,",
+						"          EURValue = Value",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> EUR",
+						"fCAD select(mapColumn(",
+						"          CADInputCurrency = InputCurrency,",
+						"          CADOutputCurrency = OutputCurrency,",
+						"          CADMonthYearID = MonthYearID,",
+						"          CADMonthYear = MonthYear,",
+						"          CADPeriod = Period,",
+						"          CADValue = Value",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> CAD",
+						"fUSD select(mapColumn(",
+						"          USDInputCurrency = InputCurrency,",
+						"          USDOutputCurrency = OutputCurrency,",
+						"          USDMonthYearID = MonthYearID,",
+						"          USDMonthYear = MonthYear,",
+						"          USDPeriod = Period,",
+						"          USDValue = Value",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> USD",
+						"fBRL select(mapColumn(",
+						"          BRLInputCurrency = InputCurrency,",
+						"          BRLOutputCurrency = OutputCurrency,",
+						"          BRLMonthYearID = MonthYearID,",
+						"          BRLMonthYear = MonthYear,",
+						"          BRLPeriod = Period,",
+						"          BRLValue = Value",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> BRL",
+						"addPeriodYYYYMM01, EUR join(Currency_Code == EURInputCurrency",
+						"     && Period == EURPeriod",
+						"     && PeriodYYYYMM01 == EURMonthYearID,",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> joinEUR",
+						"joinEUR, USD join(Currency_Code == USDInputCurrency",
+						"     && Period == USDPeriod",
+						"     && PeriodYYYYMM01 == USDMonthYearID,",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> joinUSD",
+						"joinUSD, CAD join(Currency_Code == CADInputCurrency",
+						"     && Period == CADPeriod",
+						"     && PeriodYYYYMM01 == CADMonthYearID,",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> joinCAD",
+						"joinCAD, BRL join(Currency_Code == BRLInputCurrency",
+						"     && Period == BRLPeriod",
+						"     && PeriodYYYYMM01 == BRLMonthYearID,",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> joinBRL",
+						"cleanColumns sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          BusinessUnit as string,",
+						"          Scenario as string,",
+						"          NatureID as integer,",
+						"          Nature as string,",
+						"          MonthYear as timestamp,",
+						"          Value as double",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     recreate:true,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> insertMBRStagingData"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_ocean_ods')]",
+				"[concat(variables('factoryId'), '/datasets/ds_ocean_dwh')]",
+				"[concat(variables('factoryId'), '/datasets/stg_financials')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_stg_kpi_pyramid')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "02STG"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_ocean_ods",
+								"type": "DatasetReference"
+							},
+							"name": "getMBRKpiPyramid"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "stg_kpi_pyramid",
+								"type": "DatasetReference"
+							},
+							"name": "insertMBRStagingData"
+						}
+					],
+					"transformations": [
+						{
+							"name": "castColumns"
+						},
+						{
+							"name": "removeEmptyRows"
+						},
+						{
+							"name": "nulltoZero"
+						}
+					],
+					"scriptLines": [
+						"parameters{",
+						"     kpiPyramidTableName as string",
+						"}",
+						"source(output(",
+						"          BU as string,",
+						"          Version as string,",
+						"          Period as string,",
+						"          CostCenter as string,",
+						"          PeopleType as string,",
+						"          LevelSeniority as string,",
+						"          EndOfMonth_FTE as string,",
+						"          SrvcSales_bef_bonimali as string,",
+						"          BillableDays as string,",
+						"          DailyRate as string,",
+						"          AnnualDirectCosts as string,",
+						"          AnnualProductionDays as string,",
+						"          DailyCost as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     query: (\"select * from [ods].[{$kpiPyramidTableName}]\"),",
+						"     format: 'query') ~> getMBRKpiPyramid",
+						"removeEmptyRows cast(output(",
+						"          Period as date 'yyyy-MM-dd',",
+						"          EndOfMonth_FTE as float,",
+						"          SrvcSales_bef_bonimali as float,",
+						"          BillableDays as float,",
+						"          DailyRate as float,",
+						"          AnnualDirectCosts as float,",
+						"          AnnualProductionDays as float,",
+						"          DailyCost as float",
+						"     ),",
+						"     errors: true) ~> castColumns",
+						"getMBRKpiPyramid filter(not(isNull(BU))) ~> removeEmptyRows",
+						"castColumns derive(EndOfMonth_FTE = iifNull(EndOfMonth_FTE,0),",
+						"          SrvcSales_bef_bonimali = iifNull(SrvcSales_bef_bonimali,0),",
+						"          BillableDays = iifNull(BillableDays,0),",
+						"          DailyRate = iifNull(DailyRate,0),",
+						"          AnnualDirectCosts = iifNull(AnnualDirectCosts,0),",
+						"          AnnualProductionDays = iifNull(AnnualProductionDays,0),",
+						"          DailyCost = iifNull(DailyCost,0)) ~> nulltoZero",
+						"nulltoZero sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     recreate:true,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> insertMBRStagingData"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_ocean_ods')]",
+				"[concat(variables('factoryId'), '/datasets/stg_kpi_pyramid')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_unpvt_mbr_data')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "01ODS"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_ocean_ods",
+								"type": "DatasetReference"
+							},
+							"name": "getMBRData",
+							"description": "Retrieve data from the raw MBR sql table"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_unpvtdata_table",
+								"type": "DatasetReference"
+							},
+							"name": "InsertUnpvtMBRData",
+							"description": "Create and insert unpivot MBR data in the corresponding table"
+						}
+					],
+					"transformations": [
+						{
+							"name": "UnpivotMBRData",
+							"description": "Unpivot MBR Data to group by Period"
+						}
+					],
+					"scriptLines": [
+						"parameters{",
+						"     RawTableName as string,",
+						"     UnpivotTableName as string",
+						"}",
+						"source(output(",
+						"          Index as string,",
+						"          Anaplant_Index as string,",
+						"          PBI_Index as string,",
+						"          K_Nature as string,",
+						"          Actual_LY_01 as string,",
+						"          Actual_LY_02 as string,",
+						"          Actual_LY_03 as string,",
+						"          Actual_LY_04 as string,",
+						"          Actual_LY_05 as string,",
+						"          Actual_LY_06 as string,",
+						"          Actual_LY_07 as string,",
+						"          Actual_LY_08 as string,",
+						"          Actual_LY_09 as string,",
+						"          Actual_LY_10 as string,",
+						"          Actual_LY_11 as string,",
+						"          Actual_LY_12 as string,",
+						"          Budget_CY_01 as string,",
+						"          Budget_CY_02 as string,",
+						"          Budget_CY_03 as string,",
+						"          Budget_CY_04 as string,",
+						"          Budget_CY_05 as string,",
+						"          Budget_CY_06 as string,",
+						"          Budget_CY_07 as string,",
+						"          Budget_CY_08 as string,",
+						"          Budget_CY_09 as string,",
+						"          Budget_CY_10 as string,",
+						"          Budget_CY_11 as string,",
+						"          Budget_CY_12 as string,",
+						"          Actual_CY_01 as string,",
+						"          Actual_CY_02 as string,",
+						"          Actual_CY_03 as string,",
+						"          Actual_CY_04 as string,",
+						"          Actual_CY_05 as string,",
+						"          Actual_CY_06 as string,",
+						"          Actual_CY_07 as string,",
+						"          Actual_CY_08 as string,",
+						"          Actual_CY_09 as string,",
+						"          Actual_CY_10 as string,",
+						"          Actual_CY_11 as string,",
+						"          Actual_CY_12 as string,",
+						"          BU_Code as string,",
+						"          BU_Name as string,",
+						"          Currency_Code as string,",
+						"          MBR_Scope as string,",
+						"          MBR_Month as string,",
+						"          CostCenter_Code as string,",
+						"          Actual_NY_01 as string,",
+						"          Actual_NY_02 as string,",
+						"          Actual_NY_03 as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> getMBRData",
+						"getMBRData unpivot(output(",
+						"          Period as string,",
+						"          Value as string",
+						"     ),",
+						"     ungroupBy(Index,",
+						"          Anaplant_Index,",
+						"          PBI_Index,",
+						"          K_Nature,",
+						"          BU_Code,",
+						"          BU_Name,",
+						"          Currency_Code,",
+						"          MBR_Scope,",
+						"          MBR_Month,",
+						"          CostCenter_Code),",
+						"     lateral: false,",
+						"     ignoreNullPivots: true) ~> UnpivotMBRData",
+						"UnpivotMBRData sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     recreate:true,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> InsertUnpvtMBRData"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_ocean_ods')]",
+				"[concat(variables('factoryId'), '/datasets/ds_unpvtdata_table')]"
 			]
 		}
 	]

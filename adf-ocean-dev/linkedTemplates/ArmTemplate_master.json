@@ -19,6 +19,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'ls_sharepoint_xml'"
 		},
+		"ls_snowflake_ocean_ods_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'ls_snowflake_ocean_ods'"
+		},
 		"ocean_db_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'ocean_db'"
@@ -26,10 +30,6 @@
 		"ocean_db_nonencrypted_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'ocean_db_nonencrypted'"
-		},
-		"ls_snowflake_ocean_ods_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'ls_snowflake_ocean_ods'"
 		},
 		"AzureKeyVaultOceanProject_properties_typeProperties_baseUrl": {
 			"type": "string",

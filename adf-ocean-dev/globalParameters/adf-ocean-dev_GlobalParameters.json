@@ -33,11 +33,11 @@
 	},
 	"gFactDriversTableName": {
 		"type": "string",
-		"value": "FactDrivers"
+		"value": "FactDrivers_T"
 	},
 	"gFactFinancialsTableName": {
 		"type": "string",
-		"value": "FactFinancials"
+		"value": "FactFinancials_T"
 	},
 	"gFactKpiPyramid": {
 		"type": "string",
@@ -62,5 +62,9 @@
 	"gSnowflakeOnly": {
 		"type": "int",
 		"value": 1
+	},
+	"gDimCurrencyConversionTableName": {
+		"type": "string",
+		"value": "DimConversionRate"
 	}
 }
