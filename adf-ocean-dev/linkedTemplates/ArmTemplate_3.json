@@ -513,13 +513,6 @@
 								"type": "DatasetReference"
 							},
 							"name": "getDimCostCenter"
-						},
-						{
-							"dataset": {
-								"referenceName": "ds_ocean_dwh",
-								"type": "DatasetReference"
-							},
-							"name": "getDimCurrency"
 						}
 					],
 					"sinks": [
@@ -608,9 +601,6 @@
 						},
 						{
 							"name": "joinDimCostCenter"
-						},
-						{
-							"name": "currAddYearMonth"
 						}
 					],
 					"scriptLines": [
@@ -758,21 +748,6 @@
 						"     validateSchema: false,",
 						"     isolationLevel: 'READ_UNCOMMITTED',",
 						"     format: 'table') ~> getDimCostCenter",
-						"source(output(",
-						"          CurrencyID as long,",
-						"          InputCurrency as string,",
-						"          CurrencyPair as string,",
-						"          MonthYear as timestamp,",
-						"          Actual_LY as double,",
-						"          Budget_CY as double,",
-						"          Actual_CY as double,",
-						"          Forecast_CY as double,",
-						"          Forecast_NY as double",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     isolationLevel: 'READ_UNCOMMITTED',",
-						"     format: 'table') ~> getDimCurrency",
 						"getMBRStagingData derive(CreatedBy = $pPipelineRunID) ~> addColumns",
 						"addColumns, getDimScenario join(lower(trim(Scenario)) == lower(trim(Scenario_Name0)),",
 						"     joinType:'inner',",
@@ -940,7 +915,6 @@
 						"     matchType:'exact',",
 						"     ignoreSpaces: false,",
 						"     broadcast: 'auto')~> joinDimCostCenter",
-						"getDimCurrency derive(MonthYearID = toInteger(concat(toString(year(MonthYear)), lpad(toString(month(MonthYear)),2,'0'), '01'))) ~> currAddYearMonth",
 						"insertOrUpdate sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     input(",
@@ -2150,7 +2124,7 @@
 								"referenceName": "ds_ocean_dwh",
 								"type": "DatasetReference"
 							},
-							"name": "getDimConversionRate"
+							"name": "getFactConversionRate"
 						}
 					],
 					"sinks": [
@@ -2264,7 +2238,7 @@
 						"     allowSchemaDrift: false,",
 						"     validateSchema: false,",
 						"     isolationLevel: 'READ_UNCOMMITTED',",
-						"     format: 'table') ~> getDimConversionRate",
+						"     format: 'table') ~> getFactConversionRate",
 						"getMBRUnpvtData derive(Scenario = case( \r",
 						"    like(Period, 'Actual%'),\r",
 						"    'Actual',\r",
@@ -2304,7 +2278,7 @@
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true) ~> cleanColumns",
 						"addColumns derive(PeriodYYYYMM01 = toInteger(concat(toString(year(MonthYear)),right(concat('0',toString(month(MonthYear))),2), '01'))) ~> addPeriodYYYYMM01",
-						"getDimConversionRate select(mapColumn(",
+						"getFactConversionRate select(mapColumn(",
 						"          InputCurrency,",
 						"          OutputCurrency,",
 						"          MonthYearID,",
@@ -2960,6 +2934,7 @@
 								"value": "@activity('Get All Staging Data').output.value",
 								"type": "Expression"
 							},
+							"batchCount": 10,
 							"activities": [
 								{
 									"name": "Load Fact Financials",
@@ -3029,12 +3004,6 @@
 												"getDimCostCenter": {
 													"vTableName": {
 														"value": "@pipeline().globalParameters.gDimCostCenterTableName",
-														"type": "Expression"
-													}
-												},
-												"getDimCurrency": {
-													"vTableName": {
-														"value": "@pipeline().globalParameters.gDimCurrency",
 														"type": "Expression"
 													}
 												},
@@ -3124,6 +3093,7 @@
 								"type": "Expression"
 							},
 							"isSequential": false,
+							"batchCount": 10,
 							"activities": [
 								{
 									"name": "Staging Financial Table",
@@ -3154,9 +3124,9 @@
 														"type": "Expression"
 													}
 												},
-												"getDimConversionRate": {
+												"getFactConversionRate": {
 													"vTableName": {
-														"value": "@pipeline().globalParameters.gDimCurrencyConversionTableName",
+														"value": "@pipeline().globalParameters.gFactCurrencyConversionTableName",
 														"type": "Expression"
 													}
 												},
@@ -3511,7 +3481,7 @@
 								"type": "Expression"
 							},
 							"isSequential": false,
-							"batchCount": 3,
+							"batchCount": 10,
 							"activities": [
 								{
 									"name": "Copy MBR Files to ODS",
@@ -4033,6 +4003,7 @@
 								"value": "@activity('Get All Staging Data').output.value",
 								"type": "Expression"
 							},
+							"batchCount": 10,
 							"activities": [
 								{
 									"name": "Load Fact KPI Pyramid",
@@ -4313,6 +4284,7 @@
 								"type": "Expression"
 							},
 							"isSequential": false,
+							"batchCount": 10,
 							"activities": [
 								{
 									"name": "Ingest MBR Data",
