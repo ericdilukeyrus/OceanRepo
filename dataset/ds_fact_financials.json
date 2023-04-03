@@ -64,7 +64,22 @@
 				"precision": 15
 			},
 			{
-				"name": "ValueEuro",
+				"name": "ValueEUR",
+				"type": "float",
+				"precision": 15
+			},
+			{
+				"name": "ValueUSD",
+				"type": "float",
+				"precision": 15
+			},
+			{
+				"name": "ValueCAD",
+				"type": "float",
+				"precision": 15
+			},
+			{
+				"name": "ValueBRL",
 				"type": "float",
 				"precision": 15
 			},
@@ -91,7 +106,7 @@
 		],
 		"typeProperties": {
 			"schema": "dwh",
-			"table": "FactFinancials"
+			"table": "FactFinancials_T"
 		}
 	},
 	"type": "Microsoft.DataFactory/factories/datasets"
