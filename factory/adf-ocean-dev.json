@@ -36,7 +36,7 @@
 			},
 			"gFactDriversTableName": {
 				"type": "string",
-				"value": "FactDrivers"
+				"value": "FactDrivers_T"
 			},
 			"gFactFinancialsTableName": {
 				"type": "string",
