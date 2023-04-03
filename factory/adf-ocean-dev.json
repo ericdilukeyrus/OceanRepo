@@ -69,6 +69,10 @@
 			"gFactCurrencyConversionTableName": {
 				"type": "string",
 				"value": "FactConversionRate"
+			},
+			"gDimCurrencyConversionTableName": {
+				"type": "string",
+				"value": "DimCurrency"
 			}
 		},
 		"globalConfigurations": {
