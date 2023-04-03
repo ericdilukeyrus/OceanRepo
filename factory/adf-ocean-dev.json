@@ -40,7 +40,7 @@
 			},
 			"gFactFinancialsTableName": {
 				"type": "string",
-				"value": "FactFinancials"
+				"value": "FactFinancials_T"
 			},
 			"gFactKpiPyramid": {
 				"type": "string",
