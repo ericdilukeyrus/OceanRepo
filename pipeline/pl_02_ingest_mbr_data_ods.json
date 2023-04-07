@@ -408,11 +408,33 @@
 											"value": "'@{pipeline().parameters.pFileName}'",
 											"type": "Expression"
 										}
+									},
+									"datasetParameters": {
+										"getMBRData": {
+											"vSheetName": {
+												"value": "@item().SheetName",
+												"type": "Expression"
+											},
+											"vFileName": {
+												"value": "@pipeline().parameters.pFileName",
+												"type": "Expression"
+											},
+											"vFolderName": {
+												"value": "@pipeline().parameters.pFolderName",
+												"type": "Expression"
+											}
+										},
+										"insertRawMBRDataSnowf": {
+											"pRawTableName": {
+												"value": "@item().RawTableName",
+												"type": "Expression"
+											}
+										}
 									}
 								},
-								"compute": {
-									"coreCount": 8,
-									"computeType": "General"
+								"integrationRuntime": {
+									"referenceName": "integrationRuntime",
+									"type": "IntegrationRuntimeReference"
 								},
 								"traceLevel": "Fine"
 							}
