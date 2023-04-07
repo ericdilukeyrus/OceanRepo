@@ -385,7 +385,7 @@
 											"type": "Expression"
 										},
 										"pRawTableName": {
-											"value": "'@{replace(item().RawTableName,'&','')}'",
+											"value": "'@{toUpper(replace(item().RawTableName,'&',''))}'",
 											"type": "Expression"
 										},
 										"pMBR_Scope": {
@@ -426,7 +426,7 @@
 										},
 										"insertRawMBRDataSnowf": {
 											"pRawTableName": {
-												"value": "@replace(item().RawTableName,'&','')",
+												"value": "@toUpper(replace(item().RawTableName,'&',''))",
 												"type": "Expression"
 											}
 										}
