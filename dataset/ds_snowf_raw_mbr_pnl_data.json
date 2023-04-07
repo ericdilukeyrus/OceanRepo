@@ -303,7 +303,7 @@
 			}
 		],
 		"typeProperties": {
-			"schema": "ODS",
+			"schema": "OCEAN_ODS",
 			"table": {
 				"value": "@dataset().pRawTableName",
 				"type": "Expression"
