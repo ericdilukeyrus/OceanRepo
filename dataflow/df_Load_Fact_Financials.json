@@ -118,8 +118,7 @@
 					"name": "cleanColumnsToUpsert"
 				},
 				{
-					"name": "convertToInteger",
-					"description": "Convert Surrogate Key to Integer"
+					"name": "convertToInteger"
 				},
 				{
 					"name": "FINorKPI"

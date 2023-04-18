@@ -106,7 +106,7 @@
 		],
 		"typeProperties": {
 			"schema": "dwh",
-			"table": "FactDrivers_T"
+			"table": "FactDrivers"
 		}
 	},
 	"type": "Microsoft.DataFactory/factories/datasets"
