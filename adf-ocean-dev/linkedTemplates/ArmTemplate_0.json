@@ -399,7 +399,7 @@
 					}
 				],
 				"typeProperties": {
-					"schema": "ODS",
+					"schema": "OCEAN_ODS",
 					"table": {
 						"value": "@dataset().pRawTableName",
 						"type": "Expression"
@@ -717,7 +717,7 @@
 				],
 				"typeProperties": {
 					"schema": "dwh",
-					"table": "FactDrivers_T"
+					"table": "FactDrivers"
 				}
 			},
 			"dependsOn": [
@@ -834,7 +834,7 @@
 				],
 				"typeProperties": {
 					"schema": "dwh",
-					"table": "FactFinancials_T"
+					"table": "FactFinancials"
 				}
 			},
 			"dependsOn": [

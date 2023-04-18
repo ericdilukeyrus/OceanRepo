@@ -569,8 +569,7 @@
 							"name": "cleanColumnsToUpsert"
 						},
 						{
-							"name": "convertToInteger",
-							"description": "Convert Surrogate Key to Integer"
+							"name": "convertToInteger"
 						},
 						{
 							"name": "FINorKPI"
@@ -1648,13 +1647,6 @@
 					"sinks": [
 						{
 							"dataset": {
-								"referenceName": "ds_ocean_stg_nonecrypted",
-								"type": "DatasetReference"
-							},
-							"name": "insertRawMBRData"
-						},
-						{
-							"dataset": {
 								"referenceName": "ds_snowf_raw_mbr_pnl_data",
 								"type": "DatasetReference"
 							},
@@ -1793,119 +1785,6 @@
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true) ~> removeEmptyColumns",
-						"removeEmptyColumns sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     input(",
-						"          Index as string,",
-						"          Anaplant_Index as string,",
-						"          PBI_Index as string,",
-						"          K_Nature as string,",
-						"          Actual_LY_01 as string,",
-						"          Actual_LY_02 as string,",
-						"          Actual_LY_03 as string,",
-						"          Actual_LY_04 as string,",
-						"          Actual_LY_05 as string,",
-						"          Actual_LY_06 as string,",
-						"          Actual_LY_07 as string,",
-						"          Actual_LY_08 as string,",
-						"          Actual_LY_09 as string,",
-						"          Actual_LY_10 as string,",
-						"          Actual_LY_11 as string,",
-						"          Actual_LY_12 as string,",
-						"          Budget_CY_01 as string,",
-						"          Budget_CY_02 as string,",
-						"          Budget_CY_03 as string,",
-						"          Budget_CY_04 as string,",
-						"          Budget_CY_05 as string,",
-						"          Budget_CY_06 as string,",
-						"          Budget_CY_07 as string,",
-						"          Budget_CY_08 as string,",
-						"          Budget_CY_09 as string,",
-						"          Budget_CY_10 as string,",
-						"          Budget_CY_11 as string,",
-						"          Budget_CY_12 as string,",
-						"          Actual_CY_01 as string,",
-						"          Actual_CY_02 as string,",
-						"          Actual_CY_03 as string,",
-						"          Actual_CY_04 as string,",
-						"          Actual_CY_05 as string,",
-						"          Actual_CY_06 as string,",
-						"          Actual_CY_07 as string,",
-						"          Actual_CY_08 as string,",
-						"          Actual_CY_09 as string,",
-						"          Actual_CY_10 as string,",
-						"          Actual_CY_11 as string,",
-						"          Actual_CY_12 as string,",
-						"          BU_Code as string,",
-						"          BU_Name as string,",
-						"          Currency_Code as string,",
-						"          MBR_Scope as string,",
-						"          MBR_Month as string,",
-						"          CostCenter_Code as string,",
-						"          Actual_NY_01 as string,",
-						"          Actual_NY_02 as string,",
-						"          Actual_NY_03 as string",
-						"     ),",
-						"     deletable:false,",
-						"     insertable:true,",
-						"     updateable:false,",
-						"     upsertable:false,",
-						"     recreate:true,",
-						"     format: 'table',",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError',",
-						"     mapColumn(",
-						"          Index = {_col0_},",
-						"          Anaplant_Index = {_col1_},",
-						"          PBI_Index = {_col2_},",
-						"          K_Nature = {_col4_},",
-						"          Actual_LY_01 = {_col5_},",
-						"          Actual_LY_02 = {_col6_},",
-						"          Actual_LY_03 = {_col7_},",
-						"          Actual_LY_04 = {_col8_},",
-						"          Actual_LY_05 = {_col9_},",
-						"          Actual_LY_06 = {_col10_},",
-						"          Actual_LY_07 = {_col11_},",
-						"          Actual_LY_08 = {_col12_},",
-						"          Actual_LY_09 = {_col13_},",
-						"          Actual_LY_10 = {_col14_},",
-						"          Actual_LY_11 = {_col15_},",
-						"          Actual_LY_12 = {_col16_},",
-						"          Budget_CY_01 = {_col19_},",
-						"          Budget_CY_02 = {_col20_},",
-						"          Budget_CY_03 = {_col21_},",
-						"          Budget_CY_04 = {_col22_},",
-						"          Budget_CY_05 = {_col23_},",
-						"          Budget_CY_06 = {_col24_},",
-						"          Budget_CY_07 = {_col25_},",
-						"          Budget_CY_08 = {_col26_},",
-						"          Budget_CY_09 = {_col27_},",
-						"          Budget_CY_10 = {_col28_},",
-						"          Budget_CY_11 = {_col29_},",
-						"          Budget_CY_12 = {_col30_},",
-						"          Actual_CY_01 = {_col33_},",
-						"          Actual_CY_02 = {_col34_},",
-						"          Actual_CY_03 = {_col35_},",
-						"          Actual_CY_04 = {_col36_},",
-						"          Actual_CY_05 = {_col37_},",
-						"          Actual_CY_06 = {_col38_},",
-						"          Actual_CY_07 = {_col39_},",
-						"          Actual_CY_08 = {_col40_},",
-						"          Actual_CY_09 = {_col41_},",
-						"          Actual_CY_10 = {_col42_},",
-						"          Actual_CY_11 = {_col43_},",
-						"          Actual_CY_12 = {_col44_},",
-						"          Actual_NY_01 = {_col46_},",
-						"          Actual_NY_02 = {_col47_},",
-						"          Actual_NY_03 = {_col48_},",
-						"          BU_Code,",
-						"          BU_Name,",
-						"          Currency_Code,",
-						"          MBR_Scope,",
-						"          MBR_Month,",
-						"          CostCenter_Code",
-						"     )) ~> insertRawMBRData",
 						"removeEmptyColumns sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     input(",
@@ -3136,8 +3015,7 @@
 														"type": "Expression"
 													}
 												}
-											},
-											"linkedServiceParameters": {}
+											}
 										},
 										"staging": {},
 										"integrationRuntime": {
@@ -3560,6 +3438,90 @@
 										"traceLevel": "Fine",
 										"runConcurrently": true
 									}
+								},
+								{
+									"name": "Copy MBR Files to Snowflake",
+									"type": "ExecuteDataFlow",
+									"dependsOn": [
+										{
+											"activity": "Copy MBR Files to ODS",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataflow": {
+											"referenceName": "df_copy_all_mbr_snowflake",
+											"type": "DataFlowReference",
+											"parameters": {
+												"pBU_Code": {
+													"value": "'@{item().BU_Code}'",
+													"type": "Expression"
+												},
+												"pRawTableName": {
+													"value": "'@{toUpper(replace(item().RawTableName,'&',''))}'",
+													"type": "Expression"
+												},
+												"pMBR_Scope": {
+													"value": "'@{item().MBR_Scope}'",
+													"type": "Expression"
+												},
+												"pMBR_Month": {
+													"value": "'@{item().MBR_Month}'",
+													"type": "Expression"
+												},
+												"pBU_Name": {
+													"value": "'@{item().BU_Name}'",
+													"type": "Expression"
+												},
+												"pCurrency_Code": {
+													"value": "'@{item().Currency_Code}'",
+													"type": "Expression"
+												},
+												"pFileName": {
+													"value": "'@{pipeline().parameters.pFileName}'",
+													"type": "Expression"
+												}
+											},
+											"datasetParameters": {
+												"getMBRData": {
+													"vSheetName": {
+														"value": "@item().SheetName",
+														"type": "Expression"
+													},
+													"vFileName": {
+														"value": "@pipeline().parameters.pFileName",
+														"type": "Expression"
+													},
+													"vFolderName": {
+														"value": "@pipeline().parameters.pFolderName",
+														"type": "Expression"
+													}
+												},
+												"insertRawMBRDataSnowf": {
+													"pRawTableName": {
+														"value": "@toUpper(replace(item().RawTableName,'&',''))",
+														"type": "Expression"
+													}
+												}
+											}
+										},
+										"staging": {},
+										"integrationRuntime": {
+											"referenceName": "integrationRuntime",
+											"type": "IntegrationRuntimeReference"
+										},
+										"traceLevel": "Fine"
+									}
 								}
 							]
 						}
@@ -3942,6 +3904,7 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/dataflows/df_copy_all_mbr')]",
+				"[concat(variables('factoryId'), '/dataflows/df_copy_all_mbr_snowflake')]",
 				"[concat(variables('factoryId'), '/dataflows/df_unpvt_mbr_data')]"
 			]
 		},
