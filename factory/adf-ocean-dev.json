@@ -36,11 +36,11 @@
 			},
 			"gFactDriversTableName": {
 				"type": "string",
-				"value": "FactDrivers_T"
+				"value": "FactDrivers"
 			},
 			"gFactFinancialsTableName": {
 				"type": "string",
-				"value": "FactFinancials_T"
+				"value": "FactFinancials"
 			},
 			"gFactKpiPyramid": {
 				"type": "string",
