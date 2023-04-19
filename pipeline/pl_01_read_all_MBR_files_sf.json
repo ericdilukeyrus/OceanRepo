@@ -62,7 +62,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"pipeline": {
-									"referenceName": "pl_02_ingest_mbr_data_ods",
+									"referenceName": "pl_02_ingest_mbr_data_ods_sf",
 									"type": "PipelineReference"
 								},
 								"waitOnCompletion": true,

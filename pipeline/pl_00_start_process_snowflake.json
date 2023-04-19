@@ -70,7 +70,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"pipeline": {
-									"referenceName": "pl_01_read_all_MBR_files",
+									"referenceName": "pl_01_read_all_MBR_files_sf",
 									"type": "PipelineReference"
 								},
 								"waitOnCompletion": true,
