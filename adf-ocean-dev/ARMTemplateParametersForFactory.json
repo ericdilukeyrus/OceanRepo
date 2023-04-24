@@ -28,6 +28,9 @@
 		},
 		"SharepointOceanProject_properties_typeProperties_url": {
 			"value": "https://keyrusgroup.sharepoint.com"
+		},
+		"RestService1_properties_typeProperties_url": {
+			"value": "https://api.paradime.io/api/v1/sha8vppvucjfvxwa/graphql"
 		}
 	}
 }
