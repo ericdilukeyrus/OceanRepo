@@ -19,7 +19,7 @@
 			"location": {
 				"type": "HttpServerLocation",
 				"relativeUrl": {
-					"value": "/sites/OceanProject/_api/web/GetFolderByServerRelativeUrl('/sites/OceanProject/Shared Documents/@{dataset().pShrepointFolder}/')/Files\r\n\r\n\r\n",
+					"value": "/sites/KEYRUSKAP/_api/web/GetFolderByServerRelativeUrl('/sites/KEYRUSKAP/Shared Documents/@{dataset().pShrepointFolder}/')/Files\n\n\n",
 					"type": "Expression"
 				}
 			}
