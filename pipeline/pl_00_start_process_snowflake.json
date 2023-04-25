@@ -132,6 +132,12 @@
 							"Succeeded",
 							"Failed"
 						]
+					},
+					{
+						"activity": "Get All Active MBR Scope",
+						"dependencyConditions": [
+							"Failed"
+						]
 					}
 				],
 				"userProperties": [],
