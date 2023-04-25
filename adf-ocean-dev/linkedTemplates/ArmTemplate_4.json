@@ -13,449 +13,6 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/pl_02_ingest_mbr_data_ods_sf')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Move all import tables from the source systems",
-				"activities": [
-					{
-						"name": "Copy MBR Parameters",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "ExcelSource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true,
-									"enablePartitionDiscovery": false
-								}
-							},
-							"sink": {
-								"type": "AzureSqlSink",
-								"preCopyScript": {
-									"value": "DROP TABLE IF EXISTS ods.R_MBR_Parameters_@{pipeline().parameters.pMBRScope}",
-									"type": "Expression"
-								},
-								"writeBehavior": "insert",
-								"sqlWriterUseTableLock": false,
-								"tableOption": "autoCreate",
-								"disableMetricsCollection": true
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"type": "String",
-											"ordinal": 1
-										},
-										"sink": {
-											"name": "Prop_0",
-											"type": "String",
-											"physicalType": "nvarchar"
-										}
-									},
-									{
-										"source": {
-											"type": "String",
-											"ordinal": 2
-										},
-										"sink": {
-											"name": "Prop_1",
-											"type": "String",
-											"physicalType": "nvarchar"
-										}
-									}
-								],
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "ds_mbr_parameters",
-								"type": "DatasetReference",
-								"parameters": {
-									"pFileName": {
-										"value": "@pipeline().parameters.pFileName",
-										"type": "Expression"
-									},
-									"pFolderName": {
-										"value": "@pipeline().parameters.pFolderName",
-										"type": "Expression"
-									}
-								}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "ds_ocean_ods",
-								"type": "DatasetReference",
-								"parameters": {
-									"vTableName": {
-										"value": "@concat('R_MBR_Parameters_',pipeline().parameters.pMBRScope)",
-										"type": "Expression"
-									}
-								}
-							}
-						]
-					},
-					{
-						"name": "Copy MBR Currency",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "ExcelSource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true,
-									"enablePartitionDiscovery": false
-								}
-							},
-							"sink": {
-								"type": "AzureSqlSink",
-								"preCopyScript": {
-									"value": "DROP TABLE IF EXISTS ods.R_MBR_Currency_@{pipeline().parameters.pMBRScope}",
-									"type": "Expression"
-								},
-								"writeBehavior": "insert",
-								"sqlWriterUseTableLock": false,
-								"tableOption": "autoCreate",
-								"disableMetricsCollection": true
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"type": "String",
-											"ordinal": 1
-										},
-										"sink": {
-											"name": "bu_sequence",
-											"physicalType": "String"
-										}
-									},
-									{
-										"source": {
-											"type": "String",
-											"ordinal": 2
-										},
-										"sink": {
-											"name": "bu_name",
-											"physicalType": "String"
-										}
-									},
-									{
-										"source": {
-											"type": "String",
-											"ordinal": 3
-										},
-										"sink": {
-											"name": "currency_code",
-											"physicalType": "String"
-										}
-									},
-									{
-										"source": {
-											"type": "String",
-											"ordinal": 4
-										},
-										"sink": {
-											"name": "bu_select",
-											"physicalType": "String"
-										}
-									}
-								],
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "ds_mbr_currency",
-								"type": "DatasetReference",
-								"parameters": {
-									"pFileName": {
-										"value": "@pipeline().parameters.pFileName",
-										"type": "Expression"
-									},
-									"pFolderName": {
-										"value": "@pipeline().parameters.pFolderName",
-										"type": "Expression"
-									}
-								}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "ds_ocean_ods",
-								"type": "DatasetReference",
-								"parameters": {
-									"vTableName": {
-										"value": "@concat('R_MBR_Currency_',pipeline().parameters.pMBRScope)",
-										"type": "Expression"
-									}
-								}
-							}
-						]
-					},
-					{
-						"name": "Get MBR Parameters",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "Copy MBR Parameters",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "Copy MBR Currency",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "select a.Prop_1 as MBR_Scope, b.Prop_1 as MBR_Month,  CONCAT('P&L FI_', bu_sequence ) AS SheetName, bu_sequence AS BU_Code, bu_name as BU_Name,\nCONCAT('R_P&L_FI_', a.Prop_1, '_',bu_sequence) AS RawTableName,  CONCAT('U_P&L_FI_', a.Prop_1, '_', bu_sequence) AS UnpvtTableName, currency_code as Currency_Code,\nCONCAT('R_KPI_Pyramid_', a.Prop_1) AS KPIPyramidTableName\nfrom ods.R_MBR_Currency_@{pipeline().parameters.pMBRScope},\n(select Prop_1 from ods.R_MBR_Parameters_@{pipeline().parameters.pMBRScope}\nwhere Prop_0 = 'MBR SCOPE') a,\n(select Prop_1 from ods.R_MBR_Parameters_@{pipeline().parameters.pMBRScope}\nwhere Prop_0 = 'MONTH') b\nwhere bu_select is not null",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "ds_ocean_ods",
-								"type": "DatasetReference",
-								"parameters": {
-									"vTableName": {
-										"value": "@concat('R_MBR_Currency_',pipeline().parameters.pMBRScope)",
-										"type": "Expression"
-									}
-								}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "ForEach Business Units sheets",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Get MBR Parameters",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Get MBR Parameters').output.value",
-								"type": "Expression"
-							},
-							"isSequential": false,
-							"batchCount": 10,
-							"activities": [
-								{
-									"name": "Copy MBR Files to Snowflake",
-									"type": "ExecuteDataFlow",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"dataflow": {
-											"referenceName": "df_copy_all_mbr_snowflake",
-											"type": "DataFlowReference",
-											"parameters": {
-												"pBU_Code": {
-													"value": "'@{item().BU_Code}'",
-													"type": "Expression"
-												},
-												"pRawTableName": {
-													"value": "'@{toUpper(replace(item().RawTableName,'&',''))}'",
-													"type": "Expression"
-												},
-												"pMBR_Scope": {
-													"value": "'@{item().MBR_Scope}'",
-													"type": "Expression"
-												},
-												"pMBR_Month": {
-													"value": "'@{item().MBR_Month}'",
-													"type": "Expression"
-												},
-												"pBU_Name": {
-													"value": "'@{item().BU_Name}'",
-													"type": "Expression"
-												},
-												"pCurrency_Code": {
-													"value": "'@{item().Currency_Code}'",
-													"type": "Expression"
-												},
-												"pFileName": {
-													"value": "'@{pipeline().parameters.pFileName}'",
-													"type": "Expression"
-												}
-											},
-											"datasetParameters": {
-												"getMBRData": {
-													"vSheetName": {
-														"value": "@item().SheetName",
-														"type": "Expression"
-													},
-													"vFileName": {
-														"value": "@pipeline().parameters.pFileName",
-														"type": "Expression"
-													},
-													"vFolderName": {
-														"value": "@pipeline().parameters.pFolderName",
-														"type": "Expression"
-													}
-												},
-												"insertRawMBRDataSnowf": {
-													"pRawTableName": {
-														"value": "@toUpper(replace(item().RawTableName,'&',''))",
-														"type": "Expression"
-													}
-												}
-											}
-										},
-										"staging": {},
-										"integrationRuntime": {
-											"referenceName": "integrationRuntime",
-											"type": "IntegrationRuntimeReference"
-										},
-										"traceLevel": "Fine"
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "Copy KPI Pyramid to Snowfale",
-						"type": "ExecuteDataFlow",
-						"dependsOn": [
-							{
-								"activity": "Get MBR Parameters",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataflow": {
-								"referenceName": "df_copy_kpipyramid_snowflake",
-								"type": "DataFlowReference",
-								"parameters": {},
-								"datasetParameters": {
-									"getKPIPyramidData": {
-										"pFileName": {
-											"value": "@pipeline().parameters.pFileName",
-											"type": "Expression"
-										},
-										"pFolderName": {
-											"value": "@pipeline().parameters.pFolderName",
-											"type": "Expression"
-										}
-									},
-									"insertKPIPyramidData": {
-										"pRawTableName": {
-											"value": "@toUpper(concat('R_KPI_Pyramid_',pipeline().parameters.pMBRScope))",
-											"type": "Expression"
-										}
-									}
-								}
-							},
-							"staging": {},
-							"integrationRuntime": {
-								"referenceName": "integrationRuntime",
-								"type": "IntegrationRuntimeReference"
-							},
-							"traceLevel": "Fine"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"parameters": {
-					"pFileName": {
-						"type": "string"
-					},
-					"pFolderName": {
-						"type": "string"
-					},
-					"pMBRScope": {
-						"type": "string"
-					}
-				},
-				"variables": {
-					"vplShetName": {
-						"type": "String"
-					}
-				},
-				"folder": {
-					"name": "01ODS/Snowflake"
-				},
-				"annotations": [],
-				"lastPublishTime": "2023-02-20T10:35:32Z"
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/pl_02_load_fact_kpipyramid')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -961,9 +518,7 @@
 				"annotations": [],
 				"lastPublishTime": "2023-02-20T08:54:30Z"
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/pl_02_ingest_mbr_data_ods_sf')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/pl_00_start_process')]",
@@ -1379,7 +934,14 @@
 							{
 								"activity": "ForEach Active MBR Scope",
 								"dependencyConditions": [
-									"Succeeded"
+									"Succeeded",
+									"Failed"
+								]
+							},
+							{
+								"activity": "Get All Active MBR Scope",
+								"dependencyConditions": [
+									"Failed"
 								]
 							}
 						],
@@ -1394,11 +956,11 @@
 						}
 					},
 					{
-						"name": "Copy data1",
+						"name": "Trigger dbt schedule",
 						"type": "Copy",
 						"dependsOn": [
 							{
-								"activity": "Archives MBR Files",
+								"activity": "ForEach Active MBR Scope",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -1418,6 +980,12 @@
 								"httpRequestTimeout": "00:01:40",
 								"requestInterval": "00.00:00:00.010",
 								"requestMethod": "POST",
+								"requestBody": "{\n  \"query\": \"mutation trigger($scheduleName: String!) {triggerBoltRun(scheduleName: $scheduleName){runId}}\",\n  \"variables\": { \"scheduleName\": \"operations_run\" }\n}",
+								"additionalHeaders": {
+									"content-type": "application/json",
+									"X-API-KEY": "dq47d74m6kwkgg37r7gk2zyvghfyw6zu",
+									"X-API-SECRET": "gv7ajlg4ga50vl2e95620g33fieh1ahlkpkdpj2iw75phuwntmi1ca26amji61qph4dqywtl4zwplqfdt26vjybu5qcq05an"
+								},
 								"paginationRules": {
 									"supportRFC5988": "true"
 								}

@@ -35,13 +35,13 @@
 			"type": "string",
 			"defaultValue": "https://ocean-project.vault.azure.net/"
 		},
-		"SharepointOceanProject_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://keyrusgroup.sharepoint.com"
-		},
 		"RestService1_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://api.paradime.io/api/v1/sha8vppvucjfvxwa/graphql"
+		},
+		"SharepointOceanProject_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://keyrusgroup.sharepoint.com"
 		},
 		"containerUri": {
 			"type": "string",

@@ -35,13 +35,13 @@
 			"type": "string",
 			"defaultValue": "https://ocean-project.vault.azure.net/"
 		},
-		"SharepointOceanProject_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://keyrusgroup.sharepoint.com"
-		},
 		"RestService1_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://api.paradime.io/api/v1/sha8vppvucjfvxwa/graphql"
+		},
+		"SharepointOceanProject_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://keyrusgroup.sharepoint.com"
 		}
 	},
 	"variables": {
@@ -1989,7 +1989,14 @@
 							{
 								"activity": "ForEach Active MBR Scope",
 								"dependencyConditions": [
-									"Succeeded"
+									"Succeeded",
+									"Failed"
+								]
+							},
+							{
+								"activity": "Get All Active MBR Scope",
+								"dependencyConditions": [
+									"Failed"
 								]
 							}
 						],
@@ -2004,11 +2011,11 @@
 						}
 					},
 					{
-						"name": "Copy data1",
+						"name": "Trigger dbt schedule",
 						"type": "Copy",
 						"dependsOn": [
 							{
-								"activity": "Archives MBR Files",
+								"activity": "ForEach Active MBR Scope",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -2028,6 +2035,12 @@
 								"httpRequestTimeout": "00:01:40",
 								"requestInterval": "00.00:00:00.010",
 								"requestMethod": "POST",
+								"requestBody": "{\n  \"query\": \"mutation trigger($scheduleName: String!) {triggerBoltRun(scheduleName: $scheduleName){runId}}\",\n  \"variables\": { \"scheduleName\": \"operations_run\" }\n}",
+								"additionalHeaders": {
+									"content-type": "application/json",
+									"X-API-KEY": "dq47d74m6kwkgg37r7gk2zyvghfyw6zu",
+									"X-API-SECRET": "gv7ajlg4ga50vl2e95620g33fieh1ahlkpkdpj2iw75phuwntmi1ca26amji61qph4dqywtl4zwplqfdt26vjybu5qcq05an"
+								},
 								"paginationRules": {
 									"supportRFC5988": "true"
 								}
@@ -5035,6 +5048,50 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/dimensions_source')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DelimitedText2')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dimensions_source",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"container": "mbr-archive-zone"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/dimensions_source')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RestResource1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "RestService1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "RestResource",
+				"typeProperties": {},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/RestService1')]"
 			]
 		},
 		{
@@ -12777,6 +12834,21 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/RestService1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "[parameters('RestService1_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Anonymous"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/SharepointOceanProject')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -13802,8 +13874,9 @@
 						"     validateSchema: false,",
 						"     deletable:false,",
 						"     insertable:true,",
-						"     updateable:false,",
+						"     updateable:true,",
 						"     upsertable:false,",
+						"     keys:['OrganisationID','ScenarioID','CostCenterID','PeopleTypeID','SeniorityLevelID','MBR_Month','MonthYearID'],",
 						"     format: 'table',",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true,",
@@ -15163,140 +15236,6 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ds_ocean_ods')]",
 				"[concat(variables('factoryId'), '/datasets/ds_unpvtdata_table')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/RestService1')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "RestService",
-				"typeProperties": {
-					"url": "[parameters('RestService1_properties_typeProperties_url')]",
-					"enableServerCertificateValidation": false,
-					"authenticationType": "Anonymous"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/RestResource1')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "RestService1",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "RestResource",
-				"typeProperties": {},
-				"schema": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/RestService1')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Copy data1",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "RestSource",
-								"httpRequestTimeout": "00:01:40",
-								"requestInterval": "00.00:00:00.010",
-								"requestMethod": "POST",
-								"requestBody": "{\n  \"query\": \"mutation trigger($scheduleName: String!) {triggerBoltRun(scheduleName: $scheduleName){runId}}\",\n  \"variables\": { \"scheduleName\": \"operations_run\" }\n}",
-								"additionalHeaders": {
-									"content-type": "application/json"
-								},
-								"paginationRules": {
-									"supportRFC5988": "true"
-								}
-							},
-							"sink": {
-								"type": "DelimitedTextSink",
-								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
-								},
-								"formatSettings": {
-									"type": "DelimitedTextWriteSettings",
-									"quoteAllText": true,
-									"fileExtension": ".txt"
-								}
-							},
-							"enableStaging": false
-						},
-						"inputs": [
-							{
-								"referenceName": "RestResource1",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "DelimitedText2",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"folder": {
-					"name": "00DEV"
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/RestResource1')]",
-				"[concat(variables('factoryId'), '/datasets/DelimitedText2')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DelimitedText2')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "dimensions_source",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"container": "mbr-archive-zone"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"quoteChar": "\""
-				},
-				"schema": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/dimensions_source')]"
 			]
 		}
 	]
