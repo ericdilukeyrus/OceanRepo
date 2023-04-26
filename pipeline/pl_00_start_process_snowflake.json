@@ -129,14 +129,7 @@
 					{
 						"activity": "ForEach Active MBR Scope",
 						"dependencyConditions": [
-							"Succeeded",
-							"Failed"
-						]
-					},
-					{
-						"activity": "Get All Active MBR Scope",
-						"dependencyConditions": [
-							"Failed"
+							"Succeeded"
 						]
 					}
 				],
