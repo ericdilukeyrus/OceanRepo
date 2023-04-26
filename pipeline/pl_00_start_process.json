@@ -228,20 +228,7 @@
 					{
 						"activity": "Load Fact KPI Pyramid",
 						"dependencyConditions": [
-							"Succeeded",
-							"Failed"
-						]
-					},
-					{
-						"activity": "ForEach Active MBR Scope",
-						"dependencyConditions": [
-							"Failed"
-						]
-					},
-					{
-						"activity": "Load Financials Staging Tables",
-						"dependencyConditions": [
-							"Failed"
+							"Succeeded"
 						]
 					}
 				],
