@@ -221,8 +221,7 @@
 					{
 						"activity": "Load Fact Tables",
 						"dependencyConditions": [
-							"Succeeded",
-							"Failed"
+							"Succeeded"
 						]
 					},
 					{
