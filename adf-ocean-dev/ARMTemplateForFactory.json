@@ -1800,27 +1800,13 @@
 							{
 								"activity": "Load Fact Tables",
 								"dependencyConditions": [
-									"Succeeded",
-									"Failed"
+									"Succeeded"
 								]
 							},
 							{
 								"activity": "Load Fact KPI Pyramid",
 								"dependencyConditions": [
-									"Succeeded",
-									"Failed"
-								]
-							},
-							{
-								"activity": "ForEach Active MBR Scope",
-								"dependencyConditions": [
-									"Failed"
-								]
-							},
-							{
-								"activity": "Load Financials Staging Tables",
-								"dependencyConditions": [
-									"Failed"
+									"Succeeded"
 								]
 							}
 						],
@@ -1989,14 +1975,7 @@
 							{
 								"activity": "ForEach Active MBR Scope",
 								"dependencyConditions": [
-									"Succeeded",
-									"Failed"
-								]
-							},
-							{
-								"activity": "Get All Active MBR Scope",
-								"dependencyConditions": [
-									"Failed"
+									"Succeeded"
 								]
 							}
 						],
