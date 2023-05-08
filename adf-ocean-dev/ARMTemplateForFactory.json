@@ -23,6 +23,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'ls_snowflake_ocean_ods'"
 		},
+		"ls_snowflake_ocean_ods_prod_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'ls_snowflake_ocean_ods_prod'"
+		},
 		"ocean_db_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'ocean_db'"
@@ -30,10 +34,6 @@
 		"ocean_db_nonencrypted_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'ocean_db_nonencrypted'"
-		},
-		"ls_snowflake_ocean_ods_prod_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'ls_snowflake_ocean_ods_prod'"
 		},
 		"AzureKeyVaultOceanProject_properties_typeProperties_baseUrl": {
 			"type": "string",
@@ -2069,8 +2069,238 @@
 				"[concat(variables('factoryId'), '/pipelines/pl_00_initialization')]",
 				"[concat(variables('factoryId'), '/pipelines/pl_01_get_files_sharepoint')]",
 				"[concat(variables('factoryId'), '/pipelines/pl_04_archive_files')]",
-				"[concat(variables('factoryId'), '/datasets/RestResource1')]",
 				"[concat(variables('factoryId'), '/datasets/DelimitedText2')]",
+				"[concat(variables('factoryId'), '/datasets/RestResource1')]",
+				"[concat(variables('factoryId'), '/pipelines/pl_01_read_all_MBR_files_sf')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_00_start_process_snowflake_prod')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Get All Active MBR Scope",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "Copy Files from Sharepoint",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "SELECT [MBR_Scope] as MBRScope,\n    'toload/' + [MBR_Scope]  as MBRScope_Folder\n  FROM [cfg].[@{pipeline().globalParameters.gSourcesTableName}]\nWHERE [Active_fl] = 'Y'",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "ds_ocean_cfg",
+								"type": "DatasetReference",
+								"parameters": {
+									"vTableName": {
+										"value": "@pipeline().globalParameters.gSourcesTableName",
+										"type": "Expression"
+									}
+								}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEach Active MBR Scope",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Get All Active MBR Scope",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Get All Active MBR Scope').output.value",
+								"type": "Expression"
+							},
+							"isSequential": false,
+							"activities": [
+								{
+									"name": "Run Process by MBR Scope",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "pl_01_read_all_MBR_files_sf",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"MBRScope_Folder": {
+												"value": "@item().MBRScope_Folder",
+												"type": "Expression"
+											},
+											"MBR_Scope": {
+												"value": "@item().MBRScope",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "Initialization",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "pl_00_initialization",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Copy Files from Sharepoint",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Initialization",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "pl_01_get_files_sharepoint",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Archives MBR Files",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Trigger dbt schedule",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "pl_04_archive_files",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Trigger dbt schedule",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "ForEach Active MBR Scope",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "RestSource",
+								"httpRequestTimeout": "00:01:40",
+								"requestInterval": "00.00:00:00.010",
+								"requestMethod": "POST",
+								"requestBody": "{\n  \"query\": \"mutation trigger($scheduleName: String!) {triggerBoltRun(scheduleName: $scheduleName){runId}}\",\n  \"variables\": { \"scheduleName\": \"operations_run_prod\" }\n}",
+								"additionalHeaders": {
+									"content-type": "application/json",
+									"X-API-KEY": "dq47d74m6kwkgg37r7gk2zyvghfyw6zu",
+									"X-API-SECRET": "gv7ajlg4ga50vl2e95620g33fieh1ahlkpkdpj2iw75phuwntmi1ca26amji61qph4dqywtl4zwplqfdt26vjybu5qcq05an"
+								},
+								"paginationRules": {
+									"supportRFC5988": "true"
+								}
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobStorageWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "RestResource1",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DelimitedText2",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-17T13:38:45Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_ocean_cfg')]",
+				"[concat(variables('factoryId'), '/pipelines/pl_00_initialization')]",
+				"[concat(variables('factoryId'), '/pipelines/pl_01_get_files_sharepoint')]",
+				"[concat(variables('factoryId'), '/pipelines/pl_04_archive_files')]",
+				"[concat(variables('factoryId'), '/datasets/DelimitedText2')]",
+				"[concat(variables('factoryId'), '/datasets/RestResource1')]",
 				"[concat(variables('factoryId'), '/pipelines/pl_01_read_all_MBR_files_sf')]"
 			]
 		},
@@ -5097,24 +5327,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/RestResource1')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "RestService1",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "RestResource",
-				"typeProperties": {},
-				"schema": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/RestService1')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/ds_fact_drivers')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -7241,7 +7453,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "ls_snowflake_ocean_ods",
+					"referenceName": "ls_snowflake_ocean_ods_prod",
 					"type": "LinkedServiceReference"
 				},
 				"parameters": {
@@ -7550,7 +7762,7 @@
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_snowflake_ocean_ods')]"
+				"[concat(variables('factoryId'), '/linkedServices/ls_snowflake_ocean_ods_prod')]"
 			]
 		},
 		{
@@ -12962,6 +13174,20 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/ls_snowflake_ocean_ods_prod')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "Snowflake",
+				"typeProperties": {
+					"authenticationType": "Basic",
+					"connectionString": "[parameters('ls_snowflake_ocean_ods_prod_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ocean_db')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -15259,248 +15485,22 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/pl_00_start_process_snowflake_prod')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
+			"name": "[concat(parameters('factoryName'), '/RestResource1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"activities": [
-					{
-						"name": "Get All Active MBR Scope",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "Copy Files from Sharepoint",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "SELECT [MBR_Scope] as MBRScope,\n    'toload/' + [MBR_Scope]  as MBRScope_Folder\n  FROM [cfg].[@{pipeline().globalParameters.gSourcesTableName}]\nWHERE [Active_fl] = 'Y'",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "ds_ocean_cfg",
-								"type": "DatasetReference",
-								"parameters": {
-									"vTableName": {
-										"value": "@pipeline().globalParameters.gSourcesTableName",
-										"type": "Expression"
-									}
-								}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "ForEach Active MBR Scope",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Get All Active MBR Scope",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Get All Active MBR Scope').output.value",
-								"type": "Expression"
-							},
-							"isSequential": false,
-							"activities": [
-								{
-									"name": "Run Process by MBR Scope",
-									"type": "ExecutePipeline",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "pl_01_read_all_MBR_files_sf",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {
-											"MBRScope_Folder": {
-												"value": "@item().MBRScope_Folder",
-												"type": "Expression"
-											},
-											"MBR_Scope": {
-												"value": "@item().MBRScope",
-												"type": "Expression"
-											}
-										}
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "Initialization",
-						"type": "ExecutePipeline",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "pl_00_initialization",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					},
-					{
-						"name": "Copy Files from Sharepoint",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "Initialization",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "pl_01_get_files_sharepoint",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					},
-					{
-						"name": "Archives MBR Files",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "Trigger dbt schedule",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "pl_04_archive_files",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					},
-					{
-						"name": "Trigger dbt schedule",
-						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "ForEach Active MBR Scope",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "RestSource",
-								"httpRequestTimeout": "00:01:40",
-								"requestInterval": "00.00:00:00.010",
-								"requestMethod": "POST",
-								"requestBody": "{\n  \"query\": \"mutation trigger($scheduleName: String!) {triggerBoltRun(scheduleName: $scheduleName){runId}}\",\n  \"variables\": { \"scheduleName\": \"operations_run\" }\n}",
-								"additionalHeaders": {
-									"content-type": "application/json",
-									"X-API-KEY": "dq47d74m6kwkgg37r7gk2zyvghfyw6zu",
-									"X-API-SECRET": "gv7ajlg4ga50vl2e95620g33fieh1ahlkpkdpj2iw75phuwntmi1ca26amji61qph4dqywtl4zwplqfdt26vjybu5qcq05an"
-								},
-								"paginationRules": {
-									"supportRFC5988": "true"
-								}
-							},
-							"sink": {
-								"type": "DelimitedTextSink",
-								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
-								},
-								"formatSettings": {
-									"type": "DelimitedTextWriteSettings",
-									"quoteAllText": true,
-									"fileExtension": ".txt"
-								}
-							},
-							"enableStaging": false
-						},
-						"inputs": [
-							{
-								"referenceName": "RestResource1",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "DelimitedText2",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
+				"linkedServiceName": {
+					"referenceName": "RestService1",
+					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
-				"lastPublishTime": "2023-02-17T13:38:45Z"
+				"type": "RestResource",
+				"typeProperties": {},
+				"schema": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ds_ocean_cfg')]",
-				"[concat(variables('factoryId'), '/pipelines/pl_00_initialization')]",
-				"[concat(variables('factoryId'), '/pipelines/pl_01_get_files_sharepoint')]",
-				"[concat(variables('factoryId'), '/pipelines/pl_04_archive_files')]",
-				"[concat(variables('factoryId'), '/datasets/RestResource1')]",
-				"[concat(variables('factoryId'), '/datasets/DelimitedText2')]",
-				"[concat(variables('factoryId'), '/pipelines/pl_01_read_all_MBR_files_sf')]"
+				"[concat(variables('factoryId'), '/linkedServices/RestService1')]"
 			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ls_snowflake_ocean_ods_prod')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "Snowflake",
-				"typeProperties": {
-					"authenticationType": "Basic",
-					"connectionString": "[parameters('ls_snowflake_ocean_ods_prod_connectionString')]"
-				}
-			},
-			"dependsOn": []
 		}
 	]
 }

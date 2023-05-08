@@ -17,13 +17,13 @@
 		"ls_snowflake_ocean_ods_connectionString": {
 			"value": ""
 		},
+		"ls_snowflake_ocean_ods_prod_connectionString": {
+			"value": ""
+		},
 		"ocean_db_connectionString": {
 			"value": ""
 		},
 		"ocean_db_nonencrypted_connectionString": {
-			"value": ""
-		},
-		"ls_snowflake_ocean_ods_prod_connectionString": {
 			"value": ""
 		},
 		"AzureKeyVaultOceanProject_properties_typeProperties_baseUrl": {
