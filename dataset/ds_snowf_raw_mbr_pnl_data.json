@@ -2,7 +2,7 @@
 	"name": "ds_snowf_raw_mbr_pnl_data",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "ls_snowflake_ocean_ods",
+			"referenceName": "ls_snowflake_ocean_ods_prod",
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
