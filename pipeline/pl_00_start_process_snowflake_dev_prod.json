@@ -1,5 +1,5 @@
 {
-	"name": "pl_00_start_process_snowflake_dev",
+	"name": "pl_00_start_process_snowflake_dev_prod",
 	"properties": {
 		"activities": [
 			{
