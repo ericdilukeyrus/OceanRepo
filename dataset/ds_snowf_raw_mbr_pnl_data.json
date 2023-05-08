@@ -25,16 +25,19 @@
 			{
 				"name": "Anaplant_Index",
 				"type": "VARCHAR",
+				"precision": 0,
 				"scale": 0
 			},
 			{
 				"name": "PBI_Index",
 				"type": "VARCHAR",
+				"precision": 0,
 				"scale": 0
 			},
 			{
 				"name": "K_Nature",
 				"type": "VARCHAR",
+				"precision": 0,
 				"scale": 0
 			},
 			{
@@ -274,32 +277,44 @@
 			{
 				"name": "BU_Code",
 				"type": "VARCHAR",
+				"precision": 0,
 				"scale": 0
 			},
 			{
 				"name": "BU_Name",
 				"type": "VARCHAR",
+				"precision": 0,
 				"scale": 0
 			},
 			{
 				"name": "Currency_Code",
 				"type": "VARCHAR",
+				"precision": 0,
 				"scale": 0
 			},
 			{
 				"name": "MBR_Scope",
 				"type": "VARCHAR",
+				"precision": 0,
 				"scale": 0
 			},
 			{
 				"name": "MBR_Month",
 				"type": "VARCHAR",
+				"precision": 0,
 				"scale": 0
 			},
 			{
 				"name": "CostCenter_Code",
 				"type": "VARCHAR",
+				"precision": 0,
 				"scale": 0
+			},
+			{
+				"name": "CREATED_ON",
+				"type": "TIMESTAMP_NTZ",
+				"precision": 29,
+				"scale": 9
 			}
 		],
 		"typeProperties": {
