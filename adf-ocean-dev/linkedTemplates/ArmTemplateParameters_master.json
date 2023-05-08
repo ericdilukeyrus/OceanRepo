@@ -23,6 +23,9 @@
 		"ocean_db_nonencrypted_connectionString": {
 			"value": ""
 		},
+		"ls_snowflake_ocean_ods_prod_connectionString": {
+			"value": ""
+		},
 		"AzureKeyVaultOceanProject_properties_typeProperties_baseUrl": {
 			"value": "https://ocean-project.vault.azure.net/"
 		},

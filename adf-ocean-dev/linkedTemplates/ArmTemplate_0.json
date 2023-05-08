@@ -11,6 +11,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'ls_snowflake_ocean_ods'"
 		},
+		"ls_snowflake_ocean_ods_prod_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'ls_snowflake_ocean_ods_prod'"
+		},
 		"dimensions_source_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'dimensions_source'"
@@ -107,6 +111,20 @@
 							"cleanup": false
 						}
 					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_snowflake_ocean_ods_prod')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "Snowflake",
+				"typeProperties": {
+					"authenticationType": "Basic",
+					"connectionString": "[parameters('ls_snowflake_ocean_ods_prod_connectionString')]"
 				}
 			},
 			"dependsOn": []
@@ -1448,44 +1466,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/ls_files_to_load')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ds_mbr_files_bin')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "dimensions_source",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"pMBR_Scope": {
-						"type": "string"
-					},
-					"pFileName": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "Binary",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"fileName": {
-							"value": "@dataset().pFileName",
-							"type": "Expression"
-						},
-						"folderPath": {
-							"value": "toload/@{dataset().pMBR_Scope}",
-							"type": "Expression"
-						},
-						"container": "mbr-landing-zone"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/dimensions_source')]"
 			]
 		}
 	]
