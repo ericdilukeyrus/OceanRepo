@@ -7476,16 +7476,19 @@
 					{
 						"name": "Anaplant_Index",
 						"type": "VARCHAR",
+						"precision": 0,
 						"scale": 0
 					},
 					{
 						"name": "PBI_Index",
 						"type": "VARCHAR",
+						"precision": 0,
 						"scale": 0
 					},
 					{
 						"name": "K_Nature",
 						"type": "VARCHAR",
+						"precision": 0,
 						"scale": 0
 					},
 					{
@@ -7725,32 +7728,44 @@
 					{
 						"name": "BU_Code",
 						"type": "VARCHAR",
+						"precision": 0,
 						"scale": 0
 					},
 					{
 						"name": "BU_Name",
 						"type": "VARCHAR",
+						"precision": 0,
 						"scale": 0
 					},
 					{
 						"name": "Currency_Code",
 						"type": "VARCHAR",
+						"precision": 0,
 						"scale": 0
 					},
 					{
 						"name": "MBR_Scope",
 						"type": "VARCHAR",
+						"precision": 0,
 						"scale": 0
 					},
 					{
 						"name": "MBR_Month",
 						"type": "VARCHAR",
+						"precision": 0,
 						"scale": 0
 					},
 					{
 						"name": "CostCenter_Code",
 						"type": "VARCHAR",
+						"precision": 0,
 						"scale": 0
+					},
+					{
+						"name": "CREATED_ON",
+						"type": "TIMESTAMP_NTZ",
+						"precision": 29,
+						"scale": 9
 					}
 				],
 				"typeProperties": {
@@ -14541,7 +14556,8 @@
 						"          Currency_Code = $pCurrency_Code,",
 						"          MBR_Scope = $pMBR_Scope,",
 						"          MBR_Month = $pMBR_Month,",
-						"          CostCenter_Code = left({_col1_},7)) ~> addMBRMetadata",
+						"          CostCenter_Code = left({_col1_},7),",
+						"          Created_On = currentTimestamp()) ~> addMBRMetadata",
 						"addMBRMetadata select(mapColumn(",
 						"          {_col0_},",
 						"          {_col1_},",
@@ -14591,7 +14607,8 @@
 						"          Currency_Code,",
 						"          MBR_Scope,",
 						"          MBR_Month,",
-						"          CostCenter_Code",
+						"          CostCenter_Code,",
+						"          Created_On",
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true) ~> removeEmptyColumns",
@@ -14646,7 +14663,8 @@
 						"          Currency_Code as string,",
 						"          MBR_Scope as string,",
 						"          MBR_Month as string,",
-						"          CostCenter_Code as string",
+						"          CostCenter_Code as string,",
+						"          CREATED_ON as timestamp",
 						"     ),",
 						"     deletable:false,",
 						"     insertable:true,",
@@ -14706,7 +14724,8 @@
 						"          Currency_Code,",
 						"          MBR_Scope,",
 						"          MBR_Month,",
-						"          CostCenter_Code",
+						"          CostCenter_Code,",
+						"          CREATED_ON = Created_On",
 						"     )) ~> insertRawMBRDataSnowf"
 					]
 				}
@@ -14848,7 +14867,8 @@
 						"          Currency_Code as string,",
 						"          MBR_Scope as string,",
 						"          MBR_Month as string,",
-						"          CostCenter_Code as string",
+						"          CostCenter_Code as string,",
+						"          CREATED_ON as timestamp",
 						"     ),",
 						"     deletable:false,",
 						"     insertable:true,",
@@ -15500,6 +15520,81 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/RestService1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_00_start_process_snowflake_trigger_sched')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Trigger dbt schedule",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "RestSource",
+								"httpRequestTimeout": "00:01:40",
+								"requestInterval": "00.00:00:00.010",
+								"requestMethod": "POST",
+								"requestBody": "{\n  \"query\": \"mutation trigger($scheduleName: String!) {triggerBoltRun(scheduleName: $scheduleName){runId}}\",\n  \"variables\": { \"scheduleName\": \"operations_run\" }\n}",
+								"additionalHeaders": {
+									"content-type": "application/json",
+									"X-API-KEY": "dq47d74m6kwkgg37r7gk2zyvghfyw6zu",
+									"X-API-SECRET": "gv7ajlg4ga50vl2e95620g33fieh1ahlkpkdpj2iw75phuwntmi1ca26amji61qph4dqywtl4zwplqfdt26vjybu5qcq05an"
+								},
+								"paginationRules": {
+									"supportRFC5988": "true"
+								}
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobStorageWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "RestResource1",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DelimitedText2",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-17T13:38:45Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DelimitedText2')]",
+				"[concat(variables('factoryId'), '/datasets/RestResource1')]"
 			]
 		}
 	]
