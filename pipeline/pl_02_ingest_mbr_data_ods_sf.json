@@ -358,7 +358,7 @@
 							},
 							"userProperties": [],
 							"linkedServiceName": {
-								"referenceName": "ocean_db",
+								"referenceName": "ocean_db_sf",
 								"type": "LinkedServiceReference"
 							},
 							"typeProperties": {
@@ -366,7 +366,7 @@
 									{
 										"type": "Query",
 										"text": {
-											"value": "INSERT INTO [@{pipeline().globalParameters.gODSSchemaName}].[@{pipeline().globalParameters.gSourcesConfigTableName}]\n           ([MBR_FileName]\n           ,[MBR_Scope]\n           ,[MBR_Month]\n           ,[MBR_SheetName]\n           ,[MBR_BU_Code]\n           ,[MBR_BU_Name]\n           ,[MBR_RawTableName]\n           ,[MBR_UnpvtTableName]\n           ,[MBR_Currency_Code]\n           ,[MBR_KPIPyramid_TableName])\n     VALUES\n           ('@{pipeline().parameters.pFileName}'\n           ,'@{item().MBR_Scope}'\n           ,'@{item().MBR_Month}'\n           ,'@{item().SheetName}'\n           ,'@{item().BU_Code}'\n           ,'@{item().BU_Name}'\n           ,'@{item().RawTableName}'\n           ,'@{item().UnpvtTableName}'\n           ,'@{item().Currency_Code}'\n           ,'@{item().KPIPyramidTableName}')\n\n",
+											"value": "INSERT INTO OCEAN_ODS.SOURCES_CONFIG\n(MBR_FILENAME, MBR_SCOPE, MBR_MONTH, MBR_SHEETNAME, MBR_BU_CODE, MBR_BU_NAME, MBR_RAWTABLENAME, MBR_UNPVTTABLENAME, MBR_CURRENCY_CODE, MBR_KPIPYRAMID_TABLENAME)\nVALUES\n           ('@{pipeline().parameters.pFileName}'\n           ,'@{item().MBR_Scope}'\n           ,'@{item().MBR_Month}'\n           ,'@{item().SheetName}'\n           ,'@{item().BU_Code}'\n           ,'@{item().BU_Name}'\n           ,'@{item().RawTableName}'\n           ,'@{item().UnpvtTableName}'\n           ,'@{item().Currency_Code}'\n           ,'@{item().KPIPyramidTableName}')\n",
 											"type": "Expression"
 										}
 									}
