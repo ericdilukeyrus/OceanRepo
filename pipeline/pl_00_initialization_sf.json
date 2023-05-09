@@ -1,5 +1,5 @@
 {
-	"name": "pl_00_initialization_copy1",
+	"name": "pl_00_initialization_sf",
 	"properties": {
 		"activities": [
 			{
@@ -15,7 +15,7 @@
 				},
 				"userProperties": [],
 				"linkedServiceName": {
-					"referenceName": "ocean_db",
+					"referenceName": "ocean_db_sf",
 					"type": "LinkedServiceReference"
 				},
 				"typeProperties": {
@@ -23,7 +23,7 @@
 						{
 							"type": "Query",
 							"text": {
-								"value": "truncate table [@{pipeline().globalParameters.gODSSchemaName}].[@{pipeline().globalParameters.gSourcesConfigTableName}]",
+								"value": "truncate table OCEAN_ODS.SOURCES_CONFIG",
 								"type": "Expression"
 							}
 						}
@@ -33,7 +33,7 @@
 			}
 		],
 		"folder": {
-			"name": "00INIT"
+			"name": "00INIT/Snowflake"
 		},
 		"annotations": [],
 		"lastPublishTime": "2023-02-17T12:56:26Z"
