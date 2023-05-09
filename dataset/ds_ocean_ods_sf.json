@@ -1,0 +1,24 @@
+{
+	"name": "ds_ocean_ods_sf",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ocean_db_sf",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"vTableName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "SnowflakeTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "OCEAN_ODS",
+			"table": {
+				"value": "@dataset().vTableName",
+				"type": "Expression"
+			}
+		}
+	}
+}

@@ -23,20 +23,21 @@
 				"userProperties": [],
 				"typeProperties": {
 					"source": {
-						"type": "AzureSqlSource",
-						"sqlReaderQuery": {
-							"value": "SELECT [MBR_Scope] as MBRScope,\n    'toload/' + [MBR_Scope]  as MBRScope_Folder\n  FROM [cfg].[@{pipeline().globalParameters.gSourcesTableName}]\nWHERE [Active_fl] = 'Y'",
+						"type": "SnowflakeSource",
+						"query": {
+							"value": "SELECT MBR_SCOPE as \"MBRScope\", 'toload/' || SHAREPOINTFOLDER as \"MBRScope_Folder\"\nFROM OCEAN.OCEAN_CFG.@{pipeline().globalParameters.gSourcesTableName_sf}\nWHERE ACTIVE_FL  = 'Y'",
 							"type": "Expression"
 						},
-						"queryTimeout": "02:00:00",
-						"partitionOption": "None"
+						"exportSettings": {
+							"type": "SnowflakeExportCopyCommand"
+						}
 					},
 					"dataset": {
-						"referenceName": "ds_ocean_cfg",
+						"referenceName": "ds_ocean_cfg_sf",
 						"type": "DatasetReference",
 						"parameters": {
 							"vTableName": {
-								"value": "@pipeline().globalParameters.gSourcesTableName",
+								"value": "@pipeline().globalParameters.gSourcesTableName_sf",
 								"type": "Expression"
 							}
 						}

@@ -25,15 +25,14 @@
 						}
 					},
 					"sink": {
-						"type": "AzureSqlSink",
+						"type": "SnowflakeSink",
 						"preCopyScript": {
-							"value": "DROP TABLE IF EXISTS ods.R_MBR_Parameters_@{pipeline().parameters.pMBRScope}",
+							"value": "DROP TABLE IF EXISTS OCEAN_ODS.R_MBR_Parameters_@{pipeline().parameters.pMBRScope}",
 							"type": "Expression"
 						},
-						"writeBehavior": "insert",
-						"sqlWriterUseTableLock": false,
-						"tableOption": "autoCreate",
-						"disableMetricsCollection": true
+						"importSettings": {
+							"type": "SnowflakeImportCopyCommand"
+						}
 					},
 					"enableStaging": false,
 					"translator": {
@@ -46,8 +45,7 @@
 								},
 								"sink": {
 									"name": "Prop_0",
-									"type": "String",
-									"physicalType": "nvarchar"
+									"type": "String"
 								}
 							},
 							{
@@ -57,16 +55,10 @@
 								},
 								"sink": {
 									"name": "Prop_1",
-									"type": "String",
-									"physicalType": "nvarchar"
+									"type": "String"
 								}
 							}
-						],
-						"typeConversion": true,
-						"typeConversionSettings": {
-							"allowDataTruncation": true,
-							"treatBooleanAsNumber": false
-						}
+						]
 					}
 				},
 				"inputs": [
@@ -87,7 +79,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "ds_ocean_ods",
+						"referenceName": "ds_ocean_ods_sf",
 						"type": "DatasetReference",
 						"parameters": {
 							"vTableName": {
@@ -120,15 +112,14 @@
 						}
 					},
 					"sink": {
-						"type": "AzureSqlSink",
+						"type": "SnowflakeSink",
 						"preCopyScript": {
-							"value": "DROP TABLE IF EXISTS ods.R_MBR_Currency_@{pipeline().parameters.pMBRScope}",
+							"value": "DROP TABLE IF EXISTS OCEAN_ODS.R_MBR_Currency_@{pipeline().parameters.pMBRScope}",
 							"type": "Expression"
 						},
-						"writeBehavior": "insert",
-						"sqlWriterUseTableLock": false,
-						"tableOption": "autoCreate",
-						"disableMetricsCollection": true
+						"importSettings": {
+							"type": "SnowflakeImportCopyCommand"
+						}
 					},
 					"enableStaging": false,
 					"translator": {
@@ -140,8 +131,7 @@
 									"ordinal": 1
 								},
 								"sink": {
-									"name": "bu_sequence",
-									"physicalType": "String"
+									"name": "bu_sequence"
 								}
 							},
 							{
@@ -150,8 +140,7 @@
 									"ordinal": 2
 								},
 								"sink": {
-									"name": "bu_name",
-									"physicalType": "String"
+									"name": "bu_name"
 								}
 							},
 							{
@@ -160,8 +149,7 @@
 									"ordinal": 3
 								},
 								"sink": {
-									"name": "currency_code",
-									"physicalType": "String"
+									"name": "currency_code"
 								}
 							},
 							{
@@ -170,16 +158,10 @@
 									"ordinal": 4
 								},
 								"sink": {
-									"name": "bu_select",
-									"physicalType": "String"
+									"name": "bu_select"
 								}
 							}
-						],
-						"typeConversion": true,
-						"typeConversionSettings": {
-							"allowDataTruncation": true,
-							"treatBooleanAsNumber": false
-						}
+						]
 					}
 				},
 				"inputs": [
@@ -200,7 +182,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "ds_ocean_ods",
+						"referenceName": "ds_ocean_ods_sf",
 						"type": "DatasetReference",
 						"parameters": {
 							"vTableName": {
@@ -238,16 +220,17 @@
 				"userProperties": [],
 				"typeProperties": {
 					"source": {
-						"type": "AzureSqlSource",
-						"sqlReaderQuery": {
-							"value": "select a.Prop_1 as MBR_Scope, b.Prop_1 as MBR_Month,  CONCAT('P&L FI_', bu_sequence ) AS SheetName, bu_sequence AS BU_Code, bu_name as BU_Name,\nCONCAT('R_P&L_FI_', a.Prop_1, '_',bu_sequence) AS RawTableName,  CONCAT('U_P&L_FI_', a.Prop_1, '_', bu_sequence) AS UnpvtTableName, currency_code as Currency_Code,\nCONCAT('R_KPI_Pyramid_', a.Prop_1) AS KPIPyramidTableName\nfrom ods.R_MBR_Currency_@{pipeline().parameters.pMBRScope},\n(select Prop_1 from ods.R_MBR_Parameters_@{pipeline().parameters.pMBRScope}\nwhere Prop_0 = 'MBR SCOPE') a,\n(select Prop_1 from ods.R_MBR_Parameters_@{pipeline().parameters.pMBRScope}\nwhere Prop_0 = 'MONTH') b\nwhere bu_select is not null",
+						"type": "SnowflakeSource",
+						"query": {
+							"value": "select \na.Prop_1 as \"MBR_Scope\", \nb.Prop_1 as \"MBR_Month\",  \nCONCAT('P&L FI_', bu_sequence ) AS \"SheetName\", \nbu_sequence AS \"BU_Code\", \nbu_name as \"BU_Name\",\nCONCAT('R_P&L_FI_', a.Prop_1, '_',bu_sequence) AS \"RawTableName\",  \nCONCAT('U_P&L_FI_', a.Prop_1, '_', bu_sequence) AS \"UnpvtTableName\", \ncurrency_code as \"Currency_Code\",\nCONCAT('R_KPI_Pyramid_', a.Prop_1) AS \"KPIPyramidTableName\"\nfrom OCEAN_ODS.R_MBR_Currency_@{pipeline().parameters.pMBRScope},\n(select Prop_1 from OCEAN_ODS.R_MBR_Parameters_@{pipeline().parameters.pMBRScope}\nwhere Prop_0 = 'MBR SCOPE') a,\n(select Prop_1 from OCEAN_ODS.R_MBR_Parameters_@{pipeline().parameters.pMBRScope}\nwhere Prop_0 = 'MONTH') b\nwhere bu_select is not null",
 							"type": "Expression"
 						},
-						"queryTimeout": "02:00:00",
-						"partitionOption": "None"
+						"exportSettings": {
+							"type": "SnowflakeExportCopyCommand"
+						}
 					},
 					"dataset": {
-						"referenceName": "ds_ocean_ods",
+						"referenceName": "ds_ocean_ods_sf",
 						"type": "DatasetReference",
 						"parameters": {
 							"vTableName": {
