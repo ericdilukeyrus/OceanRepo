@@ -1,0 +1,239 @@
+{
+	"name": "pl_01_get_files_sharepoint_sf",
+	"properties": {
+		"activities": [
+			{
+				"name": "Get Sharepoint Folder to Load",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SnowflakeSource",
+						"query": {
+							"value": "SELECT MBR_SCOPE, SHAREPOINTFOLDER, ACTIVE_FL\nFROM OCEAN.OCEAN_CFG.@{pipeline().globalParameters.gSourcesTableName_sf}\nWHERE ACTIVE_FL = 'Y'",
+							"type": "Expression"
+						},
+						"exportSettings": {
+							"type": "SnowflakeExportCopyCommand"
+						}
+					},
+					"dataset": {
+						"referenceName": "ds_ocean_cfg_sf",
+						"type": "DatasetReference",
+						"parameters": {
+							"vTableName": {
+								"value": "@pipeline().globalParameters.gSourcesTableName_sf",
+								"type": "Expression"
+							}
+						}
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach Sharepoint Folder",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Get Sharepoint Folder to Load",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Get token",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get Sharepoint Folder to Load').output.value",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"activities": [
+						{
+							"name": "Get List of Files",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "BinarySource",
+									"storeSettings": {
+										"type": "HttpReadSettings",
+										"requestMethod": "GET",
+										"additionalHeaders": {
+											"value": "@{concat('Authorization:Bearer ',activity('Get token').output.access_token)}",
+											"type": "Expression"
+										},
+										"requestTimeout": ""
+									},
+									"formatSettings": {
+										"type": "BinaryReadSettings"
+									}
+								},
+								"sink": {
+									"type": "BinarySink",
+									"storeSettings": {
+										"type": "AzureBlobStorageWriteSettings"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_sharepoint_ocean_project",
+									"type": "DatasetReference",
+									"parameters": {
+										"pShrepointFolder": {
+											"value": "@item().SharepointFolder",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "mbr_landing_zone",
+									"type": "DatasetReference",
+									"parameters": {
+										"pMBR_Folder": {
+											"value": "@item().MBR_Scope",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "Extract List of files",
+							"type": "ExecuteDataFlow",
+							"dependsOn": [
+								{
+									"activity": "Get List of Files",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataflow": {
+									"referenceName": "df_shrp_listoffiles",
+									"type": "DataFlowReference",
+									"parameters": {
+										"pMBR_Scope": {
+											"value": "'@{item().MBR_Scope}'",
+											"type": "Expression"
+										}
+									},
+									"datasetParameters": {
+										"getListofFiles": {
+											"pMBR_Scope": {
+												"value": "@item().MBR_Scope",
+												"type": "Expression"
+											}
+										},
+										"createJSONListofFiles": {
+											"pMBR_Scope": {
+												"value": "@item().MBR_Scope",
+												"type": "Expression"
+											}
+										}
+									}
+								},
+								"integrationRuntime": {
+									"referenceName": "integrationRuntime",
+									"type": "IntegrationRuntimeReference"
+								},
+								"traceLevel": "Fine",
+								"runConcurrently": true
+							}
+						},
+						{
+							"name": "Copy file to blob",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "Extract List of files",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "pl_02_copy_files_to_blob",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"pMBR_Scope": {
+										"value": "@item().MBR_Scope",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Get token",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": "https://accounts.accesscontrol.windows.net/168e48b2-81f0-4aac-bc77-d58d07d205e2/tokens/OAuth/2",
+					"connectVia": {
+						"referenceName": "integrationRuntime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "POST",
+					"headers": {
+						"Content-Type": "application/x-www-form-urlencoded"
+					},
+					"body": "grant_type=client_credentials&client_id=63bb52e3-0d92-4899-991c-bda347d9dd3b@168e48b2-81f0-4aac-bc77-d58d07d205e2&client_secret=S8v8Q~jvkg-AXO-gSxyxnJQTd9zhR1SiPr0ukcz5&resource=00000003-0000-0ff1-ce00-000000000000/keyrusgroup.sharepoint.com@168e48b2-81f0-4aac-bc77-d58d07d205e2"
+				}
+			}
+		],
+		"folder": {
+			"name": "00INIT/Snowflake"
+		},
+		"annotations": []
+	}
+}

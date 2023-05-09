@@ -90,19 +90,6 @@
 				}
 			},
 			{
-				"name": "Initialization",
-				"type": "ExecutePipeline",
-				"dependsOn": [],
-				"userProperties": [],
-				"typeProperties": {
-					"pipeline": {
-						"referenceName": "pl_00_initialization",
-						"type": "PipelineReference"
-					},
-					"waitOnCompletion": true
-				}
-			},
-			{
 				"name": "Copy Files from Sharepoint",
 				"type": "ExecutePipeline",
 				"dependsOn": [
@@ -202,6 +189,19 @@
 						"type": "DatasetReference"
 					}
 				]
+			},
+			{
+				"name": "Initialization",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_00_initialization_sf",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
 			}
 		],
 		"annotations": [],
