@@ -73,6 +73,10 @@
 			"gDimCurrencyConversionTableName": {
 				"type": "string",
 				"value": "DimCurrency"
+			},
+			"gSourcesTableName_sf": {
+				"type": "string",
+				"value": "Sources"
 			}
 		},
 		"globalConfigurations": {
