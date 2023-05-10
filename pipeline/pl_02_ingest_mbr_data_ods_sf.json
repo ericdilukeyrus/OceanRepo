@@ -399,7 +399,7 @@
 				"type": "ExecuteDataFlow",
 				"dependsOn": [
 					{
-						"activity": "Get MBR Parameters",
+						"activity": "Get MBR Parameters_copy1",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -441,6 +441,48 @@
 						"type": "IntegrationRuntimeReference"
 					},
 					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "Get MBR Parameters_copy1",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "Get MBR Parameters",
+						"dependencyConditions": [
+							"Skipped"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "SELECT DISTINCT Prop_1 AS MBR_MONTH FROM Ocean_dev.ods.R_MBR_Parameters_@{pipeline().parameters.pMBRScope}\nWHERE Prop_0 = 'MONTH'",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_ocean_ods",
+						"type": "DatasetReference",
+						"parameters": {
+							"vTableName": {
+								"value": "@concat('R_MBR_Currency_',pipeline().parameters.pMBRScope)",
+								"type": "Expression"
+							}
+						}
+					},
+					"firstRowOnly": false
 				}
 			}
 		],
