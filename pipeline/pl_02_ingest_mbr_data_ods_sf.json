@@ -456,7 +456,7 @@
 					{
 						"activity": "Get MBR Parameters",
 						"dependencyConditions": [
-							"Skipped"
+							"Succeeded"
 						]
 					}
 				],
