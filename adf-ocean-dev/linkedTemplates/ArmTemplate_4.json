@@ -1154,63 +1154,6 @@
 						}
 					},
 					{
-						"name": "Copy KPI Pyramid to Snowfale",
-						"type": "ExecuteDataFlow",
-						"dependsOn": [
-							{
-								"activity": "Get MBR_Month",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataflow": {
-								"referenceName": "df_copy_kpipyramid_snowflake",
-								"type": "DataFlowReference",
-								"parameters": {
-									"pMBR_Month": {
-										"value": "'@{activity('Get MBR_Month').output}'",
-										"type": "Expression"
-									}
-								},
-								"datasetParameters": {
-									"getKPIPyramidData": {
-										"pFileName": {
-											"value": "@pipeline().parameters.pFileName",
-											"type": "Expression"
-										},
-										"pFolderName": {
-											"value": "@pipeline().parameters.pFolderName",
-											"type": "Expression"
-										}
-									},
-									"insertKPIPyramidData": {
-										"pRawTableName": {
-											"value": "@toUpper(concat('R_KPI_Pyramid_',pipeline().parameters.pMBRScope))",
-											"type": "Expression"
-										}
-									}
-								},
-								"linkedServiceParameters": {}
-							},
-							"staging": {},
-							"integrationRuntime": {
-								"referenceName": "integrationRuntime",
-								"type": "IntegrationRuntimeReference"
-							},
-							"traceLevel": "Fine"
-						}
-					},
-					{
 						"name": "Get MBR_Month",
 						"type": "Lookup",
 						"dependsOn": [
@@ -1250,6 +1193,77 @@
 								}
 							},
 							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "Insert KPI Pyramid",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Get MBR_Month",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Get MBR_Month').output.value",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Copy KPI Pyramid to Snowfale",
+									"type": "ExecuteDataFlow",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataflow": {
+											"referenceName": "df_copy_kpipyramid_snowflake",
+											"type": "DataFlowReference",
+											"parameters": {
+												"pMBR_Month": {
+													"value": "'@{item().MBR_MONTH}'",
+													"type": "Expression"
+												}
+											},
+											"datasetParameters": {
+												"getKPIPyramidData": {
+													"pFileName": {
+														"value": "@pipeline().parameters.pFileName",
+														"type": "Expression"
+													},
+													"pFolderName": {
+														"value": "@pipeline().parameters.pFolderName",
+														"type": "Expression"
+													}
+												},
+												"insertKPIPyramidData": {
+													"pRawTableName": {
+														"value": "@toUpper(concat('R_KPI_Pyramid_',pipeline().parameters.pMBRScope))",
+														"type": "Expression"
+													}
+												}
+											},
+											"linkedServiceParameters": {}
+										},
+										"staging": {},
+										"integrationRuntime": {
+											"referenceName": "integrationRuntime",
+											"type": "IntegrationRuntimeReference"
+										},
+										"traceLevel": "Fine"
+									}
+								}
+							]
 						}
 					}
 				],
