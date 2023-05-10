@@ -30,6 +30,9 @@
 				},
 				{
 					"name": "removeEmptyRows"
+				},
+				{
+					"name": "derivedColumn1"
 				}
 			],
 			"scriptLines": [
@@ -80,7 +83,8 @@
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> renameColumns",
 				"renameColumns filter(not(isNull(BU))) ~> removeEmptyRows",
-				"removeEmptyRows sink(allowSchemaDrift: true,",
+				"removeEmptyRows derive(MBR_Month = $pMBR_Month) ~> derivedColumn1",
+				"derivedColumn1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          Index as decimal(38,0),",

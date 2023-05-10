@@ -399,7 +399,7 @@
 				"type": "ExecuteDataFlow",
 				"dependsOn": [
 					{
-						"activity": "Get MBR Parameters_copy1",
+						"activity": "Get MBR_Month",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -417,6 +417,12 @@
 					"dataflow": {
 						"referenceName": "df_copy_kpipyramid_snowflake",
 						"type": "DataFlowReference",
+						"parameters": {
+							"pMBR_Month": {
+								"value": "'@{activity('Get MBR_Month').output}'",
+								"type": "Expression"
+							}
+						},
 						"datasetParameters": {
 							"getKPIPyramidData": {
 								"pFileName": {
@@ -444,7 +450,7 @@
 				}
 			},
 			{
-				"name": "Get MBR Parameters_copy1",
+				"name": "Get MBR_Month",
 				"type": "Lookup",
 				"dependsOn": [
 					{
