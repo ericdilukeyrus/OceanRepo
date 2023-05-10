@@ -4589,9 +4589,9 @@
 						"type": "Lookup",
 						"dependsOn": [
 							{
-								"activity": "Get MBR Parameters",
+								"activity": "ForEach Business Units sheets",
 								"dependencyConditions": [
-									"Skipped"
+									"Succeeded"
 								]
 							}
 						],
