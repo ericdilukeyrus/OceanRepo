@@ -2510,7 +2510,7 @@
 						"          MBR_Scope = $pMBR_Scope,",
 						"          MBR_Month = $pMBR_Month,",
 						"          CostCenter_Code = left({_col1_},7),",
-						"          Created_On = currentTimestamp()) ~> addMBRMetadata",
+						"          Created_On = fromUTC(currentTimestamp(),'Europe/Paris')) ~> addMBRMetadata",
 						"addMBRMetadata select(mapColumn(",
 						"          {_col0_},",
 						"          {_col1_},",
@@ -2721,7 +2721,7 @@
 							"name": "removeEmptyRows"
 						},
 						{
-							"name": "derivedColumn1"
+							"name": "addExtraInfo"
 						}
 					],
 					"scriptLines": [
@@ -2772,9 +2772,9 @@
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true) ~> renameColumns",
 						"renameColumns filter(not(isNull(BU))) ~> removeEmptyRows",
-						"removeEmptyRows derive(CREATED_ON = currentTimestamp(),",
-						"          MBR_MONTH = $pMBR_Month) ~> derivedColumn1",
-						"derivedColumn1 sink(allowSchemaDrift: true,",
+						"removeEmptyRows derive(CREATED_ON = fromUTC(currentTimestamp(),'Europe/Paris'),",
+						"          MBR_MONTH = $pMBR_Month) ~> addExtraInfo",
+						"addExtraInfo sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     input(",
 						"          Index as decimal(38,0),",
