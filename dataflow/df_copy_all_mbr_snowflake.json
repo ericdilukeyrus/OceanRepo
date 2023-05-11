@@ -104,7 +104,7 @@
 				"          MBR_Scope = $pMBR_Scope,",
 				"          MBR_Month = $pMBR_Month,",
 				"          CostCenter_Code = left({_col1_},7),",
-				"          Created_On = currentTimestamp()) ~> addMBRMetadata",
+				"          Created_On = fromUTC(currentTimestamp(),'Europe/Paris')) ~> addMBRMetadata",
 				"addMBRMetadata select(mapColumn(",
 				"          {_col0_},",
 				"          {_col1_},",
