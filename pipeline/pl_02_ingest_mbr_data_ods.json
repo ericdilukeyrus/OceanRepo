@@ -12,12 +12,6 @@
 						"dependencyConditions": [
 							"Succeeded"
 						]
-					},
-					{
-						"activity": "df_mbr_currency",
-						"dependencyConditions": [
-							"Skipped"
-						]
 					}
 				],
 				"policy": {
@@ -296,7 +290,14 @@
 			{
 				"name": "df_copy_mbr_param",
 				"type": "ExecuteDataFlow",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "df_mbr_currency",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
