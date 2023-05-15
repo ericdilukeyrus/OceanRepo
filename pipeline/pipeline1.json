@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Copy MBR Parameters",
+				"name": "Copy data1",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
@@ -25,42 +25,12 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"preCopyScript": {
-							"value": "DROP TABLE IF EXISTS ods.R_MBR_Parameters_Spain",
-							"type": "Expression"
-						},
 						"writeBehavior": "insert",
-						"sqlWriterUseTableLock": false,
-						"tableOption": "autoCreate",
-						"disableMetricsCollection": true
+						"sqlWriterUseTableLock": false
 					},
 					"enableStaging": false,
 					"translator": {
 						"type": "TabularTranslator",
-						"mappings": [
-							{
-								"source": {
-									"type": "String",
-									"ordinal": 1
-								},
-								"sink": {
-									"name": "Prop_0",
-									"type": "String",
-									"physicalType": "nvarchar"
-								}
-							},
-							{
-								"source": {
-									"type": "String",
-									"ordinal": 2
-								},
-								"sink": {
-									"name": "Prop_1",
-									"type": "String",
-									"physicalType": "nvarchar"
-								}
-							}
-						],
 						"typeConversion": true,
 						"typeConversionSettings": {
 							"allowDataTruncation": true,
@@ -70,30 +40,14 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "ds_mbr_parameters",
-						"type": "DatasetReference",
-						"parameters": {
-							"pFileName": {
-								"value": "Spain_MBR Reporting_04.2023_TEST.xlsx",
-								"type": "Expression"
-							},
-							"pFolderName": {
-								"value": "toload/Spain",
-								"type": "Expression"
-							}
-						}
+						"referenceName": "Excel1",
+						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "ds_ocean_ods",
-						"type": "DatasetReference",
-						"parameters": {
-							"vTableName": {
-								"value": "R_MBR_Parameters_Spain",
-								"type": "Expression"
-							}
-						}
+						"referenceName": "AzureSqlTable1",
+						"type": "DatasetReference"
 					}
 				]
 			}
