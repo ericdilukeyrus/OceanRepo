@@ -4,225 +4,17 @@
 		"description": "Move all import tables from the source systems",
 		"activities": [
 			{
-				"name": "Copy MBR Parameters",
-				"type": "Copy",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "ExcelSource",
-						"storeSettings": {
-							"type": "AzureBlobStorageReadSettings",
-							"recursive": true,
-							"enablePartitionDiscovery": false
-						}
-					},
-					"sink": {
-						"type": "AzureSqlSink",
-						"preCopyScript": {
-							"value": "DROP TABLE IF EXISTS ods.R_MBR_Parameters_@{pipeline().parameters.pMBRScope}",
-							"type": "Expression"
-						},
-						"writeBehavior": "insert",
-						"sqlWriterUseTableLock": false,
-						"tableOption": "autoCreate",
-						"disableMetricsCollection": true
-					},
-					"enableStaging": false,
-					"translator": {
-						"type": "TabularTranslator",
-						"mappings": [
-							{
-								"source": {
-									"type": "String",
-									"ordinal": 1
-								},
-								"sink": {
-									"name": "Prop_0",
-									"type": "String",
-									"physicalType": "nvarchar"
-								}
-							},
-							{
-								"source": {
-									"type": "String",
-									"ordinal": 2
-								},
-								"sink": {
-									"name": "Prop_1",
-									"type": "String",
-									"physicalType": "nvarchar"
-								}
-							}
-						],
-						"typeConversion": true,
-						"typeConversionSettings": {
-							"allowDataTruncation": true,
-							"treatBooleanAsNumber": false
-						}
-					}
-				},
-				"inputs": [
-					{
-						"referenceName": "ds_mbr_parameters",
-						"type": "DatasetReference",
-						"parameters": {
-							"pFileName": {
-								"value": "@pipeline().parameters.pFileName",
-								"type": "Expression"
-							},
-							"pFolderName": {
-								"value": "@pipeline().parameters.pFolderName",
-								"type": "Expression"
-							}
-						}
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "ds_ocean_ods",
-						"type": "DatasetReference",
-						"parameters": {
-							"vTableName": {
-								"value": "@concat('R_MBR_Parameters_',pipeline().parameters.pMBRScope)",
-								"type": "Expression"
-							}
-						}
-					}
-				]
-			},
-			{
-				"name": "Copy MBR Currency",
-				"type": "Copy",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "ExcelSource",
-						"storeSettings": {
-							"type": "AzureBlobStorageReadSettings",
-							"recursive": true,
-							"enablePartitionDiscovery": false
-						}
-					},
-					"sink": {
-						"type": "AzureSqlSink",
-						"preCopyScript": {
-							"value": "DROP TABLE IF EXISTS ods.R_MBR_Currency_@{pipeline().parameters.pMBRScope}",
-							"type": "Expression"
-						},
-						"writeBehavior": "insert",
-						"sqlWriterUseTableLock": false,
-						"tableOption": "autoCreate",
-						"disableMetricsCollection": true
-					},
-					"enableStaging": false,
-					"translator": {
-						"type": "TabularTranslator",
-						"mappings": [
-							{
-								"source": {
-									"type": "String",
-									"ordinal": 1
-								},
-								"sink": {
-									"name": "bu_sequence",
-									"physicalType": "String"
-								}
-							},
-							{
-								"source": {
-									"type": "String",
-									"ordinal": 2
-								},
-								"sink": {
-									"name": "bu_name",
-									"physicalType": "String"
-								}
-							},
-							{
-								"source": {
-									"type": "String",
-									"ordinal": 3
-								},
-								"sink": {
-									"name": "currency_code",
-									"physicalType": "String"
-								}
-							},
-							{
-								"source": {
-									"type": "String",
-									"ordinal": 4
-								},
-								"sink": {
-									"name": "bu_select",
-									"physicalType": "String"
-								}
-							}
-						],
-						"typeConversion": true,
-						"typeConversionSettings": {
-							"allowDataTruncation": true,
-							"treatBooleanAsNumber": false
-						}
-					}
-				},
-				"inputs": [
-					{
-						"referenceName": "ds_mbr_currency",
-						"type": "DatasetReference",
-						"parameters": {
-							"pFileName": {
-								"value": "@pipeline().parameters.pFileName",
-								"type": "Expression"
-							},
-							"pFolderName": {
-								"value": "@pipeline().parameters.pFolderName",
-								"type": "Expression"
-							}
-						}
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "ds_ocean_ods",
-						"type": "DatasetReference",
-						"parameters": {
-							"vTableName": {
-								"value": "@concat('R_MBR_Currency_',pipeline().parameters.pMBRScope)",
-								"type": "Expression"
-							}
-						}
-					}
-				]
-			},
-			{
 				"name": "Get MBR Parameters",
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "Copy MBR Parameters",
+						"activity": "Copy MBR Parameters New",
 						"dependencyConditions": [
 							"Succeeded"
 						]
 					},
 					{
-						"activity": "Copy MBR Currency",
+						"activity": "Copy MBR Currency New",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -502,13 +294,225 @@
 				}
 			},
 			{
-				"name": "Copy KPI Pyramid to ODS",
+				"name": "Copy MBR Parameters New",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "ExcelSource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						}
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": {
+							"value": "DROP TABLE IF EXISTS ods.R_MBR_Parameters_@{pipeline().parameters.pMBRScope}",
+							"type": "Expression"
+						},
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false,
+						"tableOption": "autoCreate",
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"type": "String",
+									"ordinal": 1
+								},
+								"sink": {
+									"name": "Prop_0",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"type": "String",
+									"ordinal": 2
+								},
+								"sink": {
+									"name": "Prop_1",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_mbr_parameters_new",
+						"type": "DatasetReference",
+						"parameters": {
+							"pFileName": {
+								"value": "@pipeline().parameters.pFileName",
+								"type": "Expression"
+							},
+							"pFolderName": {
+								"value": "@pipeline().parameters.pFolderName",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_ocean_new",
+						"type": "DatasetReference",
+						"parameters": {
+							"vTableName": {
+								"value": "@concat('R_MBR_Parameters_',pipeline().parameters.pMBRScope)",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			},
+			{
+				"name": "Copy MBR Currency New",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "ExcelSource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						}
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": {
+							"value": "DROP TABLE IF EXISTS ods.R_MBR_Currency_@{pipeline().parameters.pMBRScope}",
+							"type": "Expression"
+						},
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false,
+						"tableOption": "autoCreate",
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"type": "String",
+									"ordinal": 1
+								},
+								"sink": {
+									"name": "bu_sequence",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"type": "String",
+									"ordinal": 2
+								},
+								"sink": {
+									"name": "bu_name",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"type": "String",
+									"ordinal": 3
+								},
+								"sink": {
+									"name": "currency_code",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							},
+							{
+								"source": {
+									"type": "String",
+									"ordinal": 4
+								},
+								"sink": {
+									"name": "bu_select",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_currency_new",
+						"type": "DatasetReference",
+						"parameters": {
+							"pFileName": {
+								"value": "@pipeline().parameters.pFileName",
+								"type": "Expression"
+							},
+							"pFolderName": {
+								"value": "@pipeline().parameters.pFolderName",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_ocean_new",
+						"type": "DatasetReference",
+						"parameters": {
+							"vTableName": {
+								"value": "@concat('R_MBR_Currency_',pipeline().parameters.pMBRScope)",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			},
+			{
+				"name": "Copy KPI Pyramid to ODS new",
 				"type": "Copy",
 				"dependsOn": [
 					{
 						"activity": "Get MBR Parameters",
 						"dependencyConditions": [
-							"Succeeded"
+							"Skipped"
 						]
 					}
 				],
@@ -534,7 +538,7 @@
 						"writeBehavior": "insert",
 						"sqlWriterUseTableLock": false,
 						"tableOption": "autoCreate",
-						"disableMetricsCollection": true
+						"disableMetricsCollection": false
 					},
 					"enableStaging": false,
 					"translator": {
@@ -547,7 +551,8 @@
 								},
 								"sink": {
 									"name": "BU",
-									"physicalType": "String"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -557,7 +562,8 @@
 								},
 								"sink": {
 									"name": "Version",
-									"physicalType": "String"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -567,7 +573,8 @@
 								},
 								"sink": {
 									"name": "Period",
-									"physicalType": "String"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -577,7 +584,8 @@
 								},
 								"sink": {
 									"name": "CostCenter",
-									"physicalType": "String"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -587,7 +595,8 @@
 								},
 								"sink": {
 									"name": "PeopleType",
-									"physicalType": "String"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -597,7 +606,8 @@
 								},
 								"sink": {
 									"name": "LevelSeniority",
-									"physicalType": "String"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -607,7 +617,8 @@
 								},
 								"sink": {
 									"name": "EndOfMonth_FTE",
-									"physicalType": "String"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -617,7 +628,8 @@
 								},
 								"sink": {
 									"name": "SrvcSales_bef_bonimali",
-									"physicalType": "String"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -627,7 +639,8 @@
 								},
 								"sink": {
 									"name": "BillableDays",
-									"physicalType": "String"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -637,7 +650,8 @@
 								},
 								"sink": {
 									"name": "DailyRate",
-									"physicalType": "String"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -647,7 +661,8 @@
 								},
 								"sink": {
 									"name": "AnnualDirectCosts",
-									"physicalType": "String"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -657,7 +672,8 @@
 								},
 								"sink": {
 									"name": "AnnualProductionDays",
-									"physicalType": "String"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -667,7 +683,8 @@
 								},
 								"sink": {
 									"name": "DailyCost",
-									"physicalType": "String"
+									"type": "String",
+									"physicalType": "nvarchar"
 								}
 							}
 						],
@@ -680,7 +697,7 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "ds_mbr_kpi_pyramid",
+						"referenceName": "ds_mbr_kpi_pyramid_new",
 						"type": "DatasetReference",
 						"parameters": {
 							"pFileName": {
@@ -696,7 +713,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "ds_ocean_ods",
+						"referenceName": "ds_ocean_new",
 						"type": "DatasetReference",
 						"parameters": {
 							"vTableName": {

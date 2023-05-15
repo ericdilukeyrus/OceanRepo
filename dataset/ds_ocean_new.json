@@ -1,0 +1,27 @@
+{
+	"name": "ds_ocean_new",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase1",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"vTableName": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "01ODS"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "ods",
+			"table": {
+				"value": "@dataset().vTableName",
+				"type": "Expression"
+			}
+		}
+	}
+}

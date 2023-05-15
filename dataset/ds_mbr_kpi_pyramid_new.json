@@ -1,0 +1,36 @@
+{
+	"name": "ds_mbr_kpi_pyramid_new",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"pFileName": {
+				"type": "string"
+			},
+			"pFolderName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Excel",
+		"typeProperties": {
+			"sheetName": "KPI Pyramid",
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@dataset().pFileName",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().pFolderName",
+					"type": "Expression"
+				},
+				"container": "mbr-landing-zone"
+			},
+			"range": "B79:N4000"
+		},
+		"schema": []
+	}
+}
