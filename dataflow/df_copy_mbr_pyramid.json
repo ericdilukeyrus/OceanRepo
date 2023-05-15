@@ -1,0 +1,82 @@
+{
+	"name": "df_copy_mbr_pyramid",
+	"properties": {
+		"folder": {
+			"name": "01ODS"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_mbr_kpi_pyramid_new",
+						"type": "DatasetReference"
+					},
+					"name": "getMBRKpiPyramid"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_ocean_new",
+						"type": "DatasetReference"
+					},
+					"name": "insertMBRKpiPyramid"
+				}
+			],
+			"transformations": [
+				{
+					"name": "filterColumns"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          {_col0_} as string,",
+				"          {_col1_} as string,",
+				"          {_col2_} as date,",
+				"          {_col3_} as string,",
+				"          {_col4_} as string,",
+				"          {_col5_} as string,",
+				"          {_col6_} as short,",
+				"          {_col7_} as double,",
+				"          {_col8_} as double,",
+				"          {_col9_} as double,",
+				"          {_col10_} as integer,",
+				"          {_col11_} as short,",
+				"          {_col12_} as double",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> getMBRKpiPyramid",
+				"getMBRKpiPyramid select(mapColumn(",
+				"          BU = {_col0_},",
+				"          Version = {_col1_},",
+				"          Period = {_col2_},",
+				"          CostCenter = {_col3_},",
+				"          PeopleType = {_col4_},",
+				"          LevelSeniority = {_col5_},",
+				"          EndOfMonth_FTE = {_col6_},",
+				"          SrvcSales_bef_bonimali = {_col7_},",
+				"          BillableDays = {_col8_},",
+				"          DailyRate = {_col9_},",
+				"          AnnualDirectCosts = {_col10_},",
+				"          AnnualProductionDays = {_col11_},",
+				"          DailyCost = {_col12_}",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> filterColumns",
+				"filterColumns sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     recreate:true,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> insertMBRKpiPyramid"
+			]
+		}
+	}
+}
