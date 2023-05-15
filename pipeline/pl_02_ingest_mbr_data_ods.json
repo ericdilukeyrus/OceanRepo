@@ -8,15 +8,15 @@
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "Copy MBR Currency New",
+						"activity": "df_copy_mbr_param",
 						"dependencyConditions": [
 							"Succeeded"
 						]
 					},
 					{
-						"activity": "df_copy_mbr_param",
+						"activity": "df_mbr_currency",
 						"dependencyConditions": [
-							"Succeeded"
+							"Skipped"
 						]
 					}
 				],
@@ -294,123 +294,6 @@
 				}
 			},
 			{
-				"name": "Copy MBR Currency New",
-				"type": "Copy",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "ExcelSource",
-						"storeSettings": {
-							"type": "AzureBlobStorageReadSettings",
-							"recursive": true,
-							"enablePartitionDiscovery": false
-						}
-					},
-					"sink": {
-						"type": "AzureSqlSink",
-						"preCopyScript": {
-							"value": "DROP TABLE IF EXISTS ods.R_MBR_Currency_@{pipeline().parameters.pMBRScope}",
-							"type": "Expression"
-						},
-						"writeBehavior": "insert",
-						"sqlWriterUseTableLock": false,
-						"tableOption": "autoCreate",
-						"disableMetricsCollection": false
-					},
-					"enableStaging": false,
-					"translator": {
-						"type": "TabularTranslator",
-						"mappings": [
-							{
-								"source": {
-									"type": "String",
-									"ordinal": 1
-								},
-								"sink": {
-									"name": "bu_sequence",
-									"type": "String",
-									"physicalType": "nvarchar"
-								}
-							},
-							{
-								"source": {
-									"type": "String",
-									"ordinal": 2
-								},
-								"sink": {
-									"name": "bu_name",
-									"type": "String",
-									"physicalType": "nvarchar"
-								}
-							},
-							{
-								"source": {
-									"type": "String",
-									"ordinal": 3
-								},
-								"sink": {
-									"name": "currency_code",
-									"type": "String",
-									"physicalType": "nvarchar"
-								}
-							},
-							{
-								"source": {
-									"type": "String",
-									"ordinal": 4
-								},
-								"sink": {
-									"name": "bu_select",
-									"type": "String",
-									"physicalType": "nvarchar"
-								}
-							}
-						],
-						"typeConversion": true,
-						"typeConversionSettings": {
-							"allowDataTruncation": true,
-							"treatBooleanAsNumber": false
-						}
-					}
-				},
-				"inputs": [
-					{
-						"referenceName": "ds_currency_new",
-						"type": "DatasetReference",
-						"parameters": {
-							"pFileName": {
-								"value": "@pipeline().parameters.pFileName",
-								"type": "Expression"
-							},
-							"pFolderName": {
-								"value": "@pipeline().parameters.pFolderName",
-								"type": "Expression"
-							}
-						}
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "ds_ocean_new",
-						"type": "DatasetReference",
-						"parameters": {
-							"vTableName": {
-								"value": "@concat('R_MBR_Currency_',pipeline().parameters.pMBRScope)",
-								"type": "Expression"
-							}
-						}
-					}
-				]
-			},
-			{
 				"name": "Copy KPI Pyramid to ODS new",
 				"type": "Copy",
 				"dependsOn": [
@@ -669,6 +552,48 @@
 							"insertMBRParams": {
 								"vTableName": {
 									"value": "@concat('R_MBR_Parameters_',pipeline().parameters.pMBRScope)",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "integrationRuntime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "df_mbr_currency",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_mbr_currency",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"getMBRCurr": {
+								"pFileName": {
+									"value": "@pipeline().parameters.pFileName",
+									"type": "Expression"
+								},
+								"pFolderName": {
+									"value": "@pipeline().parameters.pFolderName",
+									"type": "Expression"
+								}
+							},
+							"insertMBRCurr": {
+								"vTableName": {
+									"value": "@concat('R_MBR_Currency_',pipeline().parameters.pMBRScope)",
 									"type": "Expression"
 								}
 							}
