@@ -2394,225 +2394,17 @@
 				"description": "Move all import tables from the source systems",
 				"activities": [
 					{
-						"name": "Copy MBR Parameters",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "ExcelSource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true,
-									"enablePartitionDiscovery": false
-								}
-							},
-							"sink": {
-								"type": "AzureSqlSink",
-								"preCopyScript": {
-									"value": "DROP TABLE IF EXISTS ods.R_MBR_Parameters_@{pipeline().parameters.pMBRScope}",
-									"type": "Expression"
-								},
-								"writeBehavior": "insert",
-								"sqlWriterUseTableLock": false,
-								"tableOption": "autoCreate",
-								"disableMetricsCollection": true
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"type": "String",
-											"ordinal": 1
-										},
-										"sink": {
-											"name": "Prop_0",
-											"type": "String",
-											"physicalType": "nvarchar"
-										}
-									},
-									{
-										"source": {
-											"type": "String",
-											"ordinal": 2
-										},
-										"sink": {
-											"name": "Prop_1",
-											"type": "String",
-											"physicalType": "nvarchar"
-										}
-									}
-								],
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "ds_mbr_parameters",
-								"type": "DatasetReference",
-								"parameters": {
-									"pFileName": {
-										"value": "@pipeline().parameters.pFileName",
-										"type": "Expression"
-									},
-									"pFolderName": {
-										"value": "@pipeline().parameters.pFolderName",
-										"type": "Expression"
-									}
-								}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "ds_ocean_ods",
-								"type": "DatasetReference",
-								"parameters": {
-									"vTableName": {
-										"value": "@concat('R_MBR_Parameters_',pipeline().parameters.pMBRScope)",
-										"type": "Expression"
-									}
-								}
-							}
-						]
-					},
-					{
-						"name": "Copy MBR Currency",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "ExcelSource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true,
-									"enablePartitionDiscovery": false
-								}
-							},
-							"sink": {
-								"type": "AzureSqlSink",
-								"preCopyScript": {
-									"value": "DROP TABLE IF EXISTS ods.R_MBR_Currency_@{pipeline().parameters.pMBRScope}",
-									"type": "Expression"
-								},
-								"writeBehavior": "insert",
-								"sqlWriterUseTableLock": false,
-								"tableOption": "autoCreate",
-								"disableMetricsCollection": true
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"type": "String",
-											"ordinal": 1
-										},
-										"sink": {
-											"name": "bu_sequence",
-											"physicalType": "String"
-										}
-									},
-									{
-										"source": {
-											"type": "String",
-											"ordinal": 2
-										},
-										"sink": {
-											"name": "bu_name",
-											"physicalType": "String"
-										}
-									},
-									{
-										"source": {
-											"type": "String",
-											"ordinal": 3
-										},
-										"sink": {
-											"name": "currency_code",
-											"physicalType": "String"
-										}
-									},
-									{
-										"source": {
-											"type": "String",
-											"ordinal": 4
-										},
-										"sink": {
-											"name": "bu_select",
-											"physicalType": "String"
-										}
-									}
-								],
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "ds_mbr_currency",
-								"type": "DatasetReference",
-								"parameters": {
-									"pFileName": {
-										"value": "@pipeline().parameters.pFileName",
-										"type": "Expression"
-									},
-									"pFolderName": {
-										"value": "@pipeline().parameters.pFolderName",
-										"type": "Expression"
-									}
-								}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "ds_ocean_ods",
-								"type": "DatasetReference",
-								"parameters": {
-									"vTableName": {
-										"value": "@concat('R_MBR_Currency_',pipeline().parameters.pMBRScope)",
-										"type": "Expression"
-									}
-								}
-							}
-						]
-					},
-					{
 						"name": "Get MBR Parameters",
 						"type": "Lookup",
 						"dependsOn": [
 							{
-								"activity": "Copy MBR Parameters",
+								"activity": "df_mbr_currency",
 								"dependencyConditions": [
 									"Succeeded"
 								]
 							},
 							{
-								"activity": "Copy MBR Currency",
+								"activity": "df_copy_mbr_param",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -2895,6 +2687,105 @@
 									}
 								}
 							]
+						}
+					},
+					{
+						"name": "df_copy_mbr_param",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_copy_mbr_param",
+								"type": "DataFlowReference",
+								"parameters": {
+									"pFileName": {
+										"value": "'@{pipeline().parameters.pFileName}'",
+										"type": "Expression"
+									},
+									"pFolderName": {
+										"value": "'@{pipeline().parameters.pFolderName}'",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"getMBRParam": {
+										"pFileName": {
+											"value": "@pipeline().parameters.pFileName",
+											"type": "Expression"
+										},
+										"pFolderName": {
+											"value": "@pipeline().parameters.pFolderName",
+											"type": "Expression"
+										}
+									},
+									"insertMBRParams": {
+										"vTableName": {
+											"value": "@concat('R_MBR_Parameters_',pipeline().parameters.pMBRScope)",
+											"type": "Expression"
+										}
+									}
+								},
+								"linkedServiceParameters": {}
+							},
+							"staging": {},
+							"integrationRuntime": {
+								"referenceName": "integrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "df_mbr_currency",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_mbr_currency",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"getMBRCurr": {
+										"pFileName": {
+											"value": "@pipeline().parameters.pFileName",
+											"type": "Expression"
+										},
+										"pFolderName": {
+											"value": "@pipeline().parameters.pFolderName",
+											"type": "Expression"
+										}
+									},
+									"insertMBRCurr": {
+										"vTableName": {
+											"value": "@concat('R_MBR_Currency_',pipeline().parameters.pMBRScope)",
+											"type": "Expression"
+										}
+									}
+								},
+								"linkedServiceParameters": {}
+							},
+							"staging": {},
+							"integrationRuntime": {
+								"referenceName": "integrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
+							"traceLevel": "Fine"
 						}
 					}
 				],
