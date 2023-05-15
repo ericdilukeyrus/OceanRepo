@@ -15,6 +15,14 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'ls_snowflake_ocean_ods_prod'"
 		},
+		"AzureBlobStorage1_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorage1'"
+		},
+		"AzureSqlDatabase1_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabase1'"
+		},
 		"dimensions_source_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'dimensions_source'"
@@ -125,6 +133,32 @@
 							"cleanup": false
 						}
 					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureBlobStorage1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('AzureBlobStorage1_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureSqlDatabase1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('AzureSqlDatabase1_connectionString')]"
 				}
 			},
 			"dependsOn": []
@@ -597,353 +631,85 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/pl_00_initialization')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Truncate Config Table",
-						"type": "Script",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"linkedServiceName": {
-							"referenceName": "ocean_db",
-							"type": "LinkedServiceReference"
-						},
-						"typeProperties": {
-							"scripts": [
-								{
-									"type": "Query",
-									"text": {
-										"value": "truncate table [@{pipeline().globalParameters.gODSSchemaName}].[@{pipeline().globalParameters.gSourcesConfigTableName}]",
-										"type": "Expression"
-									}
-								}
-							],
-							"scriptBlockExecutionTimeout": "02:00:00"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"folder": {
-					"name": "00INIT"
-				},
-				"annotations": [],
-				"lastPublishTime": "2023-02-17T12:56:26Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ocean_db')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DelimitedText1')]",
+			"name": "[concat(parameters('factoryName'), '/Excel1')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "dimensions_source",
+					"referenceName": "AzureBlobStorage1",
 					"type": "LinkedServiceReference"
 				},
-				"folder": {
-					"name": "00DEV"
-				},
 				"annotations": [],
-				"type": "DelimitedText",
+				"type": "Excel",
 				"typeProperties": {
+					"sheetName": "MBR Parameters",
 					"location": {
 						"type": "AzureBlobStorageLocation",
-						"fileName": "edi_test.csv",
+						"fileName": "20230428_090107_MBR Reporting_2023_v22 - 09 BUs 03-2023 à utiliser - wo links – Copie.xlsx",
+						"folderPath": "toload/France",
 						"container": "mbr-landing-zone"
 					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
+					"range": "F8:I16"
 				},
-				"schema": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/dimensions_source')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DelimitedText2')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "dimensions_source",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"container": "mbr-archive-zone"
+				"schema": [
+					{
+						"type": "String"
 					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"quoteChar": "\""
-				},
-				"schema": []
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					}
+				]
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/dimensions_source')]"
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage1')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/ds_fact_drivers')]",
+			"name": "[concat(parameters('factoryName'), '/AzureSqlTable1')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "ocean_db_nonencrypted",
+					"referenceName": "AzureSqlDatabase1",
 					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"FactName": {
-						"type": "string"
-					}
-				},
-				"folder": {
-					"name": "03DWH"
 				},
 				"annotations": [],
 				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "FactDriversID",
-						"type": "bigint",
-						"precision": 19
-					},
-					{
-						"name": "ScenarioID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "OrganisationID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "KPIID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "CostCenterID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "MBRMonth",
-						"type": "nvarchar"
-					},
-					{
-						"name": "MonthYearID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "MonthYear",
-						"type": "date"
-					},
-					{
-						"name": "CurrencyCode",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Value",
-						"type": "float",
-						"precision": 15
-					},
-					{
-						"name": "ValueEUR",
-						"type": "float",
-						"precision": 15
-					},
-					{
-						"name": "ValueUSD",
-						"type": "float",
-						"precision": 15
-					},
-					{
-						"name": "ValueCAD",
-						"type": "float",
-						"precision": 15
-					},
-					{
-						"name": "ValueBRL",
-						"type": "float",
-						"precision": 15
-					},
-					{
-						"name": "CreatedOn",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "CreatedBy",
-						"type": "nvarchar"
-					},
-					{
-						"name": "ModifiedOn",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "ModifiedBy",
-						"type": "nvarchar"
-					}
-				],
+				"schema": [],
 				"typeProperties": {
-					"schema": "dwh",
-					"table": "FactDrivers"
+					"schema": "ods",
+					"table": "testParam"
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ocean_db_nonencrypted')]"
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/ds_fact_financials')]",
+			"name": "[concat(parameters('factoryName'), '/ds_mbr_parameters_new')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "ocean_db_nonencrypted",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"FactName": {
-						"type": "string"
-					}
-				},
-				"folder": {
-					"name": "03DWH"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "FactFinID",
-						"type": "bigint",
-						"precision": 19
-					},
-					{
-						"name": "ScenarioID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "NatureID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "OrganisationID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "CostCenterID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "MBRMonth",
-						"type": "nvarchar"
-					},
-					{
-						"name": "MonthYearID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "MonthYear",
-						"type": "date"
-					},
-					{
-						"name": "CurrencyCode",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Value",
-						"type": "float",
-						"precision": 15
-					},
-					{
-						"name": "ValueEUR",
-						"type": "float",
-						"precision": 15
-					},
-					{
-						"name": "ValueUSD",
-						"type": "float",
-						"precision": 15
-					},
-					{
-						"name": "ValueCAD",
-						"type": "float",
-						"precision": 15
-					},
-					{
-						"name": "ValueBRL",
-						"type": "float",
-						"precision": 15
-					},
-					{
-						"name": "CreatedOn",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "CreatedBy",
-						"type": "nvarchar"
-					},
-					{
-						"name": "ModifiedOn",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "ModifiedBy",
-						"type": "nvarchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "dwh",
-					"table": "FactFinancials"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ocean_db_nonencrypted')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ds_mbr_currency')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "dimensions_source",
+					"referenceName": "AzureBlobStorage1",
 					"type": "LinkedServiceReference"
 				},
 				"parameters": {
@@ -973,163 +739,9 @@
 						},
 						"container": "mbr-landing-zone"
 					},
-					"range": "F8:I16",
-					"firstRowAsHeader": false
+					"range": "B2:C4"
 				},
 				"schema": [
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
 					{
 						"type": "String"
 					},
@@ -1442,29 +1054,65 @@
 				]
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/dimensions_source')]"
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage1')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/ds_mbr_excel_files')]",
+			"name": "[concat(parameters('factoryName'), '/ds_ocean_new')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "ls_files_to_load",
+					"referenceName": "AzureSqlDatabase1",
 					"type": "LinkedServiceReference"
 				},
 				"parameters": {
-					"pFolder": {
-						"type": "string"
-					},
-					"pFileName": {
+					"vTableName": {
 						"type": "string"
 					}
 				},
+				"folder": {
+					"name": "01ODS"
+				},
 				"annotations": [],
-				"type": "Binary",
+				"type": "AzureSqlTable",
+				"schema": [],
 				"typeProperties": {
+					"schema": "ods",
+					"table": {
+						"value": "@dataset().vTableName",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_currency_new')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"pFileName": {
+						"type": "string"
+					},
+					"pFolderName": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "01ODS"
+				},
+				"annotations": [],
+				"type": "Excel",
+				"typeProperties": {
+					"sheetName": "MBR Parameters",
 					"location": {
 						"type": "AzureBlobStorageLocation",
 						"fileName": {
@@ -1472,15 +1120,17 @@
 							"type": "Expression"
 						},
 						"folderPath": {
-							"value": "@dataset().pFolder",
+							"value": "@dataset().pFolderName",
 							"type": "Expression"
 						},
 						"container": "mbr-landing-zone"
-					}
-				}
+					},
+					"range": "F8:I16"
+				},
+				"schema": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_files_to_load')]"
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage1')]"
 			]
 		}
 	]

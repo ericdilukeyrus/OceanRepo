@@ -26,6 +26,12 @@
 		"ocean_db_nonencrypted_connectionString": {
 			"value": ""
 		},
+		"AzureBlobStorage1_connectionString": {
+			"value": ""
+		},
+		"AzureSqlDatabase1_connectionString": {
+			"value": ""
+		},
 		"AzureKeyVaultOceanProject_properties_typeProperties_baseUrl": {
 			"value": "https://ocean-project.vault.azure.net/"
 		},

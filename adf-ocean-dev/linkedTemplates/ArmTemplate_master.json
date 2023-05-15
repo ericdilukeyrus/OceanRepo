@@ -35,6 +35,14 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'ocean_db_nonencrypted'"
 		},
+		"AzureBlobStorage1_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorage1'"
+		},
+		"AzureSqlDatabase1_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabase1'"
+		},
 		"AzureKeyVaultOceanProject_properties_typeProperties_baseUrl": {
 			"type": "string",
 			"defaultValue": "https://ocean-project.vault.azure.net/"
@@ -79,6 +87,12 @@
 					},
 					"ls_snowflake_ocean_ods_prod_connectionString": {
 						"value": "[parameters('ls_snowflake_ocean_ods_prod_connectionString')]"
+					},
+					"AzureBlobStorage1_connectionString": {
+						"value": "[parameters('AzureBlobStorage1_connectionString')]"
+					},
+					"AzureSqlDatabase1_connectionString": {
+						"value": "[parameters('AzureSqlDatabase1_connectionString')]"
 					},
 					"dimensions_source_connectionString": {
 						"value": "[parameters('dimensions_source_connectionString')]"
