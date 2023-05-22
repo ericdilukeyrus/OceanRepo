@@ -1,0 +1,41 @@
+{
+	"name": "pl_00_start_process_az_sf",
+	"properties": {
+		"activities": [
+			{
+				"name": "pl_00_start_process",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_00_start_process",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "pl_00_start_process_snowflake_prod",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "pl_00_start_process",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_00_start_process_snowflake_prod",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			}
+		],
+		"annotations": []
+	}
+}
