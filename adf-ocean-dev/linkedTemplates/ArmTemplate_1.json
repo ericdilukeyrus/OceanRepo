@@ -6,6 +6,10 @@
 			"type": "string",
 			"metadata": "Data Factory name",
 			"defaultValue": "adf-ocean-dev"
+		},
+		"ocean_db_nonencrypted_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'ocean_db_nonencrypted'"
 		}
 	},
 	"variables": {
@@ -13,41 +17,19 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/ds_mbr_kpi_pyramid_new')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
+			"name": "[concat(parameters('factoryName'), '/ocean_db_nonencrypted')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureBlobStorage1",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"pFileName": {
-						"type": "string"
-					},
-					"pFolderName": {
-						"type": "string"
-					}
-				},
 				"annotations": [],
-				"type": "Excel",
+				"type": "AzureSqlDatabase",
 				"typeProperties": {
-					"sheetName": "KPI Pyramid",
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"fileName": {
-							"value": "@dataset().pFileName",
-							"type": "Expression"
-						},
-						"folderPath": {
-							"value": "@dataset().pFolderName",
-							"type": "Expression"
-						},
-						"container": "mbr-landing-zone"
-					},
-					"range": "B79:N4000"
+					"connectionString": "[parameters('ocean_db_nonencrypted_connectionString')]"
 				},
-				"schema": []
+				"connectVia": {
+					"referenceName": "integrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
 			},
 			"dependsOn": []
 		},
@@ -265,7 +247,9 @@
 					"table": "FactDrivers"
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ocean_db_nonencrypted')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/ds_fact_financials')]",
@@ -380,7 +364,9 @@
 					"table": "FactFinancials"
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ocean_db_nonencrypted')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/ds_mbr_currency')]",
@@ -1987,7 +1973,9 @@
 					}
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ocean_db_nonencrypted')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/ds_raw_mbr_pnl_data')]",
